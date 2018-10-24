@@ -1,0 +1,9 @@
+# Ignore catkin_make build files
+/ros/build/
+/ros/devel/
+/ros/.settings/
+/ros/.cproject
+/ros/.project
+/ros/Debug/
+/ros/.pydevproject
+/ros/src/CMakeLists.txt
