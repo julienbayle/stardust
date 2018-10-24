@@ -32,7 +32,7 @@ void publish_cmd_vel_source() {
 	std_msgs::String cmd_vel_source;
 	cmd_vel_source.data = cmd_vel_sources[cmd_vel_sources_index];
 	cmd_vel_source_publisher.publish(cmd_vel_source);
-	ROS_INFO("Change cmd_vel source to %s", cmd_vel_source.data.c_str());
+	ROS_INFO("Teleop : Change cmd_vel source to %s", cmd_vel_source.data.c_str());
 }
 
 
@@ -85,7 +85,7 @@ int main(int argc, char **argv)
     nh.param("cmd_vel_sources", cmd_vel_sources, cmd_vel_sources);    
     nh.param("joy_topic", joy_topic_name, joy_topic_name);
     
-    cmd_vel_teleop_publisher = nh.advertise<geometry_msgs::Twist>("cmd_vel_teleop", 1);
+    cmd_vel_teleop_publisher = nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
     cmd_vel_source_publisher = nh.advertise<std_msgs::String>("cmd_vel_source", 1, true);
     
     ros::Subscriber joy_subscriber = nh.subscribe<sensor_msgs::Joy>(joy_topic_name, 1, joy_handler);

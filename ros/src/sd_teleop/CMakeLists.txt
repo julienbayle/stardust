@@ -41,8 +41,8 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(cmd_vel_selector_node 
-	src/cmd_vel_selector_node.cpp
+add_executable(twist_switcher_node 
+	src/twist_switcher_node.cpp
 )
 
 add_executable(teleop_node
@@ -51,7 +51,7 @@ add_executable(teleop_node
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(cmd_vel_selector_node 
+add_dependencies(twist_switcher_node 
 	${${PROJECT_NAME}_EXPORTED_TARGETS} 
 	${catkin_EXPORTED_TARGETS}
 )
@@ -62,7 +62,7 @@ add_dependencies(teleop_node
 )
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(cmd_vel_selector_node
+target_link_libraries(twist_switcher_node
   ${catkin_LIBRARIES}
 )
 
