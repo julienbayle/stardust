@@ -1,0 +1,13 @@
+<launch>
+
+	<machine name="localhost" address="localhost" env-loader="/opt/ros/kinetic/env.sh"/>
+
+	<include file="$(find sd_main)/launch/r1.launch">
+		<arg name="sim" value="true" /> 
+	</include>
+
+	<include file="$(find sd_main)/launch/r2.launch">
+		<arg name="sim" value="true" /> 
+	</include>
+	
+</launch>

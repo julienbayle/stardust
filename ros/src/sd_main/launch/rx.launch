@@ -1,0 +1,9 @@
+<launch>
+	<arg name="robot_ns" default="false"/>
+
+	<!-- Teleop  -->
+	<include file="$(find sd_teleop)/launch/sd_teleop.launch">
+		<arg name="robot_ns" value="$(arg robot_ns)" />
+	</include>
+	
+</launch>

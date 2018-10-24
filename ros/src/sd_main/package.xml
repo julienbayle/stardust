@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>sd_main</name>
+  <version>0.0.1</version>
+  <description>The sd_main package</description>
+
+  <maintainer email="jbayle@gmail.com">Julien BAYLE</maintainer>
+  <author email="jbayle@gmail.com">Julien BAYLE</author>
+  
+  <license>MIT</license>
+  <url type="website">https://github.com/julienbayle/stardust</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>sd_teleop</exec_depend>
+
+</package>

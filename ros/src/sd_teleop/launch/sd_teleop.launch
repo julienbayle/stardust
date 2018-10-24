@@ -1,0 +1,7 @@
+<launch>
+	<arg name="robot_ns"/>
+
+	<rosparam file="$(find sd_teleop)/config/sd_teleop.yaml" command="load"/>
+	<node name="joy" pkg="joy" type="joy_node" ns="$(arg robot_ns)"/>
+	<node name="teleop" pkg="sd_teleop" type="teleop_node" ns="$(arg robot_ns)" output="screen"/>
+</launch>
