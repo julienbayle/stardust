@@ -4,9 +4,9 @@ L'équipe s'est formée en décembre 2017. C'était donc notre première partici
 
 Nous avons fini 75ème. Nous sommes très fier de notre résultat et remercions notre sponsor, l'[agence de communication Kelcom, basée à Nantes](http://www.kelcom.fr), pour les élégants [polos marqués](https://www.objets-publicitaires-pro.com/) offerts.
 
-Cette année=là, 133 équipes avaient réussi à homologuer leurs robots sur près de 200 équipes inscrites. 
+Cette année-là, 133 équipes avaient réussi à homologuer leurs robots sur près de 200 équipes inscrites. 
 
-<img src="https://github.com/julienbayle/stardust/raw/master/docs/images/march2018.jpg" width="400" />
+<img src="https://github.com/julienbayle/stardust/raw/master/docs/images/match2018.jpg" width="400" />
 
 Les robots étaient presque prêts à notre arrivée à la coupe. L'abeille et le panneau domotique étaient prêts. Autrement dit, nous n'étions pas tout à fait prêts pour la phase d'homologation. Sur le robot principal, chaque chose fonctionnait indépendamment. Il restait "juste" à tout faire fonctionner ensemble. Sur le robot secondaire, il fonctionnait à la télécommande mais pas encore en mode autonome.
 
