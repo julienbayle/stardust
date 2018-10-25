@@ -27,13 +27,13 @@ Nombre de points cible robot secondaire : 52 points
 Détails robot secondaire :
 
 * classe :
-** 2 palets rouges issus de la zone de démarrage : 10 points
-** 2 autres palets trouvés (petit distributeur, table, …)  : 10 points
+    * 2 palets rouges issus de la zone de démarrage : 10 points
+    * 2 autres palets trouvés (petit distributeur, table, …)  : 10 points
 
 * pèse :
-** 1 palet vert issu de la zone de démarrage : 8 points
-** 1 palet rouge issu de la pente : 4 points
-** 1 palet vert issu du petit distributeur : 8 points
+    * 1 palet vert issu de la zone de démarrage : 8 points
+    * 1 palet rouge issu de la pente : 4 points
+    * 1 palet vert issu du petit distributeur : 8 points
 
 * bonus évaluation de la performance : 12 points
 
