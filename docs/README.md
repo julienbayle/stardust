@@ -1,8 +1,4 @@
-# Stardust
-
 Stardust est une équipe de robotique basée en Loire Atlantique qui participe à la coupe de France de robotique (Eurobot) depuis 2018.
-
-<img src="https://github.com/julienbayle/stardust/raw/master/docs/images/team_logo_stardust.png" width="100" />
 
 ## Projet 2019
 
