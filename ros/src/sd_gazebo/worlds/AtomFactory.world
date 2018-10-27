@@ -1,0 +1,82 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+	<world name="world">
+
+		<scene>
+          <ambient rgba="0.4 0.4 0.4 1"/>
+          <background rgba="0.4 0.4 0.4 1"/>
+          <shadows enabled="true"/>
+        </scene>
+
+		<physics type="ode">
+			<gravity>0 0 -9.81</gravity>
+			
+			<!-- 1 means realistic -->
+			<real_time_factor>1</real_time_factor>
+
+			<!-- specifies the time duration in seconds of each physics update step -->
+			<max_step_size>0.001</max_step_size>
+
+			<!-- specifies in Hz the number of physics updates that will be attempted per second -->
+			<real_time_update_rate>1000</real_time_update_rate>
+			
+			<!-- Inspiration : https://github.com/JenniferBuehler/gazebo-pkgs/wiki/Gazebo-physics-settings -->
+			<ode>
+				<solver>
+					<type>quick</type>
+					<iters>50</iters>
+					<sor>1.3</sor>
+				</solver>
+				<constraints>
+					<!-- Global constraint force mixing parameter (1e-10 to 1). 
+					Recommended : 10e-9 -->
+					<cfm>0.000000001</cfm>
+					<!-- Global error reduction parameter (0 to 1). 
+					Recommended : 0.1 to 0.8 -->
+					<erp>0.2</erp>
+					<contact_max_correcting_vel>100.0</contact_max_correcting_vel>
+					<contact_surface_layer>0.001</contact_surface_layer>
+				</constraints>
+			</ode>
+		</physics>
+	
+	   <model name="table">
+		    <static>true</static>
+		    <link name="table">
+		      <collision name="collision">
+		        <geometry>
+		          <!-- IGES to STL with FreeCAD -->
+		          <mesh filename="package://sd_gazebo/meshes/AtomFactory.stl" scale="0.001 0.001 0.001"/>
+		        </geometry>
+		        <origin xyz="-1.022 -1.522 0.0" rpy="${pi/ 2} 0 ${pi/ 2}"/>
+		        
+		        <!-- Source : https://www.engineeringtoolbox.com/friction-coefficients-d_778.html -->
+		        <surface>
+		          <friction>
+		            <ode>
+		              <mu>0.4</mu>
+		              <mu2>0.4</mu2>
+		            </ode>
+		          </friction>
+		        </surface>
+
+		        <!-- Set intensity for an object so gazebo_ros_laser will notice -->
+		        <laser_retro>20</laser_retro>
+		      
+		      </collision>
+		      <visual name="visual">
+		        <geometry>
+		          <mesh filename="package://sd_gazebo/meshes/AtomFactory.stl" scale="0.001 0.001 0.001"/>
+		        </geometry>
+		        <origin xyz="-1.022 -1.522 0.0" rpy="${pi/ 2} 0 ${pi/ 2}"/>
+		      </visual>
+		    </link>
+		</model>
+
+	    <!-- Global light source : Sun-->
+	    <include>
+	      <uri>model://sun</uri>
+	    </include>
+
+	</world>
+</sdf>
