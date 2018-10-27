@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+	<param name="robot_description"
+	  command="$(find xacro)/xacro --inorder '$(find sd_description)/urdf/r1.xacro'"/>
+</launch>

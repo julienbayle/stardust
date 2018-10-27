@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+<robot name="r2" xmlns:xacro="http://ros.org/wiki/xacro">
+    <xacro:property name="body_length" value="0.150" />
+    <xacro:property name="body_width" value="0.260" />
+    <xacro:property name="body_height" value="0.424" />
+    <xacro:property name="body_ground_spacing" value="0.01" />
+
+    <xacro:property name="wheel_length" value="0.014" />
+    <xacro:property name="wheel_radius" value="0.0375" />
+    <xacro:property name="wheel_separation" value="0.195" />
+    <xacro:property name="wheel_effort_max" value="10000" />
+    <xacro:property name="wheel_velocity_max" value="10000" />
+    <xacro:property name="wheel_x" value="0.030" />
+    
+    <xacro:property name="imu_size" value="0.050"/>
+    <xacro:property name="imu_x" value="0.0" />
+    <xacro:property name="imu_y" value="0.0" />
+    <xacro:property name="imu_z" value="0.170" />
+    
+    <xacro:property name="lidar_height" value="0.037"/>
+    <xacro:property name="lidar_width" value="0.100" />
+    <xacro:property name="lidar_x" value="0.0" />
+    <xacro:property name="lidar_y" value="0.0" />
+    <xacro:property name="lidar_z" value="0.040" />
+	
+    <!-- Import all Gazebo-customization elements, including Gazebo colors -->
+  	<xacro:include filename="$(find sd_description)/urdf/r2.gazebo" />
+
+    <xacro:include filename="$(find sd_description)/urdf/materials.xacro" />
+
+    <link name="base_link"/>
+
+    <link name="body_link">
+        <visual>
+            <geometry>
+				<mesh filename="package://sd_description/meshes/r2_base.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+            <material name="red"/>
+        </visual>
+        <collision>
+            <geometry>
+				<mesh filename="package://sd_description/meshes/r2_base.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+        </collision>
+        <inertial>
+			<mass value="4.2"/>
+			<inertia ixx="3e-2" ixy="0.0" ixz="0.0" iyy="3e-2" iyz="0.0" izz="4e-2"/>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+        </inertial>
+    </link>
+
+    <joint name="body_to_base" type="fixed">
+        <parent link="base_link"/>
+        <child link="body_link"/>
+        <origin xyz="0 0 ${- wheel_radius + body_ground_spacing}" rpy="0 0 0"/>
+    </joint>
+
+    <xacro:macro name="wheel_macro" params="prefix reflect">
+        <link name="${prefix}_wheel_link">
+            <visual>
+                <geometry>
+                    <cylinder length="${wheel_length}" radius="${wheel_radius}"/>
+                </geometry>
+                <material name="black"/>
+            </visual>
+            <collision>
+                <geometry>
+                    <cylinder length="${wheel_length}" radius="${wheel_radius}"/>
+                </geometry>
+            </collision>
+	        <inertial>
+				<mass value="0.3"/>
+				<inertia ixx="2e-4" ixy="0.0" ixz="0.0" iyy="2e-4" iyz="0.0" izz="2.5e-4"/>
+	        </inertial>
+        </link>
+
+        <joint name="${prefix}_wheel_to_base" type="continuous">
+            <parent link="base_link"/>
+            <child link="${prefix}_wheel_link"/>
+            <origin xyz="${wheel_x} ${wheel_separation / 2 * reflect} 0" rpy="${-pi / 2} 0 0"/>
+            <limit effort="${wheel_effort_max}" velocity="${wheel_velocity_max}"/>
+            <axis xyz="0 0 1"/>
+        </joint>
+	    
+		<transmission name="${prefix}_wheel_to_base_transmission">
+		    <type>transmission_interface/SimpleTransmission</type>
+		    <joint name="${prefix}_wheel_to_base">
+				<hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+		    </joint>
+		    <actuator name="${prefix}_wheel_to_base_actuator">
+				<hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+				<mechanicalReduction>7</mechanicalReduction>
+		    </actuator>
+		</transmission>
+    </xacro:macro>
+
+    <wheel_macro prefix="left" reflect="1"/>
+    <wheel_macro prefix="right" reflect="-1"/>
+    
+    <!-- Sensors -->
+    <link name="imu_link">
+        <visual>
+            <geometry>
+                <box size="${imu_size} ${imu_size} ${imu_size}"/>
+            </geometry>
+            <material name="blue"/>
+        </visual>
+        <!-- <inertial>
+			<mass value="0.1"/>
+			<inertia ixx="0.1e-3" ixy="0.0" ixz="0.0" iyy="0.1e-3" iyz="0.0" izz="0.1e-3"/>
+        </inertial> -->
+    </link>
+
+    <joint name="imu_to_body" type="fixed">
+        <parent link="body_link"/>
+        <child link="imu_link"/>
+        <origin xyz="${imu_x} ${imu_y} ${imu_z}" rpy="0 0 0"/>
+    </joint>
+    
+    <link name="lidar_link">
+        <visual>
+            <geometry>
+                <box size="${lidar_width} ${lidar_width} ${lidar_height}"/>
+            </geometry>
+            <material name="blue"/>
+        </visual>
+        <!-- <inertial>
+			<mass value="0.3"/>
+			<inertia ixx="0.5e-3" ixy="0.0" ixz="0.0" iyy="0.5e-3" iyz="0.0" izz="0.5e-3"/>
+        </inertial> -->
+    </link>
+
+    <joint name="lidar_to_body" type="fixed">
+        <parent link="body_link"/>
+        <child link="lidar_link"/>
+        <origin xyz="${lidar_x} ${lidar_y} ${lidar_z}" rpy="0 0 0"/>
+    </joint>
+</robot>
