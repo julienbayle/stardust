@@ -1,9 +1,14 @@
 <launch>
-	<arg name="robot_ns" default="false"/>
+	<arg name="sim" default="false"/>
+	
+	<!-- Combine joint values -->
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
+			respawn="false" output="screen">
+	</node>
 
 	<!-- Teleop  -->
 	<include file="$(find sd_teleop)/launch/sd_teleop.launch">
-		<arg name="robot_ns" value="$(arg robot_ns)" />
+		<arg name="sim" value="$(arg sim)"/>
 	</include>
 	
 </launch>
