@@ -15,10 +15,6 @@ r1:
     # Seconds
     coalesce_interval: 0.0
 
-  cmd_vel_switcher:
-    source_topic: /r1/teleop/cmd_vel_source
-    output_topic: /r1/cmd_vel
-
 r2:
   teleop:
     max_linear_x_velocity: 0.2
@@ -35,7 +31,3 @@ r2:
     autorepeat_rate: 20.0
     # Seconds
     coalesce_interval: 0.0
-
-  cmd_vel_switcher:
-    source_topic: /r2/teleop/cmd_vel_source
-    output_topic: /r2/cmd_vel

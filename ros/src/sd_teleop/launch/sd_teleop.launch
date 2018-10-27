@@ -1,8 +1,8 @@
 <launch>
-	<arg name="robot_ns"/>
+	<arg name="sim" default="false"/>
 
 	<rosparam file="$(find sd_teleop)/config/sd_teleop.yaml" command="load"/>
-	<node name="joy" pkg="joy" type="joy_node" ns="$(arg robot_ns)"/>
-	<node name="teleop" pkg="sd_teleop" type="teleop_node" ns="$(arg robot_ns)" output="screen"/>
-	<node name="cmd_vel_switcher" pkg="sd_teleop" type="twist_switcher_node" ns="$(arg robot_ns)" output="screen"/>
+
+	<node name="joy" pkg="joy" type="joy_node" unless="$(arg sim)"/>
+	<node name="teleop" pkg="sd_teleop" type="teleop_node" output="screen"/>
 </launch>
