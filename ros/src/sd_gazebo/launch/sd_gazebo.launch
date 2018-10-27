@@ -1,0 +1,46 @@
+<launch>
+	<machine name="localhost" address="localhost" env-loader="/opt/ros/kinetic/env.sh"/>
+
+	<!-- these are the arguments you can pass this launch file, for example paused:=true -->
+	<arg name="paused" default="false"/>
+	<arg name="use_sim_time" default="true"/>
+	<arg name="gui" default="true"/>
+	<arg name="headless" default="false"/>
+	<arg name="debug" default="false"/>
+	
+	<!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+	<include file="$(find gazebo_ros)/launch/empty_world.launch">
+		<arg name="world_name" value="$(find sd_gazebo)/worlds/table_2019.world"/>
+		<arg name="debug" value="$(arg debug)" />
+		<arg name="gui" value="$(arg gui)" />
+		<arg name="paused" value="$(arg paused)"/>
+		<arg name="use_sim_time" value="$(arg use_sim_time)"/>
+		<arg name="headless" value="$(arg headless)"/>
+	</include>
+	
+	<!-- Field description  -->
+	<param name="table_2019"
+		command="$(find xacro)/xacro --inorder '$(find sd_gazebo)/urdf/table_2019.xacro'" />
+	
+	<!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
+	<node name="urdf_spawner_world" pkg="gazebo_ros" type="spawn_model" respawn="false"
+		args="-urdf -model table_2019 -param table_2019 -z 0.1"/>
+		
+	<!-- Robot main -->
+	<include file="$(find sd_main)/launch/sim.launch">
+	</include>
+
+	<!-- Run a python script to the send a service call to gazebo_ros to spawn robots -->
+	<node name="urdf_spawner_r1" pkg="gazebo_ros" type="spawn_model" respawn="false"
+		args="-urdf -model r1 -param robot_description -z 0.3 -y -0.5" ns="/r1"/>
+	<node name="urdf_spawner_r2" pkg="gazebo_ros" type="spawn_model" respawn="false"
+		args="-urdf -model r2 -param robot_description -z 0.3 -y 0.5" ns="/r2"/>
+	
+	
+	<!-- Gazebo mock -->
+	<!--<node name="sd_gazebo" pkg="sd_gazebo" type="sd_gazebo_node" ns="/sd">
+	</node>-->
+
+	<!-- Rviz   -->
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find sd_gazebo)/rviz/sd_gazebo.rviz"/>
+</launch>
