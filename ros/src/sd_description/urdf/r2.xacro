@@ -3,7 +3,7 @@
     <xacro:property name="body_length" value="0.150" />
     <xacro:property name="body_width" value="0.260" />
     <xacro:property name="body_height" value="0.424" />
-    <xacro:property name="body_ground_spacing" value="0.01" />
+    <xacro:property name="body_ground_spacing" value="0.005" />
 
     <xacro:property name="wheel_length" value="0.014" />
     <xacro:property name="wheel_radius" value="0.0375" />
