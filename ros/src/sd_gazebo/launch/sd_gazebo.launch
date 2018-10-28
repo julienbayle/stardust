@@ -1,4 +1,3 @@
-
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
 	<machine name="localhost" address="localhost" env-loader="/opt/ros/kinetic/env.sh"/>
@@ -28,10 +27,6 @@
 	<node name="urdf_spawner_world" pkg="gazebo_ros" type="spawn_model" respawn="false"
 		args="-urdf -model table_2019 -param table_2019 -z 0.1"/>
 		
-	<!-- Robot main -->
-	<include file="$(find sd_main)/launch/sim.launch">
-	</include>
-
 	<!-- Run a python script to the send a service call to gazebo_ros to spawn robots -->
 	<node name="urdf_spawner_r1" pkg="gazebo_ros" type="spawn_model" respawn="false"
 		args="-urdf -model r1 -param robot_description -z 0.3 -y -0.5" ns="/r1"/>
