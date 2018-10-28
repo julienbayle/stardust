@@ -8,8 +8,6 @@ project(sd_gazebo)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  geometry_msgs
-  roscpp
 )
 
 ## System dependencies are found with CMake's conventions
@@ -105,8 +103,6 @@ catkin_package(
 #  LIBRARIES sd_gazebo
 #  CATKIN_DEPENDS geometry_msgs roscpp
 #  DEPENDS system_lib
-	roscpp
-	geometry_msgs
 )
 
 ###########

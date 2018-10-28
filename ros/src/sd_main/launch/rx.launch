@@ -11,10 +11,4 @@
 	<include file="$(find sd_teleop)/launch/sd_teleop.launch">
 		<arg name="sim" value="$(arg sim)"/>
 	</include>
-
-	<!-- Description  -->
-	<include file="$(find sd_description)/launch/sd_description.launch">
-		<arg name="robot_ns" value="$(arg robot_ns)" />
-	</include>
-	
 </launch>
