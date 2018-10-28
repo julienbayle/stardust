@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<robot name="table_2019" xmlns:xacro="http://ros.org/wiki/xacro">
+	<xacro:property name="world_laser_retro" value="10.0"/>
+
+    <xacro:property name="beacon_width" value="0.1" />
+    <xacro:property name="beacon_height" value="0.5" />
+	<xacro:property name="beacon_laser_retro" value="100.0"/>
+	<xacro:property name="beacon_side" value="1"/>
+
+    <link name="world"/>
+
+	<link name="table_2019">
+		<visual>
+			<geometry>
+				<mesh filename="package://sd_gazebo/meshes/table_2019.stl" scale="0.001 0.001 0.001"/>
+			</geometry>
+    		<origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="package://sd_gazebo/meshes/table_2019.stl" scale="0.001 0.001 0.001"/>
+			</geometry>
+    		<origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+    		<laser_retro>${world_laser_retro}</laser_retro>
+		</collision>
+        <inertial>
+			<mass value="100.0"/>
+			<inertia ixx="1" ixy="0.0" ixz="0.0" iyy="1" iyz="0.0" izz="1"/>
+        </inertial>
+	</link>
+
+	<gazebo reference="table_2019">
+		<mu1>Inf</mu1>
+		<mu2>Inf</mu2>
+		<material>Gazebo/DarkGrey</material>
+		<static>true</static>
+		<visual>
+    		<laser_retro>${world_laser_retro}</laser_retro>
+		</visual>
+		<collision>
+    		<laser_retro>${world_laser_retro}</laser_retro>
+		</collision>
+	</gazebo>
+    
+    <joint name="world_to_table_2019" type="fixed">
+	    <parent link="world"/>
+	    <child link="table_2019"/>
+    	<origin xyz="0 0 0" rpy="0 0 0"/>
+	</joint>
+	
+	<xacro:macro name="beacon" params="beacon_name beacon_x beacon_y">
+		<link name="${beacon_name}">
+			<visual>
+	            <geometry>
+	                <box size="${beacon_width} ${beacon_width} ${beacon_height}"/>
+	            </geometry>
+	    		<origin xyz="0 0 ${beacon_height/2}" rpy="0 0 0"/>
+	            <material name="white"/>
+			</visual>
+			<collision>
+	            <geometry>
+	                <box size="${beacon_width} ${beacon_width} ${beacon_height}"/>
+	            </geometry>
+	    		<origin xyz="0 0 ${beacon_height/2}" rpy="0 0 0"/>
+			</collision>
+	        <inertial>
+				<mass value="0.3"/>
+				<inertia ixx="2e-4" ixy="0.0" ixz="0.0" iyy="2e-4" iyz="0.0" izz="2.5e-4"/>
+	        </inertial>
+        </link>
+        
+        <joint name="world_to_${beacon_name}" type="fixed">
+		    <parent link="world"/>
+		    <child link="${beacon_name}"/>
+	    	<origin xyz="${beacon_x} ${beacon_y} 0.022" rpy="0 0 0"/>
+		</joint>
+		
+		<gazebo reference="${beacon_name}">
+			<material>Gazebo/White</material>
+			<visual>
+	    		<laser_retro>${beacon_laser_retro}</laser_retro>
+			</visual>
+			<collision>
+	    		<laser_retro>${beacon_laser_retro}</laser_retro>
+			</collision>
+		</gazebo>
+	</xacro:macro>
+	
+	<beacon beacon_name="beacon_1" beacon_x="-0.95" beacon_y="${beacon_side * -1.594}"/>
+	<beacon beacon_name="beacon_2" beacon_x="0.0" beacon_y="${beacon_side * 1.594}"/>
+	<beacon beacon_name="beacon_3" beacon_x="0.95" beacon_y="${beacon_side * -1.594}"/>
+</robot>

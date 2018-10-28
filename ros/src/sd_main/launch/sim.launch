@@ -13,4 +13,7 @@
 		<arg name="sim" value="true" /> 
 	</include>
 	
+	<!-- Launch joy node at root namespace and relay it to one of the robots -->
+	<node name="joy" pkg="joy" type="joy_node"/>
+	<node name="joy_switcher" pkg="sd_teleop" type="joy_switcher_node" output="screen"/>
 </launch>

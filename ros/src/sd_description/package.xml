@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>sd_description</name>
+
   <version>0.0.1</version>
   <description>Robots URDF</description>
 
-  <maintainer email="jbayle@gmail.com">Julien BAYLE</maintainer>
+  <maintainer email="cbx@todo.todo">cbx</maintainer>
+  <author email="cbx@todo.todo">cbx</author>
   <author email="jbayle@gmail.com">Julien BAYLE</author>
   
   <license>MIT</license>
   <url type="website">https://github.com/julienbayle/stardust</url>
-
   <buildtool_depend>catkin</buildtool_depend>
-
 </package>
