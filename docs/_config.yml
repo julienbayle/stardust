@@ -1,1 +1,8 @@
 theme: jekyll-theme-minimal
+
+title: Stardust
+description: Robotique amateur sur Nantes
+
+logo: https://github.com/julienbayle/stardust/raw/master/docs/images/team_logo_stardust.png
+show_downloads: false
+google_analytics: UA-40705361-5

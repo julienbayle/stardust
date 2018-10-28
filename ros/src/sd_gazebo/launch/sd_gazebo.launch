@@ -1,3 +1,5 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
 <launch>
 	<machine name="localhost" address="localhost" env-loader="/opt/ros/kinetic/env.sh"/>
 
@@ -43,4 +45,5 @@
 
 	<!-- Rviz   -->
 	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find sd_gazebo)/rviz/sd_gazebo.rviz"/>
+
 </launch>

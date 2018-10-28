@@ -7,3 +7,4 @@
 /ros/Debug/
 /ros/.pydevproject
 /ros/src/CMakeLists.txt
+/scripts/robot.id
