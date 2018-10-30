@@ -22,9 +22,6 @@
     <xacro:property name="lidar_x" value="0.0" />
     <xacro:property name="lidar_y" value="0.0" />
     <xacro:property name="lidar_z" value="0.040" />
-	
-    <!-- Import all Gazebo-customization elements, including Gazebo colors -->
-  	<xacro:include filename="$(find sd_description)/urdf/r2.gazebo" />
 
     <xacro:include filename="$(find sd_description)/urdf/materials.xacro" />
 

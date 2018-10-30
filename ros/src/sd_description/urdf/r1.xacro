@@ -8,9 +8,6 @@
     <xacro:property name="wheel_radius" value="0.030" />
     <xacro:property name="wheel_effort_max" value="10000" />
     <xacro:property name="wheel_velocity_max" value="10000" />
-	
-    <!-- Import all Gazebo-customization elements, including Gazebo colors -->
-  	<xacro:include filename="$(find sd_description)/urdf/r1.gazebo" />
 
     <xacro:include filename="$(find sd_description)/urdf/materials.xacro" />
 

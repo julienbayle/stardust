@@ -5,7 +5,7 @@
 	<!-- these are the arguments you can pass this launch file, for example paused:=true -->
 	<arg name="paused" default="false"/>
 	<arg name="use_sim_time" default="true"/>
-	<arg name="gui" default="true"/>
+	<arg name="gui" default="false"/>
 	<arg name="headless" default="false"/>
 	<arg name="debug" default="false"/>
 	
@@ -28,8 +28,16 @@
 		args="-urdf -model table_2019 -param table_2019 -z 0.1"/>
 		
 	<!-- Run a python script to the send a service call to gazebo_ros to spawn robots -->
-	<node name="urdf_spawner_r1" pkg="gazebo_ros" type="spawn_model" respawn="false"
-		args="-urdf -model r1 -param robot_description -z 0.3 -y -0.5" ns="/r1"/>
-	<node name="urdf_spawner_r2" pkg="gazebo_ros" type="spawn_model" respawn="false"
-		args="-urdf -model r2 -param robot_description -z 0.3 -y 0.5" ns="/r2"/>
+	<group ns="r1">
+		<param name="robot_description_gazebo"
+			command="$(find xacro)/xacro --inorder '$(find sd_gazebo)/urdf/r1.gazebo.xacro'"/>
+		<node name="urdf_spawner_r1" pkg="gazebo_ros" type="spawn_model" respawn="false"
+			args="-urdf -model r1 -param robot_description_gazebo -z 0.3 -y -0.5"/>
+	</group>
+	<group ns="r2">
+		<param name="robot_description_gazebo"
+			command="$(find xacro)/xacro --inorder '$(find sd_gazebo)/urdf/r2.gazebo.xacro'"/>
+		<node name="urdf_spawner_r2" pkg="gazebo_ros" type="spawn_model" respawn="false"
+			args="-urdf -model r2 -param robot_description_gazebo -z 0.3 -y 0.5"/>
+	</group>
 </launch>
