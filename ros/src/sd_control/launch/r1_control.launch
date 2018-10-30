@@ -9,5 +9,5 @@
 		output="screen" args="
 			joint_state_controller
 			--timeout 2400
-	" if="$(arg sim)"/>
+	"/>
 </launch>

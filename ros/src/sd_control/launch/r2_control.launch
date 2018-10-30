@@ -10,5 +10,5 @@
 			joint_state_controller
 			mobile_base_controller
 			--timeout 2400
-	" if="$(arg sim)"/>
+	"/>
 </launch>

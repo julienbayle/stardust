@@ -32,13 +32,4 @@
 		args="-urdf -model r1 -param robot_description -z 0.3 -y -0.5" ns="/r1"/>
 	<node name="urdf_spawner_r2" pkg="gazebo_ros" type="spawn_model" respawn="false"
 		args="-urdf -model r2 -param robot_description -z 0.3 -y 0.5" ns="/r2"/>
-	
-	
-	<!-- Gazebo mock -->
-	<!--<node name="sd_gazebo" pkg="sd_gazebo" type="sd_gazebo_node" ns="/sd">
-	</node>-->
-
-	<!-- Rviz   -->
-	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find sd_gazebo)/rviz/sd_gazebo.rviz"/>
-
 </launch>

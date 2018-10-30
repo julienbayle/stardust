@@ -1,14 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
 	<arg name="sim" default="false"/>
-	
-	<!-- Combine joint values -->
-	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
-			respawn="false" output="screen">
-	</node>
+	<arg name="robot_ns" default=""/>
+
+	<group ns="$(arg robot_ns)">
+		<!-- Description  -->
+		<include file="$(find sd_description)/launch/$(arg robot_ns)_description.launch">
+		</include>
+
+		<!-- Control  -->
+		<include file="$(find sd_control)/launch/$(arg robot_ns)_control.launch">
+			<arg name="sim" value="$(arg sim)"/>
+		</include>
+		
+		<!-- Combine joint values -->
+		<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
+				respawn="false" output="screen">
+		</node>
+
+		<!-- Show in Rviz   -->
+		<node name="rviz" pkg="rviz" type="rviz" args="-d $(find sd_description)/rviz/$(arg robot_ns).rviz" if="$(arg sim)"/>
+	</group>
 
 	<!-- Teleop  -->
 	<include file="$(find sd_teleop)/launch/sd_teleop.launch">
 		<arg name="sim" value="$(arg sim)"/>
+		<arg name="robot_ns" value="$(arg robot_ns)"/>
 	</include>
 </launch>
