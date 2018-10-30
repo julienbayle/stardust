@@ -5,7 +5,8 @@
 
 	<group ns="$(arg robot_ns)">
 		<!-- Description  -->
-		<include file="$(find sd_description)/launch/$(arg robot_ns)_description.launch">
+		<include file="$(find sd_description)/launch/sd_description.launch">
+			<arg name="robot_ns" value="$(arg robot_ns)"/>
 		</include>
 
 		<!-- Control  -->
