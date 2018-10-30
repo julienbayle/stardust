@@ -7,7 +7,6 @@ Panels:
         - /Global Options1
         - /Status1
         - /RobotModel1
-        - /TF1
       Splitter Ratio: 0.5
     Tree Height: 595
   - Class: rviz/Selection
@@ -86,7 +85,7 @@ Visualization Manager:
           Value: true
       Name: RobotModel
       Robot Description: robot_description
-      TF Prefix: ""
+      TF Prefix: r1
       Update Interval: 0
       Value: true
       Visual Enabled: true
@@ -95,15 +94,27 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        base_link:
+        r1/base_link:
           Value: true
-        body_link:
+        r1/body_link:
           Value: true
-        wheel_1_link:
+        r1/wheel_1_link:
           Value: true
-        wheel_2_link:
+        r1/wheel_2_link:
           Value: true
-        wheel_3_link:
+        r1/wheel_3_link:
+          Value: true
+        r2/base_link:
+          Value: true
+        r2/body_link:
+          Value: true
+        r2/imu_link:
+          Value: true
+        r2/left_wheel_link:
+          Value: true
+        r2/lidar_link:
+          Value: true
+        r2/right_wheel_link:
           Value: true
       Marker Scale: 0.5
       Name: TF
@@ -111,14 +122,14 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        base_link:
-          body_link:
+        r1/base_link:
+          r1/body_link:
             {}
-          wheel_1_link:
+          r1/wheel_1_link:
             {}
-          wheel_2_link:
+          r1/wheel_2_link:
             {}
-          wheel_3_link:
+          r1/wheel_3_link:
             {}
       Update Interval: 0
       Value: true
@@ -126,7 +137,7 @@ Visualization Manager:
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: base_link
+    Fixed Frame: r1/base_link
     Frame Rate: 30
   Name: root
   Tools:
@@ -178,5 +189,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1216
-  X: 65
-  Y: 24
+  X: 592
+  Y: 45
