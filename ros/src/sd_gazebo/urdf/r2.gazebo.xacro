@@ -80,6 +80,12 @@
 		<mu2>50</mu2>
 		<material>Gazebo/Black</material>
 	</gazebo>
+	
+	<gazebo reference="free_wheel_link">
+		<mu1>0.0</mu1>
+		<mu2>0.0</mu2>
+		<material>Gazebo/Black</material>
+	</gazebo>
 
 	<gazebo>
 		<!--static>true</static-->

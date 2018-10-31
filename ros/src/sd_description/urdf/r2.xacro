@@ -3,7 +3,7 @@
     <xacro:property name="body_length" value="0.150" />
     <xacro:property name="body_width" value="0.260" />
     <xacro:property name="body_height" value="0.424" />
-    <xacro:property name="body_ground_spacing" value="0.005" />
+    <xacro:property name="body_ground_spacing" value="0.010" />
 
     <xacro:property name="wheel_length" value="0.014" />
     <xacro:property name="wheel_radius" value="0.0375" />
@@ -11,6 +11,8 @@
     <xacro:property name="wheel_effort_max" value="10000" />
     <xacro:property name="wheel_velocity_max" value="10000" />
     <xacro:property name="wheel_x" value="0.030" />
+
+    <xacro:property name="free_wheel_x" value="${-body_length/2 + body_ground_spacing}" />
     
     <xacro:property name="imu_size" value="0.050"/>
     <xacro:property name="imu_x" value="0.0" />
@@ -93,6 +95,30 @@
 
     <wheel_macro prefix="left" reflect="1"/>
     <wheel_macro prefix="right" reflect="-1"/>
+
+    <link name="free_wheel_link">
+        <visual>
+            <geometry>
+                <sphere radius="${body_ground_spacing}"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+        <collision>
+            <geometry>
+                <sphere radius="${body_ground_spacing}"/>
+            </geometry>
+        </collision>
+        <inertial>
+			<mass value="0.001"/>
+			<inertia ixx="1e-5" ixy="0.0" ixz="0.0" iyy="1e-5" iyz="0.0" izz="1e-5"/>
+        </inertial>
+    </link>
+
+    <joint name="free_wheel_to_body" type="fixed">
+        <parent link="body_link"/>
+        <child link="free_wheel_link"/>
+        <origin xyz="${free_wheel_x} 0 0" rpy="0 0 0"/>
+    </joint>
     
     <!-- Sensors -->
     <link name="imu_link">
