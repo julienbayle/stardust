@@ -45,7 +45,7 @@ Déroulement type d'un match (robot principal) :
 2. Le robot indique qu’il attend que l’on insère le cordon de démarrage
 3. On insère le cordon de démarrage
 4. Le robot se positionne automatiquement, détecte automatiquement son camp et confirme qu’il est prêt
-5. Cordon de démarrage tiré, c’est parti !
+5. Cordon de démarrage tiré (ou liébration de l'arrêt d'urgence si robot branché au secteur), c’est parti !
 6. 0 à 20 secondes : Le robot va cherche 3 palets sur le distributeur (l'expérience se lance)
 7. 20 à 30 secondes : Le robot va face à l'accélérateur
 8. 30 à 45 secondes : Le robot met 4 palet dans l'accélérateur
@@ -85,7 +85,7 @@ En permanence, les robots estiment leur position sur l’espace de jeu à l’ai
 
 En permanence, les données du laser et des ultrasons sont traitées afin de détecter les obstacles dynamiques (autres robots). Ces données “obstacles” sont agrégées dans une carte en s’appuyant sur la position du robot recalée.
 
-Une action de jeu permet de demander au robot de se rendre en position X,Y avec l’orientation theta avec une marge d’erreur configurable. Le robot génère des trajectoires basées sur la carte du plateau et tenant compte du repérage des obstacles dynamiques.
+Une action de jeu permet de demander au robot de se rendre en position X,Y avec l’orientation theta avec une marge d’erreur configurable pouvant atteindre à 3 cm et 10°. Le robot génère des trajectoires basées sur la carte du plateau et tenant compte du repérage des obstacles dynamiques.
 
 ### Etre en capacité d’afficher son score et son état
 
@@ -99,9 +99,9 @@ Les robots sont équipés d'un réflecteur permettant de lancer l'expérience lo
 
 La position initiale des robots est telle que l'expérience capte les réflecteurs du robot principal et si celui-ci est absent, le réflecteur du robot secondaire.
 
-### Avoir une autonomie de 4 matchs et 2h d’attente allumé
+### Avoir une autonomie de 2 matchs et 1h d’attente allumé
 
-L'autonomie du robot est suffisante pour réaliser l’équivalent de 4 matchs entrecoupés d'une pause de 30 minutes.
+L'autonomie du robot est suffisante pour réaliser l’équivalent de 2 matchs entrecoupés d'une pause de 30 minutes.
 
 ### Etre en capacité de se positionner automatiquement et détecter son camp
 
@@ -177,19 +177,19 @@ Possibilité de recharger les batteries du robot sans avoir à le démonter
 
 #### Etre en capacité de saisir des palets dans un distributeur
 
-Le robot est capable de prendre des palets stockés sur un distributeur lorsque celui ci est placé devant le distributeur
+Le robot est capable de prendre des palets stockés sur un distributeur lorsque celui ci est placé devant le distributeur à plus ou plus 5 cm et 15° de la position idéale.
 
 #### Etre capable de pousser un palet dans l'accélérateur
 
-Le robot peut pousser un palet présent sur la pente de l'accélérateur, qu'il transporte ou non des palets.
+Le robot peut pousser un palet présent sur la pente de l'accélérateur, qu'il transporte ou non des palets lorsque celui ci est placé devant le distributeur à plus ou plus 5 cm et 15° de la position idéale.
 
 #### Etre capable de mettre des palets capturés dans l'accélérateur
 
-Le robot est capable de libérer des palets dans l'accélérateur et de les pousser dans la pente
+Le robot est capable de libérer des palets dans l'accélérateur et de les pousser dans la pente lorsque celui ci est placé devant le distributeur à plus ou plus 5 cm et 15° de la position idéale.
 
 #### Etre capable de sortir le palet goldenium
 
-Le robot est capable d'extraire le palet goldenium de son support sans pour autant être capable de le saisir.
+Le robot est capable d'extraire le palet goldenium de son support sans pour autant être capable de le saisir lorsque celui ci est placé devant le distributeur à plus ou plus 5 cm et 15° de la position idéale.
 
 ### Exigences spécifiques au robot secondaire
 
