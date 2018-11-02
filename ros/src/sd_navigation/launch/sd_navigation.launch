@@ -1,0 +1,13 @@
+<launch>
+	<rosparam file="$(find sd_navigation)/config/sd_navigation.yaml" command="load"/>
+	<arg name="robot_ns" default=""/>
+	
+	<node name="$(arg robot_ns)_map_server" pkg="map_server" type="map_server" args="$(find sd_navigation)/config/sd_map.yaml"/>
+	
+	<!--<node name="sd_move_base" pkg="move_base" type="move_base" respawn="false" output="screen">
+		<rosparam file="$(find sd_navigation)/config/sd_costmap_common_params.yaml" command="load" ns="global_costmap"/>
+	    <rosparam file="$(find sd_navigation)/config/sd_costmap_common_params.yaml" command="load" ns="local_costmap"/>
+	    
+	    <remap from="cmd_vel" to="auto_cmd_vel"/>
+	</node>-->
+</launch>
