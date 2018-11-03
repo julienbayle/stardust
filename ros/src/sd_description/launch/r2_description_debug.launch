@@ -1,20 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <launch>
 	<group ns="/r2">
 		<!-- Description  -->
-		<include file="$(find sd_description)/launch/r2_description.launch">
+		<include file="$(find sd_description)/launch/sd_description.launch">
+			<arg name="robot_ns" value="r2"/>
 		</include>
 		
 		<!-- send fake joint values -->
 		<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
 			<param name="use_gui" value="TRUE"/>
+			<param name="tf_prefix" value="r2"/>
 		</node>
 		
 		<!-- Combine joint values -->
 		<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
 				respawn="false" output="screen">
+			<param name="tf_prefix" value="r2"/>
 		</node>
 		
 		<!-- Show in Rviz   -->
-		<node name="rviz" pkg="rviz" type="rviz" args="-d $(find sd_description)/rviz/r2.rviz"/>
+		<node name="rviz" pkg="rviz" type="rviz" args="-d $(find sd_description)/rviz/r2_debug.rviz"/>
 	</group>
 </launch>

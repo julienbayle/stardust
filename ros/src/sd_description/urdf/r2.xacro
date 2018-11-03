@@ -24,6 +24,13 @@
     <xacro:property name="lidar_x" value="0.0" />
     <xacro:property name="lidar_y" value="0.0" />
     <xacro:property name="lidar_z" value="0.040" />
+    
+    <xacro:property name="sonar_length" value="0.02"/>
+    <xacro:property name="sonar_width" value="0.044"/>
+    <xacro:property name="sonar_height" value="0.02"/>
+    <xacro:property name="sonar_y" value="0.073"/>
+    <xacro:property name="sonar_z" value="0.120"/>
+
 
     <xacro:include filename="$(find sd_description)/urdf/materials.xacro" />
 
@@ -158,4 +165,24 @@
         <child link="lidar_link"/>
         <origin xyz="${lidar_x} ${lidar_y} ${lidar_z}" rpy="0 0 0"/>
     </joint>
+
+    <xacro:macro name="sonar_macro" params="name y">
+        <link name="sonar_${name}_link">
+            <visual>
+                <geometry>
+                    <mesh filename="package://sd_description/meshes/HC-SR04.stl" scale="0.001 0.001 0.001"/>
+                </geometry>
+                <material name="white"/>
+            </visual>
+        </link>
+        
+        <joint name="sonar_${name}_to_body" type="fixed">
+            <parent link="body_link"/>
+            <child link="sonar_${name}_link"/>
+            <origin xyz="${body_length / 2 - sonar_length / 2} ${y} ${sonar_z}" rpy="0 0 0"/>
+        </joint>
+    </xacro:macro>
+
+    <sonar_macro name="left" y="${sonar_y}"/>
+    <sonar_macro name="right" y="${-sonar_y}"/>
 </robot>
