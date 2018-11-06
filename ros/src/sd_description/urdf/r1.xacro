@@ -2,7 +2,7 @@
 <robot name="r1" xmlns:xacro="http://ros.org/wiki/xacro">
     <xacro:property name="body_height" value="0.130" />
     <xacro:property name="body_ground_spacing" value="0.01" />
-    <xacro:property name="body_wheels_radius" value="0.162" />
+    <xacro:property name="body_wheel_to_center" value="0.175" />
 
     <xacro:property name="wheel_length" value="0.034" />
     <xacro:property name="wheel_radius" value="0.030" />
@@ -16,13 +16,14 @@
     <link name="body_link">
         <visual>
             <geometry>
-				<mesh filename="package://sd_description/meshes/r1_base.stl" scale="0.001 0.001 0.001"/>
+				<mesh filename="package://sd_description/meshes/r1_base.stl" scale="0.000897 0.000897 0.000897"/>
             </geometry>
             <material name="red"/>
+            <origin xyz="0 0 0" rpy="0 0 ${pi}"/>
         </visual>
         <collision>
             <geometry>
-				<mesh filename="package://sd_description/meshes/r1_base.stl" scale="0.001 0.001 0.001"/>
+				<mesh filename="package://sd_description/meshes/r1_base.stl" scale="0.000897 0.000897 0.000897"/>
             </geometry>
         </collision>
         <inertial>
@@ -38,8 +39,8 @@
         <origin xyz="0 0 ${- wheel_radius + body_ground_spacing}" rpy="0 0 0"/>
     </joint>
 
-    <xacro:macro name="wheel_macro" params="num angle">
-        <link name="wheel_${num}_link">
+    <xacro:macro name="wheel_macro" params="name angle">
+        <link name="${name}_wheel_link">
             <visual>
                 <geometry>
 				    <mesh filename="package://sd_description/meshes/r1_wheel.stl" scale="0.001 0.001 0.001"/>
@@ -57,27 +58,27 @@
 	        </inertial>
         </link>
 
-        <joint name="wheel_${num}_to_base" type="continuous">
+        <joint name="${name}_wheel_to_base" type="continuous">
             <parent link="base_link"/>
-            <child link="wheel_${num}_link"/>
-            <origin xyz="${body_wheels_radius * cos(angle)} ${body_wheels_radius * sin(angle)} 0" rpy="${-pi / 2} 0 ${-pi / 2 + angle}"/>
+            <child link="${name}_wheel_link"/>
+            <origin xyz="${body_wheel_to_center * cos(angle)} ${body_wheel_to_center * sin(angle)} 0" rpy="${-pi / 2} 0 ${pi / 2 + angle}"/>
             <limit effort="${wheel_effort_max}" velocity="${wheel_velocity_max}"/>
             <axis xyz="0 0 1"/>
         </joint>
 	    
-		<transmission name="wheel_${num}_to_base_transmission">
+		<transmission name="${name}_wheel_to_base_transmission">
 		    <type>transmission_interface/SimpleTransmission</type>
-		    <joint name="wheel_${num}_to_base">
+		    <joint name="${name}_wheel_to_base">
 				<hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
 		    </joint>
-		    <actuator name="wheel_${num}_to_base_actuator">
+		    <actuator name="${name}_wheel_to_base_actuator">
 				<hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
-				<mechanicalReduction>7</mechanicalReduction>
+				<mechanicalReduction>1</mechanicalReduction>
 		    </actuator>
 		</transmission>
     </xacro:macro>
 
-    <wheel_macro num="1" angle="0"/>
-    <wheel_macro num="2" angle="${2 * pi / 3}"/>
-    <wheel_macro num="3" angle="${-2 * pi / 3}"/>
+    <wheel_macro name="left" angle="${pi / 3}"/>
+    <wheel_macro name="right" angle="${-1 * pi / 3}"/>
+    <wheel_macro name="back" angle="${pi}"/>
 </robot>

@@ -30,22 +30,22 @@
 		<material>Gazebo/Red</material>
 	</gazebo>
 
-	<gazebo reference="wheel_1_link">
-		<mu1>100</mu1>
-		<mu2>50</mu2>
+	<gazebo reference="left_wheel_link">
+		<mu1>0.5</mu1>
+		<mu2>0.01</mu2>
 		<material>Gazebo/Black</material>
 	</gazebo>
 
-	<gazebo reference="wheel_2_link">
-		<mu1>100</mu1>
-		<mu2>50</mu2>
+	<gazebo reference="right_wheel_link">
+		<mu1>0.5</mu1>
+		<mu2>0.01</mu2>
 		<material>Gazebo/Black</material>
 	</gazebo>
 
-	<gazebo reference="wheel_3_link">
-		<mu1>100</mu1>
-		<mu2>50</mu2>
-		<material>Gazebo/Black</material>
+	<gazebo reference="back_wheel_link">
+		<mu1>0.5</mu1>
+		<mu2>0.01</mu2>
+		<material>Gazebo/Yellow</material>
 	</gazebo>
 
 	<gazebo>

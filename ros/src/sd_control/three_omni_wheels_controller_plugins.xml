@@ -1,0 +1,9 @@
+<library path="lib/libsd_control">
+
+  <class name="sd_control/ThreeOmniWheelsDriveController" type="sd_control::ThreeOmniWheelsDriveController" base_class_type="controller_interface::ControllerBase">
+    <description>
+      The ThreeOmniWheelsDriveController tracks velocity commands. It expects 3 VelocityJointInterface type of hardware interfaces.
+    </description>
+  </class>
+
+</library>
