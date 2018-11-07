@@ -74,7 +74,7 @@ namespace sd_control {
     ROS_INFO_STREAM_NAMED(name_, "Publishing to tf is " << (enable_odom_tf_?"enabled":"disabled"));
 
     // Velocity and acceleration limits:
-    /*controller_nh.param("linear/x/has_velocity_limits"    , limiter_lin_x_.has_velocity_limits    , limiter_lin_x_.has_velocity_limits    );
+    controller_nh.param("linear/x/has_velocity_limits"    , limiter_lin_x_.has_velocity_limits    , limiter_lin_x_.has_velocity_limits    );
     controller_nh.param("linear/x/has_acceleration_limits", limiter_lin_x_.has_acceleration_limits, limiter_lin_x_.has_acceleration_limits);
     controller_nh.param("linear/x/has_jerk_limits"        , limiter_lin_x_.has_jerk_limits        , limiter_lin_x_.has_jerk_limits        );
     controller_nh.param("linear/x/max_velocity"           , limiter_lin_x_.max_velocity           ,  limiter_lin_x_.max_velocity          );
@@ -102,7 +102,7 @@ namespace sd_control {
     controller_nh.param("angular/z/max_acceleration"       , limiter_ang_.max_acceleration       ,  limiter_ang_.max_acceleration      );
     controller_nh.param("angular/z/min_acceleration"       , limiter_ang_.min_acceleration       , -limiter_ang_.max_acceleration      );
     controller_nh.param("angular/z/max_jerk"               , limiter_ang_.max_jerk               ,  limiter_ang_.max_jerk              );
-    controller_nh.param("angular/z/min_jerk"               , limiter_ang_.min_jerk               , -limiter_ang_.max_jerk              );*/
+    controller_nh.param("angular/z/min_jerk"               , limiter_ang_.min_jerk               , -limiter_ang_.max_jerk              );
 
     // Publish limited velocity:
     controller_nh.param("publish_cmd", publish_cmd_, publish_cmd_);
@@ -210,9 +210,9 @@ namespace sd_control {
     // Limit velocities and accelerations:
     const double cmd_dt(period.toSec());
 
-    //limiter_lin_x_.limit(curr_cmd.lin_x, last0_cmd_.lin_x, last1_cmd_.lin_x, cmd_dt);
-    //limiter_lin_y_.limit(curr_cmd.lin_y, last0_cmd_.lin_y, last1_cmd_.lin_y, cmd_dt);
-    //limiter_ang_.limit(curr_cmd.ang, last0_cmd_.ang, last1_cmd_.ang, cmd_dt);
+    limiter_lin_x_.limit(curr_cmd.lin_x, last0_cmd_.lin_x, last1_cmd_.lin_x, cmd_dt);
+    limiter_lin_y_.limit(curr_cmd.lin_y, last0_cmd_.lin_y, last1_cmd_.lin_y, cmd_dt);
+    limiter_ang_.limit(curr_cmd.ang, last0_cmd_.ang, last1_cmd_.ang, cmd_dt);
 
     last1_cmd_ = last0_cmd_;
     last0_cmd_ = curr_cmd;
@@ -227,15 +227,15 @@ namespace sd_control {
       cmd_vel_pub_->unlockAndPublish();
     }
 
-    // Compute wheels velocities:
+    // Compute wheels velocities (m/s) :
     const double vel_left  = -1.0 * SQRT3_2 * curr_cmd.lin_x + 0.5 * curr_cmd.lin_y + wheel_to_center_ * curr_cmd.ang;
     const double vel_right = SQRT3_2 * curr_cmd.lin_x + 0.5 * curr_cmd.lin_y + wheel_to_center_ * curr_cmd.ang;
     const double vel_back = -1.0 * curr_cmd.lin_y + wheel_to_center_ * curr_cmd.ang;
 
-    // Set wheels velocities:
-    left_wheel_joint_.setCommand(vel_left);
-    right_wheel_joint_.setCommand(vel_right);
-    back_wheel_joint_.setCommand(vel_back);
+    // Set wheels velocities (rad/s) :
+    left_wheel_joint_.setCommand(vel_left / wheel_radius_);
+    right_wheel_joint_.setCommand(vel_right / wheel_radius_);
+    back_wheel_joint_.setCommand(vel_back / wheel_radius_);
   }
 
   void ThreeOmniWheelsDriveController::starting(const ros::Time& time)

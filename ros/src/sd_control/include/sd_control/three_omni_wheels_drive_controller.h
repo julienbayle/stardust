@@ -13,7 +13,7 @@
 #include <realtime_tools/realtime_publisher.h>
 
 #include <sd_control/three_omni_wheels_odometry.h>
-#include <diff_drive_controller/speed_limiter.h>
+#include <sd_control/speed_limiter.h>
 
 namespace sd_control {
 
@@ -124,9 +124,9 @@ namespace sd_control {
     /// Speed limiters:
     Commands last1_cmd_;
     Commands last0_cmd_;
-    //diff_drive_controller::SpeedLimiter limiter_lin_x_;
-    //diff_drive_controller::SpeedLimiter limiter_lin_y_;
-    //diff_drive_controller::SpeedLimiter limiter_ang_;
+    SpeedLimiter limiter_lin_x_;
+    SpeedLimiter limiter_lin_y_;
+    SpeedLimiter limiter_ang_;
 
     /// Publish limited velocity:
     bool publish_cmd_;

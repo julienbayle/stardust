@@ -23,7 +23,7 @@ include_directories(SYSTEM
   ${catkin_INCLUDE_DIRS}
 )
 
-add_library(${PROJECT_NAME} src/three_omni_wheels_drive_controller.cpp src/three_omni_wheels_odometry.cpp)
+add_library(${PROJECT_NAME} src/three_omni_wheels_drive_controller.cpp src/three_omni_wheels_odometry.cpp src/speed_limiter.cpp)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 install(DIRECTORY include/${PROJECT_NAME}/
