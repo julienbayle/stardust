@@ -19,11 +19,6 @@
 				respawn="false" output="screen">
 			<param name="tf_prefix" value="$(arg robot_ns)"/>
 		</node>
-		
-		<!-- Navigation -->
-		<include file="$(find sd_navigation)/launch/sd_navigation.launch">
-			<arg name="robot_ns" value="$(arg robot_ns)"/>
-		</include>
 
 		<!-- Show in Rviz   -->
 		<node name="rviz" pkg="rviz" type="rviz" args="-d $(find sd_description)/rviz/$(arg robot_ns).rviz" if="$(arg sim)"/>

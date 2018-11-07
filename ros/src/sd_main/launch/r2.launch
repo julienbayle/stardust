@@ -4,6 +4,17 @@
 	
 	<machine name="localhost" address="localhost" env-loader="/opt/ros/kinetic/env.sh"/>
 
+	<group ns="/r2">
+		<include file="$(find sd_sensor)/launch/sd_sensor.launch">
+			<arg name="robot_ns" value="r2"/>
+		</include>
+		
+		<!-- Navigation -->
+		<include file="$(find sd_navigation)/launch/sd_navigation.launch">
+			<arg name="robot_ns" value="r2"/>
+		</include>
+	</group>
+
 	<!-- Common nodes between r1 and r2 robot  -->
 	<include file="$(find sd_main)/launch/rx.launch">
 		<arg name="sim" value="$(arg sim)"/>

@@ -1,0 +1,12 @@
+<launch>
+	<arg name="robot_ns" default=""/>
+
+	<node pkg="sd_sensor" type="$(arg robot_ns)_sensor_node" name="$(arg robot_ns)_sensor_node">
+	</node>
+
+	<node pkg="laser_filters" type="scan_to_scan_filter_chain" name="$(arg robot_ns)_laser_scan_filter" output="screen">
+		<rosparam file="$(find sd_sensor)/config/$(arg robot_ns)_laser_config.yaml" command="load"/>
+		<remap from="scan" to="laser/scan" />
+		<remap from="scan_filtered" to="laser/scan_filtered" />
+	</node>
+</launch>

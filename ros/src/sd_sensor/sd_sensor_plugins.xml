@@ -1,0 +1,10 @@
+<class_libraries>
+  <library path="lib/libsd_sensor_filters">
+    <class name="sd_sensor/LaserScanAngularBoundsListFilter" type="sd_sensor::LaserScanAngularBoundsListFilter" 
+	      base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+      <description>
+	 This is a filter that removes points in a laser scan outside of certain angular bounds list.
+      </description>
+    </class>
+  </library>
+</class_libraries>

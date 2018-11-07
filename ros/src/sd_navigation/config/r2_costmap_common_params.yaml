@@ -1,0 +1,32 @@
+obstacle_range: 2.5
+raytrace_range: 3.0
+footprint: [[-0.105, 0.115], [0.075, 0.115], [0.105, 0.045], [0.105, -0.045], [0.075, -0.115], [-0.105, -0.115]]
+#robot_radius: ir_of_robot
+inflation_radius: 0.005
+cost_scaling_factor: 10.0
+
+observation_sources: lidar sonar_left sonar_right
+
+lidar: {
+  sensor_frame: r2/lidar_link,
+  data_type: LaserScan,
+  topic: /r2/laser/scan,
+  clearing: true,
+  marking: true
+}
+
+sonar_left: { 
+  sensor_frame: r2/sonar_left_link,
+  data_type: PointCloud,
+  topic: /r2/sonar/left_point_cloud,
+  clearing: true,
+  marking: true
+}
+
+sonar_right: { 
+  sensor_frame: r2/sonar_right_link,
+  data_type: PointCloud,
+  topic: /r2/sonar/right_point_cloud,
+  clearing: true,
+  marking: true
+}
