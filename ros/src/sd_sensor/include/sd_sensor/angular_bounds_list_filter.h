@@ -70,7 +70,7 @@ namespace sd_sensor
         //loop through the scan and remove ranges at angles between lower_angle_ and upper_angle_
         for(unsigned int i = 0; i < input_scan.ranges.size(); ++i) {
           // Switch to next range
-          if (current_angle > ((double)current_list_value[1]) && current_list_index < current_list_value.size()) {
+          if (current_angle > ((double)current_list_value[1]) && current_list_index < angles_.size() - 1) {
             current_list_index++;
             current_list_value = angles_[current_list_index];
           }
