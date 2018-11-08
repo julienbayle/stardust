@@ -30,25 +30,36 @@
 		<material>Gazebo/Red</material>
 	</gazebo>
 
-	<gazebo reference="left_wheel_link">
-		<mu1>0.5</mu1>
-		<mu2>0.01</mu2>
-		<material>Gazebo/Black</material>
-	</gazebo>
+	<!-- One roller of the wheel -->
+    <xacro:macro name="roller_gazebo" params="parent name">
+        <gazebo reference="roller_${name}_${parent}_link">
+	        <mu1>0.5</mu1>
+			<mu2>0.5</mu2>
+			<material>Gazebo/White</material>
+		</gazebo>	
+    </xacro:macro>
 
-	<gazebo reference="right_wheel_link">
-		<mu1>0.5</mu1>
-		<mu2>0.01</mu2>
-		<material>Gazebo/Black</material>
-	</gazebo>
+    <!-- Roller loop -->
+    <xacro:macro name="roller_loop_gazebo" params="parent roller_i prefix">
+        <xacro:if value="${roller_i}">
+            <xacro:roller_gazebo parent="${parent}" name="${prefix}_${roller_i}" />
+            <xacro:roller_loop_gazebo parent="${parent}" roller_i="${roller_i - 1}" prefix="${prefix}"/>
+        </xacro:if>
+    </xacro:macro>
 
-	<gazebo reference="back_wheel_link">
-		<mu1>0.5</mu1>
-		<mu2>0.01</mu2>
-		<material>Gazebo/Yellow</material>
-	</gazebo>
+    <!-- Whell with rollers -->
+    <xacro:macro name="omni_wheel_gazebo" params="name">
+        <gazebo reference="${name}_wheel_link">
+	        <mu1>0.01</mu1>
+			<mu2>0.01</mu2>
+			<material>Gazebo/Black</material>
+		</gazebo>
+        <xacro:roller_loop_gazebo parent="${name}_wheel" prefix="ext" roller_i="${wheel_roller_number}" />
+        <xacro:roller_loop_gazebo parent="${name}_wheel" prefix="int" roller_i="${wheel_roller_number}" />
+    </xacro:macro>
 
-	<gazebo>
-		<!--static>true</static-->
-	</gazebo>
+    <omni_wheel_gazebo name="left" />
+    <omni_wheel_gazebo name="right" />
+    <omni_wheel_gazebo name="back" />
+
 </robot>
