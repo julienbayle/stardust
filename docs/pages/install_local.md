@@ -15,7 +15,10 @@ Chacun est libre de l'installer comme il le préfère et comme il le sent.
 
 Une machine virtuelle VMWare a été préparée pour le club (Niveau de compatibilité VMWARE 14).
 
-Elle intègre l'installation des VMWare tools, la bonne version d'Ubuntu, ROS et le projet (version à la date de création de la machine virtuelle)
+Elle intègre :
+ - Ubuntu (installation de base sans rien de spécifique)
+ - VMWare tools (version disponible dans les dépôts Ubuntu)
+ - ROS et le projet (version à la date de création de la machine virtuelle, installé selon la procédure décrite ci-après)
 
 Pour la récupérer, envoyer un email à Julien avant une réunion du club.
 
@@ -27,6 +30,8 @@ Password : stardust
 Le code est installé dans le /home de l'utilisateur.
 
 Si Gazebo crashe, désactiver l'accélération 3D dans les propriétés de la machine sous vmware. En effet, les derniers VMWare Tools ne peuvent pas être installés pour Ubuntu 16, ce qui pose souci sur certaines machines récentes.
+
+Vous pouvez également réaliser votre propre VM, rien de particulier à prendre en compte à part la version d'Ubuntu.
 
 ## Installation Ubuntu 16
 
