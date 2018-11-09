@@ -24,7 +24,7 @@ Stardust est une équipe de robotique basée en Loire Atlantique qui participe �
 
 [Conception mecanique des robots](https://github.com/julienbayle/stardust/tree/master/docs/mechanics)
 
-[Controle-commande des robots](pages/control.md)
+[Contrôle commande des robots](pages/control.md)
 
 <img src="https://github.com/julienbayle/stardust/raw/master/docs/images/secondary_3d.png" width="200" />
 
