@@ -1,3 +1,6 @@
+# Mac os
+.DS_Store
+
 # Ignore catkin_make build files
 /ros/build/
 /ros/devel/
