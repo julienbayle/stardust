@@ -14,66 +14,66 @@ Les équations suivantes résument les transformation de la vitesse de la base v
 
 Vitesse angulaire des roues <-> Vitesse linéaire au centre de la roue :
 
-\(
+\\(
 \begin{bmatrix}
-\dot{\theta_{left}} \\ 
-\dot{\theta_{right}} \\ 
+\dot{\theta_{left}} \\\\ 
+\dot{\theta_{right}} \\\\ 
 \dot{\theta_{back}}
 \end{bmatrix}
 = 
 \begin{bmatrix}
-\frac{1}{r} & 0 &0 \\ 
-0 & \frac{1}{r} & 0 \\ 
+\frac{1}{r} & 0 &0 \\\\ 
+0 & \frac{1}{r} & 0 \\\\ 
 0 & 0 & \frac{1}{r}
 \end{bmatrix}
 \begin{bmatrix}
-v_{left} \\ 
-v_{right} \\ 
+v_{left} \\\\ 
+v_{right} \\\\ 
 v_{back} 
-\end{bmatrix} \\
-\)
+\end{bmatrix}
+\\)
 
 Vitesse linéaire au centre de la roue <-> Vitesse linéraire au centre du robot :
 
-\(
+\\(
 \begin{bmatrix}
-v_{left} \\ 
-v_{right} \\ 
+v_{left} \\\\ 
+v_{right} \\\\ 
 v_{back} 
 \end{bmatrix}
 =
 \begin{bmatrix}
-\frac{-\sqrt{3}}{2} & \frac{1}{2} & L \\ 
-\frac{\sqrt{3}}{2} & \frac{1}{2} & L \\ 
+\frac{-\sqrt{3}}{2} & \frac{1}{2} & L \\\\ 
+\frac{\sqrt{3}}{2} & \frac{1}{2} & L \\\\ 
 0 & -1 & L
 \end{bmatrix}
 \begin{bmatrix}
-v_{x} \\ 
-v_{y} \\ 
+v_{x} \\\\ 
+v_{y} \\\\ 
 \dot{\theta}
-\end{bmatrix} \\ 
-\)
+\end{bmatrix} 
+\\)
 
 Vitesse linéraire au centre du robot <-> Vitesse linéaire au centre de la roue :
 
-\(
+\\(
 \begin{bmatrix}
-v_{x} \\ 
-v_{y} \\ 
+v_{x} \\\\ 
+v_{y} \\\\ 
 \dot{\theta}
 \end{bmatrix}
 =
 \begin{bmatrix}
-\frac{-\sqrt{3}}{3} & \frac{\sqrt{3}}{3}  & L \\ 
-\frac{1}{3} & \frac{1}{3} & \frac{-2}{3} \\ 
-\frac{1}{3L} & \frac{1}{3L} & \frac{-2}{3L} \\ 
+\frac{-\sqrt{3}}{3} & \frac{\sqrt{3}}{3}  & L \\\\ 
+\frac{1}{3} & \frac{1}{3} & \frac{-2}{3} \\\\ 
+\frac{1}{3L} & \frac{1}{3L} & \frac{-2}{3L} \\\\ 
 \end{bmatrix}
 \begin{bmatrix}
-v_{left} \\ 
-v_{right} \\ 
+v_{left} \\\\
+v_{right} \\\\ 
 v_{back} 
 \end{bmatrix}
-\)
+\\)
 
 
 Le contrôle commande est inspirée de l'article suivant :
