@@ -26,7 +26,7 @@ mobile_base_controller:
 
   publish_rate: 50.0               # default: 50
   publish_cmd: true
-  enable_odom_tf: false
+  enable_odom_tf: true
   open_loop: false
   
   pose_covariance_diagonal : [0.001, 0.001, 1000000.0, 1000000.0, 1000000.0, 1000.0]
@@ -42,7 +42,8 @@ mobile_base_controller:
   cmd_vel_timeout: 0.25
 
   # Base frame_id (default: base_link)
-  base_frame_id: base_link
+  base_frame_id: 'r1/base_link'
+  odom_frame_id: 'r1/odom'
 
   # Velocity and acceleration limits
   # Whenever a min_* is unspecified, default to -max_*

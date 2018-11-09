@@ -70,6 +70,17 @@
             <axis xyz="0 0 1"/>
             <origin xyz="${xyz}" rpy="${rpy}" />
         </joint>
+
+        <transmission name="roller_${name}_${parent}_to_${parent}_transmission">
+            <type>transmission_interface/SimpleTransmission</type>
+            <joint name="roller_${name}_${parent}_to_${parent}">
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            </joint>
+            <actuator name="roller_${name}_${parent}_to_${parent}_actuator">
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+                <mechanicalReduction>1</mechanicalReduction>
+            </actuator>
+        </transmission>
     </xacro:macro>
 
     <!-- Roller loop -->

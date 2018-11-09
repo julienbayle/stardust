@@ -38,9 +38,8 @@
 			args="-urdf -model r1 -param robot_description_gazebo -z 0.3 -y -0.5"/>
 
 		<!-- Broadcast ground truth as tf transform from world to robot -->
-		<node name="ground_truth_r1" pkg="sd_gazebo" type="ground_truth_tf_broadcaster.py">
+		<node name="ground_truth_r1" pkg="sd_gazebo" type="ground_truth_tf_broadcaster">
 			<param name="tf_prefix" value="r1"/>
-			<param name="target_frame" value="map"/>
 		</node>
 	</group>
 	<group ns="r2" if="$(arg r2)">
