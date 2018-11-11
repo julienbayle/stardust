@@ -20,6 +20,11 @@
 			<param name="tf_prefix" value="$(arg robot_ns)"/>
 		</node>
 		
+		<!-- Behavior -->
+		<include file="$(find sd_behavior)/launch/sd_behavior.launch">
+			<arg name="robot_ns" value="$(arg robot_ns)"/>
+		</include>
+		
 		<!-- Navigation -->
 		<include file="$(find sd_navigation)/launch/sd_navigation.launch">
 			<arg name="robot_ns" value="$(arg robot_ns)"/>

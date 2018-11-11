@@ -3,6 +3,7 @@
 #include "geometry_msgs/Twist.h"
 #include "sensor_msgs/Joy.h"
 #include "std_msgs/String.h"
+#include "std_msgs/Bool.h"
 
 #include "xbox_pad.h"
 
@@ -10,6 +11,7 @@ class TeleopNode {
 	private:
 		// Publishers
 		ros::Publisher cmd_vel_teleop_publisher;
+		ros::Publisher mode_auto_publisher;
 		ros::Subscriber joy_subscriber;
 
 		// Config
@@ -34,6 +36,7 @@ class TeleopNode {
 			nh_priv.param("joy_topic", joy_topic_name, std::string("joy"));
 			
 			cmd_vel_teleop_publisher = nh_priv.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+			mode_auto_publisher = nh.advertise<std_msgs::Bool>("mode_auto", 1);
 			
 			joy_subscriber = nh.subscribe<sensor_msgs::Joy>(joy_topic_name, 1, &TeleopNode::joy_handler, this);
 		}
@@ -58,6 +61,17 @@ class TeleopNode {
 			twist.angular.z *= max_angular_z_velocity * current_boost_ratio;
 			
 			cmd_vel_teleop_publisher.publish(twist);
+
+			// Mode auto
+			if (joy_msg->buttons[XBOX_BUTTON_BACK]) {
+				std_msgs::Bool bool_msg;
+				bool_msg.data = false;
+				mode_auto_publisher.publish(bool_msg);
+			} else if (joy_msg->buttons[XBOX_BUTTON_START]) {
+				std_msgs::Bool bool_msg;
+				bool_msg.data = true;
+				mode_auto_publisher.publish(bool_msg);
+			}
 		}
 };
 
