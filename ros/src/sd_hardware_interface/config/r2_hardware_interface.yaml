@@ -16,8 +16,7 @@ hardware_interface:
   pwm_topics:
     - right/pwm
     - left/pwm
-  encoder_tics_for_one_wheel_revolution:
-    - 140.0
+  encoder_steps_for_one_wheel_revolution:
     - 140.0
     - 140.0
   velocity_controllers_pid_p:

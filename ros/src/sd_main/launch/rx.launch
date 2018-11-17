@@ -13,6 +13,11 @@
 		<include file="$(find sd_control)/launch/$(arg robot_ns)_control.launch">
 			<arg name="sim" value="$(arg sim)"/>
 		</include>
+
+		<!-- Hardware interface  -->
+		<include file="$(find sd_hardware_interface)/launch/sd_hardware_interface.launch" unless="$(arg sim)">
+			<arg name="robot_ns" value="$(arg robot_ns)"/>
+		</include>
 		
 		<!-- Combine joint values -->
 		<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
