@@ -1,0 +1,41 @@
+control_loop:
+  loop_hz: 20 # in Hz
+  cycle_time_error_threshold: 0.01 # in seconds (Means an 20% error threshold for 20Hz)
+  print_state: true   # true to see controller state in console (every second)
+  publish_state: true # publish regulator state to topics
+
+hardware_interface:
+  is_quadrature_encoder : true
+  timeout: 1.0 # seconds
+  joints: 
+    - right_wheel_to_base
+    - left_wheel_to_base
+    - back_wheel_to_base
+  encoder_topics:
+    - right/encoder
+    - left/encoder
+    - back/encoder
+  pwm_topics:
+    - right/pwm
+    - left/pwm
+    - back/pwm
+  encoder_steps_for_one_wheel_revolution:
+    - 80.0
+    - 80.0
+    - 80.0
+  velocity_controllers_pid_p:
+    - 500.0
+    - 500.0
+    - 500.0
+  velocity_controllers_pid_i:
+    - 0.5
+    - 0.5
+    - 0.5
+  velocity_controllers_pid_d:
+    - 0.0
+    - 0.0
+    - 0.0
+
+rosserial_server:
+  baud: 57600
+  port: /dev/ttyUSB0

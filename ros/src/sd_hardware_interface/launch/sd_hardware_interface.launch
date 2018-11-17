@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="robot_ns"/>
+
+    <!-- Load controller settings -->
+    <rosparam file="$(find sd_hardware_interface)/config/$(arg robot_ns)_hardware_interface.yaml" command="load"/>
+
+    <!-- Load hardware interface -->
+    <node name="hardware_interface" pkg="sd_hardware_interface" type="sd_hardware_interface" output="screen"/>
+
+    <!-- Publish joint values from controllers -->
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+      <param name="tf_prefix" value="$(arg robot_ns)"/>
+    </node>
+
+    <!-- ROS Serial (High performance version en C++ -->
+    <node pkg="rosserial_server" type="serial_node" name="rosserial_server" />
+    <node pkg="rosserial_python" type="message_info_service.py" name="rosserial_message_info" />
+
+</launch>

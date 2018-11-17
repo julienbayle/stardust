@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>sd_hardware_interface</name>
+  <version>0.0.1</version>
+  <description>Robots hardware interface for ros_control</description>
+
+  <maintainer email="jbayle@gmail.com">Julien BAYLE</maintainer>
+  <author email="jbayle@gmail.com">Julien BAYLE</author>
+  
+  <license>MIT</license>
+  <url type="website">https://github.com/julienbayle/stardust</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>hardware_interface</depend>
+  <depend>controller_manager</depend>
+  <depend>effort_controllers</depend>
+  <depend>roscpp</depend>
+  <depend>control_msgs</depend>
+  <depend>urdf</depend>
+  <depend>joint_limits_interface</depend>
+  <depend>transmission_interface</depend>
+  <depend>control_toolbox</depend>
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>rosparam_shortcuts</depend>
+  <depend>rosserial_arduino</depend>
+  <depend>rosserial_msgs</depend>
+  <depend>rosserial_python</depend>
+  <depend>rosserial_server</depend>
+  <depend>rqt_controller_manager</depend>
+
+  <export>
+    <hardware_interface plugin="${prefix}/sd_harware_interface_plugins.xml"/>
+  </export>
+</package>
