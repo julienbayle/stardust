@@ -11,7 +11,7 @@ mobile_base_controller:
 
   publish_rate: 50.0               # default: 50
   publish_cmd: true
-  enable_odom_tf: true
+  enable_odom_tf: false
   open_loop: false
   
   pose_covariance_diagonal : [0.001, 0.001, 1000000.0, 1000000.0, 1000000.0, 1000.0]

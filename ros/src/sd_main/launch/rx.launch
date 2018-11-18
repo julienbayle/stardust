@@ -2,6 +2,7 @@
 <launch>
 	<arg name="sim" default="false"/>
 	<arg name="robot_ns" default=""/>
+	<arg name="ground_truth" default="false"/>
 
 	<group ns="$(arg robot_ns)">
 		<!-- Description  -->
@@ -27,6 +28,11 @@
 		
 		<!-- Behavior -->
 		<include file="$(find sd_behavior)/launch/sd_behavior.launch">
+			<arg name="robot_ns" value="$(arg robot_ns)"/>
+		</include>
+		
+		<!-- Localization -->
+		<include file="$(find sd_localization)/launch/sd_localization.launch" unless="$(arg ground_truth)">
 			<arg name="robot_ns" value="$(arg robot_ns)"/>
 		</include>
 		

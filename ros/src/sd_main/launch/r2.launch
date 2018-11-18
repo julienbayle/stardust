@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
 	<arg name="sim" default="false"/>
+	<arg name="ground_truth" default="false"/>
 	
 	<machine name="localhost" address="localhost" env-loader="/opt/ros/kinetic/env.sh"/>
 
@@ -14,6 +15,7 @@
 	<include file="$(find sd_main)/launch/rx.launch">
 		<arg name="sim" value="$(arg sim)"/>
 		<arg name="robot_ns" value="r2"/>
+		<arg name="ground_truth" value="$(arg ground_truth)"/>
 	</include>
 
 </launch>
