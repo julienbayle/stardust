@@ -16,6 +16,8 @@ Stardust est une équipe de robotique basée en Loire Atlantique qui participe �
 
 [Déployer et mettre à jour le code sur un raspberry pi](pages/install_raspberry.md)
 
+[Déployer et mettre à jour le code sur un arduino](pages/install_arduino.md)
+
 ## Informatique bas niveau (arduino) et électronique
 
 [Architecture électronique robot secondaire](https://www.draw.io/#Uhttps%3A%2F%2Fjulienbayle.github.io%2Fstardust%2Farchitecture%2Fr2_electronic.xml)
