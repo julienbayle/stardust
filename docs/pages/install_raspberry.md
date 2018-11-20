@@ -1,4 +1,4 @@
-# Installation sur Raspberry Pi 3
+# Installation sur Raspberry Pi 3 modèle B
 
 Ubuntu 16.04 doit être utilisé car cette distribution et version de linux propose directement les dépôts ARM de ROS Kinetic, compatible sur raspberry pi 3.
 
@@ -25,6 +25,8 @@ xzcat ubuntu-mate-16.04.2-desktop-armhf-raspberry-pi.img.xz | sudo dd bs=4m of=/
 
 Mettre la carte dans le Raspberry Pi et l'allumer. Connecter une câble ethernet, un écran via le port HDMI et une souris. Compléter alors la procédure d'installation qui s'affiche à l'écran.
 
+> Attention, **si le Raspberry Pi est un modèle B+**, la procédure d'installation doit être réalisée sur un modèle B. Puis, en fin de procédure, exécuter *rpi-update* pour mettre à jour les drivers firmware. La carte ainsi préparée pourra être ensuite être insérée dans un modèle B ou B+.
+
 ## Activation du SSH
 
 ```bash
@@ -36,21 +38,19 @@ sudo systemctl restart ssh.service
 
 ## Mise à jour du système
 
-Après l'installation, le partitionnement proposé de la carte SD ne permet pas la mise à jour du système. gparted va être intallé pour remedier à cela.
-
-```bash
-sudo apt-get install gparted
-sudo gparted
-```
-
-Utiliser gparted pour changer la taille de la partition /boot(128mo for example)
-
 Puis, mise à jour du système et redémarrage :
 
 ```bash
 sudo apt-get update
 sudo apt-get upgrade
 sudo reboot
+```
+
+Optionnel (dépend dans la taile de la taille SD) : Si le partitionnement par défaut de la carte SD ne permet pas la mise à jour du système. Il faut utiliser gparted pour remedier à cela.
+
+```bash
+sudo apt-get install gparted
+sudo gparted
 ```
 
 ## Support réseau
@@ -73,7 +73,7 @@ Source : http://wiki.ros.org/Installation/UbuntuARM
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 sudo apt-get update
-sudo apt-get install -y ros-kinetic-desktop-full
+sudo apt-get install -y ros-kinetic-desktop-full git python-wstool vim
 sudo rosdep init
 rosdep update
 echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
@@ -82,22 +82,40 @@ source ~/.bashrc
 
 ## Installation et compilation du code source du robot
 
-La première compilation nécessite l'activation de la SWAP car la mémoire du Raspberry est insuffisante. Pour les simples mises à jour, ceci n'est pas nécessaire.
+La première compilation du projet nécessite l'activation de la SWAP car la mémoire du Raspberry est insuffisante. Pour compiler une simple modification locale du code, ceci n'est nécessaire.
+
+Création d'un fichier SWAP de 512Mo :
+
+```bash
+sudo fallocate -l 512m /512m.swap
+sudo chmod 600 /512m.swap 
+sudo mkswap /512m.swap 
+```
+
+Ce fichier sera conservé car il re-servira souvent par la suite.
+
+Installation des sources du projet :
 
 ```bash
 git clone https://github.com/julienbayle/stardust
-cd stardust/ros/src
-wstool update
-cd ..
-rosdep install --from-paths src --ignore-src --rosdistro kinetic -r -y
-sudo fallocate -l 512m /file.swap
-sudo chmod 600 /file.swap 
-sudo mkswap /file.swap 
-sudo swapon /file.swap
-catkin_make
-sudo swapoff /file.swap
+```
+
+Compilation du projet ROS :
+
+```bash
+sudo swapon /512m.swap
+~/stardust/scripts/update.sh
+sudo swapoff /512m.swap
+cd ~/stardust/ros/
 source devel/setup.bash
 ```
+
+Tester que le projet démarre (remplacer r1 par r2 pour le robot secondaire) :
+
+```bash
+roslaunch sd_main r1.launch
+```
+
 ## Configuration du Raspberry
 
 ### LIDAR (UART)
@@ -116,33 +134,21 @@ A supprimer du fichier /boot/cmdline.txt
 console=serial0,115200
 ```
 
-
-En ligne de commande :
+Enfin, il faut autoriser notre utilisateur à utiliser le port série (remplacer "r1" par le nom de votre ut)
 
 ```bash
-sudo usermod -a -G dialout pi
+USER=`whoami`
+sudo usermod -a -G dialout $USER
 sudo systemctl disable hciuart
 sudo reboot
 ```
 
-### GPIO
-
-Pour l'instant, il n'y a pas de possibilité d'activer cette fonctionnilité via rosdep (pas de paquet permettant d'accéder aux GPIO du raspberry pi). Aussi, il faut ajouter ce support manuellement :
+[Connecter le LIDAR au robot](https://github.com/julienbayle/xv_11_lidar_raspberry) pour vérifier qu'il fonctionne.
 
 ```bash
-sudo apt-get install python-pip python-dev
-sudo pip install RPi.GPIO 
-sudo reboot
-```
-
-### Connexion et test du LIDAD
-
-Connecter le LIDAR au robot pour vérifier qu'il fonctionne :
-
-```bash
-cd stardust/ros/
+cd ~/stardust/ros/
 source devel/setup.bash
-roslaunch xv_11_laser_motor_control xv_11_laser.launch &
+roslaunch xv_11_lidar_raspberry xv_11_lidar_raspberry.launch port:=/dev/serial0
 ```
 
 Si le LIDAR fonctionne, il doit se mettre à tourner et sa vitesse de rotation doit être régulée. La vitesse de rotation est émise sur un topic incluant le terme *rpms*. La vitesse est régulée autour de 300 rotations par minute soit 5 tours par seconde.
@@ -159,7 +165,7 @@ sudo reboot
 Si une IMU est connectée au robot via I2C, il est possible de vérifier qu'elle est bien disponible sur le port I2C et que celui-ci marche bien :
 
 ```bash
-sudo i2cdetect -y 1
+i2cdetect -y 1
 ```
 
 ```
@@ -181,25 +187,21 @@ On voit ici les 3 puces de l'IMU (gyromètre, acceleromètre et magnétomètre)
 Si le robot est connecté via SPI à un ou plusieurs pavés LED, il faut ajouter la librairie nécessaire (pas de paquet rosdep de disponible)
 
 ```bash
-pip install luma.led_matrix
+sudo pip install luma.led_matrix
 ```
- 
 
 ## Ajout d'une manette
 
-Ajouter quelques outils :
-
-```bash
-sudo apt install joystick 
-```
+Les manettes XBOX360 et PS4 sont nativement prises en charge par le noyau linux. Il suffit donc de les lier au raspberry.
 
 Connecter le recepteur au raspberry (clé USB bluetooth pour manette PS4 et récepteur radio pour manette XBOX).
 
-Connecter la manette.
+Connecter la manette et effectuer l'appairage.
 
 Vérifier que la manette fonctionne :
 
 ```bash
+sudo apt install joystick 
 jstest /dev/input/js0
 ```
 
@@ -210,37 +212,36 @@ Le répertoire *scripts* contient des scripts pour lancer, mettre à jour et arr
 Pour identifier le robot, il faut tout d'abord créer un fichier *robot.id* dans le dossier script et mettre dedant **r1** ou **r2** selon qu'il s'agit d'une installation pour le robot principal ou secondaire.
 
 ```bash
-echo "r1" > /home/pi/stardust/scripts/robot.id
+echo "r1" > ~/stardust/scripts/robot.id
 ```
 
-Ajout d'un script pour démarrage automatique de ROS :
+Activation du démarrage automatique de ROS au démarrage du Raspberry PI :
 
 ```bash
-/home/pi/stardust/scripts/install.sh
+~/stardust/scripts/install.sh
 ```
 
-Pour démarrer ROS (lancé en tâche de fond) :
+Pour démarrer ROS manuellement (En tâche de fond) :
 
 ```bash
-/home/pi/stardust/scripts/start.sh
+~/stardust/scripts/start.sh
 ```
 
-Pour arrêter ROS :
+Pour arrêter ROS manuellement :
 
 ```bash
-/home/pi/stardust/scripts/stop.sh
+~/stardust/scripts/stop.sh
 ```
 
 Pour mettre à jour ROS :
 
 ```bash
-/home/pi/stardust/scripts/update.sh
+~/stardust/scripts/update.sh
 ```
 
 ## Accès au robot depuis un PC distant
 
-Exemple pour lancer rviz depuis un poste distant
-(ROS doit être lancé sur le robot via le script ci-dessus et le robot et l'ordinateur doivent être sur le même réseau)
+Exemple pour lancer rviz depuis un poste distant (ROS doit être lancé sur le robot via le script ci-dessus et le robot et l'ordinateur doivent être sur le même réseau) :
 
 ```bash
 export ROS_MASTER=http://RASPBERRY_IP:11311
