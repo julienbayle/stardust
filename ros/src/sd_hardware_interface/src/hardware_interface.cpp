@@ -29,11 +29,13 @@ HWInterface::HWInterface(ros::NodeHandle &nh)
   error += !rosparam_shortcuts::get(name_, rpnh, "joints", joint_names_);
   error += !rosparam_shortcuts::get(name_, rpnh, "encoder_topics", encoder_topics_);
   error += !rosparam_shortcuts::get(name_, rpnh, "pwm_topics", pwm_topics_);
+  error += !rosparam_shortcuts::get(name_, rpnh, "pwm_max", velocity_controllers_pwm_max_);
+  error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_velocity_to_pwm", velocity_controllers_velocity_to_pwm_);
+  error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_friction_pwm", velocity_controllers_friction_pwm_);
   error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_pid_p", velocity_controllers_pid_p_);
   error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_pid_i", velocity_controllers_pid_i_);
   error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_pid_d", velocity_controllers_pid_d_);
-  error += !rosparam_shortcuts::get(name_, rpnh, "encoder_steps_for_one_wheel_revolution", 
-                                                  encoder_steps_for_one_wheel_revolution_);
+  error += !rosparam_shortcuts::get(name_, rpnh, "encoder_steps_for_one_wheel_revolution", encoder_steps_for_one_wheel_revolution_);
   rosparam_shortcuts::shutdownIfError(name_, error);
 }
 
@@ -66,6 +68,21 @@ void HWInterface::init()
 
   if (num_joints_ != encoder_steps_for_one_wheel_revolution_.size()) {
     ROS_ERROR_STREAM_NAMED(name_, "pwm_topics parameter must be the same size as joints");
+    return;
+  }
+
+  if (num_joints_ != velocity_controllers_pwm_max_.size()) {
+    ROS_ERROR_STREAM_NAMED(name_, "pwm_max parameter must be the same size as joints");
+    return;
+  }
+
+  if (num_joints_ != velocity_controllers_velocity_to_pwm_.size()) {
+    ROS_ERROR_STREAM_NAMED(name_, "velocity_controllers_velocity_to_pwm parameter must be the same size as joints");
+    return;
+  }
+
+  if (num_joints_ != velocity_controllers_friction_pwm_.size()) {
+    ROS_ERROR_STREAM_NAMED(name_, "velocity_controllers_friction_pwm parameter must be the same size as joints");
     return;
   }
 
@@ -133,15 +150,20 @@ void HWInterface::init()
       new VelocityController(
         nh_,
         joint_names_[joint_id],
-        32767.0,
-        -32768.0));
+        velocity_controllers_pwm_max_[joint_id],
+        -1.0 * velocity_controllers_pwm_max_[joint_id]));
 
-    // Limit I to 10% of PWM max
+    // Configure feed forward and friction compensation
+    joint_velocity_controller->setFeedforwardAndFrictionGains(
+      velocity_controllers_velocity_to_pwm_[joint_id], 
+      velocity_controllers_friction_pwm_[joint_id]);
+    
+    // Limit I to 30% of PWM max
     joint_velocity_controller->setGains(
       velocity_controllers_pid_p_[joint_id],
       velocity_controllers_pid_i_[joint_id],
       velocity_controllers_pid_d_[joint_id],
-      3200, true);
+      0.3 * velocity_controllers_pwm_max_[joint_id], true);
 
     joint_velocity_controllers_.push_back(joint_velocity_controller);
     effort_publishers_.push_back(nh_.advertise<std_msgs::Int16>(pwm_topic, 1, false));

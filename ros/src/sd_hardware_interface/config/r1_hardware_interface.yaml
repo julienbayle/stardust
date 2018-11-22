@@ -19,10 +19,22 @@ hardware_interface:
     - right/pwm
     - left/pwm
     - back/pwm
+  pwm_max:
+    - 4096
+    - 4096
+    - 4096
   encoder_steps_for_one_wheel_revolution:
-    - 80.0
-    - 80.0
-    - 80.0
+    - 220.0
+    - 220.0
+    - 220.0
+  velocity_controllers_velocity_to_pwm: 
+    - 1000.0 # Unit : 1m/s to PWM
+    - 1000.0
+    - 1000.0
+  velocity_controllers_friction_pwm: 
+    - 200.0 # Minimum PWM allowing the wheel to turn
+    - 200.0
+    - 200.0  
   velocity_controllers_pid_p:
     - 500.0
     - 500.0

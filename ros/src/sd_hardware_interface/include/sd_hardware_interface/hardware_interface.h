@@ -86,6 +86,11 @@ namespace sd_hardware_interface
     std::vector<std::string> pwm_topics_;
     std::vector<double> encoder_steps_for_one_wheel_revolution_;
 
+    // Open loop (feed forward + friction model)
+    std::vector<double> velocity_controllers_pwm_max_;
+    std::vector<double> velocity_controllers_velocity_to_pwm_;
+    std::vector<double> velocity_controllers_friction_pwm_;
+
     //PID
     std::vector<double> velocity_controllers_pid_p_;
     std::vector<double> velocity_controllers_pid_i_;

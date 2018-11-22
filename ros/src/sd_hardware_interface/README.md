@@ -26,3 +26,21 @@ Example :
 export ROS_NAMESPACE=/r1
 rosrun controller_manager controller_manager list
 ```
+
+## Velocity controller
+
+The model is a PID with velocity feed forward plus friction boost
+
+For each wheel:
+
+Ouput (PWM) = 
+* velocity_goal * velocity_controllers_velocity_to_pwm
+* + sign(velocity_goal) * velocity_controllers_friction_pwm
+* + velocity_controllers_pid_p * (velocity_goal - velocity)
+* + velocity_controllers_pid_i * sum_over_time(velocity_goal - velocity) (contribution limited to 30% of max pwm)
+* + velocity_controllers_pid_d * d(velocity_goal - velocity)/dt
+
+with sign(velocity_goal) = 
+* -1 if velocity_goal lower than 0
+* 0 if velocity_goal is 0
+* 1 if velocity_goal is greater than 0

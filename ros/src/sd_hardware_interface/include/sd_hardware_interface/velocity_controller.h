@@ -31,9 +31,13 @@ namespace sd_hardware_interface
         const double &p, const double &i, const double &d, 
         const double &i_max, const bool &antiwindup);
 
+    /**
+    * \brief Set the feed forward and friction gains
+    */
+    void setFeedforwardAndFrictionGains(const double &feedforward_gain, const double &friction_gain);
 
     /**
-    * \brief Run PID
+    * \brief update command 
     */
     double velocityToEffort(double joint_velocity, double command_velocity, ros::Duration& period);
 
@@ -50,6 +54,12 @@ namespace sd_hardware_interface
     // Min effort value
     double min_effort_;
 
+    // Friction gain
+    double friction_gain_;
+
+    // Feed forward gain
+    double feedforward_gain_;
+
     // Memory for "publishState"
     double last_command_velocity_;
     double last_joint_velocity_;
@@ -62,6 +72,10 @@ namespace sd_hardware_interface
     // Publish data to plot PID data
     boost::scoped_ptr<realtime_tools::RealtimePublisher<
         control_msgs::JointControllerState> > controller_state_publisher_ ;
+
+    // 1 if positive, -1 if negative, 0 if zeré
+    double sign(const double d);
+
   };
 
 }	// sd_hardware_interface

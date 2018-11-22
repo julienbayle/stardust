@@ -9,6 +9,8 @@ namespace sd_hardware_interface
         double min_effort) :
         max_effort_(max_effort), 
         min_effort_(min_effort),
+        feedforward_gain_(0.0),
+        friction_gain_(0.0),
         pid_controller_()
     {
         // Start realtime state publisher
@@ -36,6 +38,15 @@ namespace sd_hardware_interface
         pid_controller_.setGains(p,i,d,i_max,-i_max,antiwindup);
     }
 
+    /**
+    * \brief Set the PID parameters
+    */
+    void VelocityController::setFeedforwardAndFrictionGains(const double &feedforward_gain, const double &friction_gain)
+    {
+        feedforward_gain_ = feedforward_gain;
+        friction_gain_ = friction_gain;
+    }
+
 
     double VelocityController::velocityToEffort(double joint_velocity, double command_velocity, ros::Duration& period)
     {
@@ -44,7 +55,9 @@ namespace sd_hardware_interface
         last_period_ = period;
 
         double error = command_velocity - joint_velocity;
-        double commanded_effort = pid_controller_.computeCommand(error, period);
+        double commanded_effort = pid_controller_.computeCommand(error, period) 
+            + feedforward_gain_ * command_velocity
+            + friction_gain_ * sign(command_velocity);
 
         if(commanded_effort > max_effort_)
           commanded_effort = max_effort_;
@@ -78,5 +91,14 @@ namespace sd_hardware_interface
           controller_state_publisher_->msg_.antiwindup = static_cast<char>(antiwindup);
           controller_state_publisher_->unlockAndPublish();
         }
+    }
+
+    double VelocityController::sign(const double d) 
+    {
+        if (d > 1e-6)
+            return 1;
+        else if (d < -1e-6)
+            return -1;
+        return 0.0;
     }
 }
