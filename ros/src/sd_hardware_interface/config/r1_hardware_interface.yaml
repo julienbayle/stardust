@@ -28,9 +28,9 @@ hardware_interface:
     - 220.0
     - 220.0
   velocity_controllers_velocity_to_pwm: 
-    - 1000.0 # Unit : 1m/s to PWM
-    - 1000.0
-    - 1000.0
+    - 25.0  # Unit : if pwm = velocity_controllers_velocity_to_pwm, wheel rotates at 1 rad/s
+    - 25.0
+    - 25.0
   velocity_controllers_friction_pwm: 
     - 200.0 # Minimum PWM allowing the wheel to turn
     - 200.0

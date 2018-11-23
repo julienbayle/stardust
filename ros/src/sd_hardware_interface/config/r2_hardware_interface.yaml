@@ -23,8 +23,8 @@ hardware_interface:
     - 140.0
     - 140.0
   velocity_controllers_velocity_to_pwm: 
-    - 1400.0 # Unit : 1m/s to PWM
-    - 1400.0
+    - 40.0    # Unit : 1 rad/s to velocity_controllers_velocity_to_pwm PWM
+    - 40.0
   velocity_controllers_friction_pwm: 
     - 30.0 # Minimum PWM allowing the wheel to turn
     - 30.0
