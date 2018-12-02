@@ -54,10 +54,14 @@ namespace sd_hardware_interface
         last_joint_velocity_ = joint_velocity;
         last_period_ = period;
 
-        double error = command_velocity - joint_velocity;
-        double commanded_effort = pid_controller_.computeCommand(error, period) 
-            + feedforward_gain_ * command_velocity
-            + friction_gain_ * sign(command_velocity);
+        double commanded_effort = 0.0;
+        if(command_velocity < -1e-6 or command_velocity > 1e-6) 
+        {
+            double error = command_velocity - joint_velocity;
+            commanded_effort = pid_controller_.computeCommand(error, period) 
+                + feedforward_gain_ * command_velocity
+                + friction_gain_ * sign(command_velocity);
+        }
 
         if(commanded_effort > max_effort_)
           commanded_effort = max_effort_;
