@@ -1,6 +1,6 @@
 control_loop:
-  loop_hz: 20 # in Hz
-  cycle_time_error_threshold: 0.01 # in seconds (Means an 20% error threshold for 20Hz)
+  loop_hz: 10 # in Hz
+  cycle_time_error_threshold: 0.005 # in seconds (Means an 50% error threshold for 10Hz)
   print_state: true   # true to see controller state in console (every second)
   publish_state: true # publish regulator state to topics
 
@@ -12,29 +12,29 @@ hardware_interface:
     - left_wheel_to_base
     - back_wheel_to_base
   encoder_topics:
-    - right/encoder
-    - left/encoder
-    - back/encoder
+    - encoder/right
+    - encoder/left
+    - encoder/back
   pwm_topics:
-    - right/pwm
-    - left/pwm
-    - back/pwm
+    - pwm/right
+    - pwm/left
+    - pwm/back
   pwm_max:
     - 4096
     - 4096
     - 4096
   encoder_steps_for_one_wheel_revolution:
-    - 220.0
-    - 220.0
-    - 220.0
+    - 206.0
+    - 206.0
+    - 206.0
   velocity_controllers_velocity_to_pwm: 
     - 25.0  # Unit : if pwm = velocity_controllers_velocity_to_pwm, wheel rotates at 1 rad/s
     - 25.0
     - 25.0
   velocity_controllers_friction_pwm: 
-    - 200.0 # Minimum PWM allowing the wheel to turn
-    - 200.0
-    - 200.0  
+    - 450.0 # Minimum PWM allowing the wheel to turn
+    - 450.0
+    - 450.0  
   velocity_controllers_pid_p:
     - 500.0
     - 500.0
