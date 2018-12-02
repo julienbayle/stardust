@@ -6,6 +6,7 @@
 	<rosparam file="$(find sd_teleop)/config/sd_teleop.yaml" command="load"/>
 	
 	<node name="joy" pkg="joy" type="joy_node" unless="$(arg sim)"/>
+	<node name="joy_switcher" pkg="sd_teleop" type="joy_switcher_node" output="screen" unless="$(arg sim)"/>
 
 	<node name="teleop" pkg="sd_teleop" type="teleop_node" output="screen" ns="$(arg robot_ns)"/>
 </launch>

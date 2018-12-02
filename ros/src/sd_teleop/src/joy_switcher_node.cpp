@@ -25,8 +25,10 @@ class JoySwitcherNode {
         void input_handler(const sensor_msgs::JoyConstPtr& input_msg) {
             if (input_msg->buttons[XBOX_BUTTON_STICK_LEFT]) {
                 publish_r2 = false;
+                ROS_INFO("Switch telop to robot 1");
             } else if (input_msg->buttons[XBOX_BUTTON_STICK_RIGHT]) {
                 publish_r2 = true;
+                ROS_INFO("Switch telop to robot 2");
             }
 
             if (publish_r2) {

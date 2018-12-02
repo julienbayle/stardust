@@ -18,4 +18,7 @@
 		<arg name="ground_truth" value="$(arg ground_truth)"/>
 	</include>
 
+	<!-- Waiting for auto mode / teleop only !-->
+	<node name="teleop_only" pkg="topic_tools" type="relay" args="/r2/teleop/cmd_vel /r2/mobile_base_controller/cmd_vel" unless="$(arg sim)" />
+
 </launch>
