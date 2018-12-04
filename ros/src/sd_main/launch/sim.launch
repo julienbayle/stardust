@@ -16,10 +16,12 @@
 
 	<include file="$(find sd_main)/launch/r1.launch" if="$(arg r1)">
 		<arg name="sim" value="true" />
+		<arg name="ground_truth" value="$(arg ground_truth)"/>
 	</include>
 
 	<include file="$(find sd_main)/launch/r2.launch" if="$(arg r2)">
 		<arg name="sim" value="true" /> 
+		<arg name="ground_truth" value="$(arg ground_truth)"/>
 	</include>
 	
 	<!-- Launch joy node at root namespace and relay it to one of the robots -->

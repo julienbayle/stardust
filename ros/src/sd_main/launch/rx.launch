@@ -32,8 +32,9 @@
 		</include>
 		
 		<!-- Localization -->
-		<include file="$(find sd_localization)/launch/sd_localization.launch" unless="$(arg ground_truth)">
+		<include file="$(find sd_localization)/launch/sd_localization.launch">
 			<arg name="robot_ns" value="$(arg robot_ns)"/>
+			<arg name="ground_truth" value="$(arg ground_truth)"/>
 		</include>
 		
 		<!-- Navigation -->
@@ -44,7 +45,7 @@
 		<!-- Show in Rviz   -->
 		<node name="rviz" pkg="rviz" type="rviz" args="-d $(find sd_description)/rviz/$(arg robot_ns).rviz" if="$(arg sim)"/>
 	</group>
-
+		
 	<!-- Teleop  -->
 	<include file="$(find sd_teleop)/launch/sd_teleop.launch">
 		<arg name="sim" value="$(arg sim)"/>
