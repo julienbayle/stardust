@@ -1,10 +1,18 @@
 <launch>
 	<arg name="robot_ns" default=""/>
 
-	<node name="$(arg robot_ns)_map_server" pkg="map_server" type="map_server" args="$(find sd_navigation)/config/sd_map.yaml"/>
+	<rosparam file="$(find sd_navigation)/config/$(arg robot_ns)_navigation.yaml" command="load"/>
+
+	<node name="$(arg robot_ns)_map_1_server" pkg="map_server" type="map_server" args="$(find sd_navigation)/config/sd_map_1.yaml">
+		<remap from="map" to="map_1"/>
+	</node>
+	<node name="$(arg robot_ns)_map_2_server" pkg="map_server" type="map_server" args="$(find sd_navigation)/config/sd_map_2.yaml">
+		<remap from="map" to="map_2"/>
+	</node>
+	<node name="$(arg robot_ns)_map_from_attitude" pkg="sd_navigation" type="map_from_attitude_node"/>
 	
 	<node name="$(arg robot_ns)_move_base" pkg="move_base" type="move_base" respawn="false" output="screen">
-		<rosparam file="$(find sd_navigation)/config/$(arg robot_ns)_navigation.yaml" command="load"/>
+		<rosparam file="$(find sd_navigation)/config/$(arg robot_ns)_move_base.yaml" command="load"/>
 		<rosparam file="$(find sd_navigation)/config/$(arg robot_ns)_costmap_common_params.yaml" command="load" ns="global_costmap"/>
 	    <rosparam file="$(find sd_navigation)/config/$(arg robot_ns)_costmap_common_params.yaml" command="load" ns="local_costmap"/>
 	    

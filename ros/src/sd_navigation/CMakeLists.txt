@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   map_server
   move_base
   teb_local_planner
+  dynamic_reconfigure
 )
 
 ## System dependencies are found with CMake's conventions
@@ -89,10 +90,9 @@ find_package(catkin REQUIRED COMPONENTS
 ##     and list every .cfg file to be processed
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
-# generate_dynamic_reconfigure_options(
-#   cfg/DynReconf1.cfg
-#   cfg/DynReconf2.cfg
-# )
+generate_dynamic_reconfigure_options(
+  cfg/MapFromAttitude.cfg
+)
 
 ###################################
 ## catkin specific configuration ##
@@ -150,6 +150,14 @@ include_directories(
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
+
+add_executable(map_from_attitude_node
+  src/map_from_attitude_node.cpp
+)
+
+target_link_libraries(map_from_attitude_node
+  ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##

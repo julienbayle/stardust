@@ -88,3 +88,20 @@ r2_localization:
                                 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     1e-9, 0,    0,
                                 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    1e-9, 0,
                                 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    1e-9]
+
+r2_imu_filter_madgwick:
+  gain: 0.1
+  zeta: 0.0
+  mag_bias_x: 0.0
+  mag_bias_y: 0.0
+  mag_bias_z: 0.0
+  orientation_stddev: 0.0
+  world_frame: "enu"
+  use_mag: true
+  use_magnetic_field_msg: false
+  fixed_frame: "odom"
+  publish_tf: false
+  reverse_tf: false
+  constant_dt: 0.0
+  publish_debug_topics: false
+  stateless: false

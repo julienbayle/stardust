@@ -27,4 +27,5 @@
   <exec_depend>tf2_ros</exec_depend>
   <exec_depend>tf2_geometry_msgs</exec_depend>
   <exec_depend>roscpp</exec_depend>
+  <exec_depend>hector_gazebo_plugins</exec_depend>
 </package>
