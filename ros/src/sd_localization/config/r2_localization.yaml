@@ -105,3 +105,16 @@ r2_imu_filter_madgwick:
   constant_dt: 0.0
   publish_debug_topics: false
   stateless: false
+
+r2_mrpt_localization_node:
+  odom_frame_id: r2/odom
+  global_frame_id: /map
+  base_frame_id: r2/base_link
+  use_map_topic: true
+  first_map_only: false
+  map_update_skip: 20
+  particlecloud_update_skip: 1
+  tf_prefix: ""
+  debug: true
+  gui_mrpt: true
+  sensor_sources: laser/scan_filtered

@@ -9,17 +9,8 @@
 	</node>
 	
 	<node pkg="mrpt_localization" type="mrpt_localization_node" name="$(arg robot_ns)_mrpt_localization_node" output="screen" unless="$(arg ground_truth)">
-		<param name="ini_file" value="$(find sd_localization)/config/pf-localization.ini"/> 
-		<param name="odom_frame_id" value="$(arg robot_ns)/odom"/> 
-		<param name="global_frame_id" value="/map"/> 
-		<param name="base_frame_id" value="$(arg robot_ns)/base_link"/> 
-		<param name="map_update_skip" value="20"/> 
-		<param name="particlecloud_update_skip" value="1"/> 
-		<param name="tf_prefix" value=""/> 
-		<param name="debug" value="true"/>
-		<param name="gui_mrpt" value="true"/> 
-		<param name="sensor_sources" value="laser/scan_filtered"/>
-		<remap from="particlecloud" to="particlecloud"/>
+		<param name="ini_file" value="$(find sd_localization)/config/pf-localization.ini"/>
+		<remap from="map" to="map_attitude"/>
 	</node>
 
 	<node pkg="imu_filter_madgwick" type="imu_filter_node" name="$(arg robot_ns)_imu_filter_madgwick"/>
