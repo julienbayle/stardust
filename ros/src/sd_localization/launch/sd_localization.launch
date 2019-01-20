@@ -8,9 +8,9 @@
 		<remap from="cmd_vel" to="mobile_base_controller/cmd_vel"/>
 	</node>
 	
-	<node pkg="mrpt_localization" type="mrpt_localization_node" name="$(arg robot_ns)_mrpt_localization_node" output="screen" unless="$(arg ground_truth)">
-		<param name="ini_file" value="$(find sd_localization)/config/pf-localization.ini"/>
+	<node pkg="amcl" type="amcl" name="$(arg robot_ns)_amcl" output="screen">
 		<remap from="map" to="map_attitude"/>
+		<remap from="scan" to="laser/scan_filtered"/>
 	</node>
 
 	<node pkg="imu_filter_madgwick" type="imu_filter_node" name="$(arg robot_ns)_imu_filter_madgwick"/>

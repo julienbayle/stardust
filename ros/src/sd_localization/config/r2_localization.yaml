@@ -106,15 +106,54 @@ r2_imu_filter_madgwick:
   publish_debug_topics: false
   stateless: false
 
-r2_mrpt_localization_node:
-  odom_frame_id: r2/odom
-  global_frame_id: /map
-  base_frame_id: r2/base_link
+r2_amcl:
+  min_particles: 500
+  max_particles: 5000
+  kld_err: 0.05
+  kld_z: 0.99
+  update_min_d: 0.0
+  update_min_a: 0.0
+  resample_interval: 1
+  transform_tolerance: 0.1
+  recovery_alpha_slow: 0.001
+  recovery_alpha_fast: 0.1
+  initial_pose_x: 0.0
+  initial_pose_y: 0.0
+  initial_pose_a: 0.0
+  initial_cov_xx: 100.0 # 1.0²
+  initial_cov_yy: 1000.0 # 1.5²
+  #initial_cov_aa: 39.47 # (2*pi)²
+  gui_publish_rate: 10.0
+  save_pose_rate: 0.5
   use_map_topic: true
   first_map_only: false
-  map_update_skip: 20
-  particlecloud_update_skip: 1
-  tf_prefix: ""
-  debug: true
-  gui_mrpt: true
-  sensor_sources: laser/scan_filtered
+
+  laser_min_range: -1.0
+  laser_max_range: -1.0
+  laser_max_beams: 30
+  laser_z_hit: 0.5
+  laser_z_short: 0.05
+  laser_z_max: 0.05
+  laser_z_rand: 0.5
+  laser_sigma_hit: 0.2
+  laser_lambda_short: 0.1
+  laser_likelihood_max_dist: 2.0
+  laser_model_type: "likelihood_field"
+
+  do_beamskip: false
+  beam_skip_distance: 0.5
+  beam_skip_threshold: 0.3
+  
+  odom_model_type: "diff-corrected"
+  odom_alpha5: 0.1
+  # Publish scans from best pose at a max of 10 Hz
+  odom_alpha1: 0.2
+  odom_alpha2: 0.2
+  # translation std dev, m
+  odom_alpha3: 0.8
+  odom_alpha4: 0.2
+  #odom_alpha5: 0.2
+  odom_frame_id: "r2/odom"
+  base_frame_id: "r2/base_link"
+  global_frame_id: "map"
+  tf_broadcast: true
