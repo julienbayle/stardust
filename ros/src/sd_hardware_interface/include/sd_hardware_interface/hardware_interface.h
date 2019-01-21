@@ -84,6 +84,7 @@ namespace sd_hardware_interface
     // Topics
     std::vector<std::string> encoder_topics_;
     std::vector<std::string> pwm_topics_;
+    std::vector<std::string> speed_topics_;
     std::vector<double> encoder_steps_for_one_wheel_revolution_;
 
     // Open loop (feed forward + friction model)
@@ -100,9 +101,13 @@ namespace sd_hardware_interface
     std::vector<boost::shared_ptr<VelocityController> > joint_velocity_controllers_;
     std::vector<ros::Subscriber> encoder_subscribers_;
     std::vector<ros::Publisher> effort_publishers_;
+    std::vector<ros::Publisher> speed_publishers_;
 
     // Encoder type
     bool is_quadrature_encoder_;
+
+    // Use torque or speed
+    bool velocity_controller_enabled_;
 
     // Topic read timeout
     double timeout_;

@@ -11,6 +11,7 @@
 // ROS parameter loading
 #include <rosparam_shortcuts/rosparam_shortcuts.h>
 #include <std_msgs/Int16.h>
+#include <std_msgs/Int32.h>
 #include <ros/ros.h>
 
 namespace sd_hardware_interface
@@ -25,10 +26,12 @@ HWInterface::HWInterface(ros::NodeHandle &nh)
   ros::NodeHandle rpnh(nh_, name_); 
   std::size_t error = 0;
   error += !rosparam_shortcuts::get(name_, rpnh, "is_quadrature_encoder", is_quadrature_encoder_);
+  error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controller_enabled", velocity_controller_enabled_);
   error += !rosparam_shortcuts::get(name_, rpnh, "timeout", timeout_);
   error += !rosparam_shortcuts::get(name_, rpnh, "joints", joint_names_);
   error += !rosparam_shortcuts::get(name_, rpnh, "encoder_topics", encoder_topics_);
   error += !rosparam_shortcuts::get(name_, rpnh, "pwm_topics", pwm_topics_);
+  error += !rosparam_shortcuts::get(name_, rpnh, "speed_topics", speed_topics_);
   error += !rosparam_shortcuts::get(name_, rpnh, "pwm_max", velocity_controllers_pwm_max_);
   error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_velocity_to_pwm", velocity_controllers_velocity_to_pwm_);
   error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_friction_pwm", velocity_controllers_friction_pwm_);
@@ -62,12 +65,17 @@ void HWInterface::init()
   }
 
   if (num_joints_ != pwm_topics_.size()) {
-    ROS_ERROR_STREAM_NAMED(name_, "write_effort_topics parameter must be the same size as joints");
+    ROS_ERROR_STREAM_NAMED(name_, "pwm_topics parameter must be the same size as joints");
+    return;
+  }
+
+  if (num_joints_ != speed_topics_.size()) {
+    ROS_ERROR_STREAM_NAMED(name_, "speed_topics parameter must be the same size as joints");
     return;
   }
 
   if (num_joints_ != encoder_steps_for_one_wheel_revolution_.size()) {
-    ROS_ERROR_STREAM_NAMED(name_, "pwm_topics parameter must be the same size as joints");
+    ROS_ERROR_STREAM_NAMED(name_, "encoder_steps_for_one_wheel_revolution parameter must be the same size as joints");
     return;
   }
 
@@ -136,6 +144,7 @@ void HWInterface::init()
     // Hardware related topics
     std::string encoder_topic = encoder_topics_[joint_id];
     std::string pwm_topic = pwm_topics_[joint_id];
+    std::string speed_topic = speed_topics_[joint_id];
 
     boost::shared_ptr<Encoder> joint_encoder( 
       new Encoder(
@@ -167,6 +176,7 @@ void HWInterface::init()
 
     joint_velocity_controllers_.push_back(joint_velocity_controller);
     effort_publishers_.push_back(nh_.advertise<std_msgs::Int16>(pwm_topic, 1, false));
+    speed_publishers_.push_back(nh_.advertise<std_msgs::Int32>(speed_topic, 1, false));
 
   }  // end for each joint
 
@@ -242,31 +252,48 @@ void HWInterface::write(ros::Duration &elapsed_time)
 {
   for (std::size_t joint_id = 0; joint_id < num_joints_; ++joint_id) 
   {
-    double cmd = joint_effort_command_[joint_id];
-    
-    cmd += joint_velocity_controllers_[joint_id]->velocityToEffort(
-        joint_velocity_[joint_id],
-        joint_velocity_command_[joint_id],
-        elapsed_time);
+    if (velocity_controller_enabled_) {
+      double cmd = joint_effort_command_[joint_id];
+      
+      cmd += joint_velocity_controllers_[joint_id]->velocityToEffort(
+          joint_velocity_[joint_id],
+          joint_velocity_command_[joint_id],
+          elapsed_time);
 
-    // Safety
-    if(!joint_encoders_[joint_id]->isAlive())
-    {
-      ROS_ERROR_STREAM_THROTTLE(1, "Encoder do not emit data. By security, actuator control is disabled");
-      cmd = 0.0;
+      // Safety
+      if(!joint_encoders_[joint_id]->isAlive())
+      {
+        ROS_ERROR_STREAM_THROTTLE(1, "Encoder do not emit data. By security, actuator control is disabled");
+        cmd = 0.0;
+      }
+
+      // Send data
+      std_msgs::Int16 effort;
+      effort.data = cmd;  
+      effort_publishers_[joint_id].publish(effort);
+
+      // set effort
+      joint_effort_[joint_id] = cmd;
+
+      // Direction for simple encoders
+      if(!is_quadrature_encoder_)
+        joint_encoders_[joint_id]->setDirection(effort_publishers_[joint_id] > 0);
     }
+    else {
+      double cmd = joint_velocity_command_[joint_id];
 
-    // Send data
-    std_msgs::Int16 effort;
-    effort.data = cmd;  
-    effort_publishers_[joint_id].publish(effort);
+      // Safety
+      if(!joint_encoders_[joint_id]->isAlive())
+      {
+        ROS_ERROR_STREAM_THROTTLE(1, "Encoder do not emit data. By security, actuator control is disabled");
+        cmd = 0.0;
+      }
 
-    // set effort
-    joint_effort_[joint_id] = cmd;
-
-    // Direction for simple encoders
-    if(!is_quadrature_encoder_)
-      joint_encoders_[joint_id]->setDirection(effort_publishers_[joint_id] > 0);
+      // Send data
+      std_msgs::Int32 speed;
+      speed.data = cmd;  
+      speed_publishers_[joint_id].publish(speed);
+    }
   }
 }
 

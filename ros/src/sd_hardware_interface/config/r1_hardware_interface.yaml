@@ -6,6 +6,7 @@ control_loop:
 
 hardware_interface:
   is_quadrature_encoder : true
+  velocity_controller_enabled : true
   timeout: 1.0 # seconds
   joints: 
     - right_wheel_to_base
@@ -19,6 +20,10 @@ hardware_interface:
     - pwm/right
     - pwm/left
     - pwm/back
+  speed_topics:
+    - speed/right
+    - speed/left
+    - speed/back
   pwm_max:
     - 4096
     - 4096
