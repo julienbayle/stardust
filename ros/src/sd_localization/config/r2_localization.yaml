@@ -157,3 +157,9 @@ r2_amcl:
   base_frame_id: "r2/base_link"
   global_frame_id: "map"
   tf_broadcast: true
+
+r2_snap_map:
+  odom_frame: "r2/odom"
+  laser_frame: "r2/laser_link"
+  base_frame: "r2/base_link"
+  map_frame: "map"

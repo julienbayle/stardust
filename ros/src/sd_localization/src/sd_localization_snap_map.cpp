@@ -58,7 +58,7 @@
 namespace sd_localization {
 class SnapMap {
 private:
-    double age_threshold_;
+    ros::Duration age_threshold_;
     double scan_rate_;
 
     double icp_inlier_dist_;
@@ -68,28 +68,18 @@ private:
 
     double dist_change_threshold_;
     double angle_change_threshold_;
-    double update_age_threshold_;
+    ros::Duration update_age_threshold_;
     double pose_covariance_trans_;
 
     bool debug_;
 
     std::string odom_frame_;
     std::string laser_frame_;
+    std::string base_frame_;
+    std::string map_frame_;
 
-    boost::mutex scan_callback_mutex_;
-
-    ros::NodeHandle nh_, nh_priv_;
-
-    ros::Publisher publisher_initial_pose_;
-    ros::Publisher publisher_scan_points_;
-    ros::Publisher publisher_scan_points_transformed_;
-    ros::Publisher publisher_debug_;
-
-    ros::Subscriber subscriber_map_;
-    ros::Subscriber subscriber_laser_scan_;
-
-    boost::shared_ptr<laser_geometry::LaserProjection> projector_;
-    boost::shared_ptr<tf::TransformListener> listener_;
+    laser_geometry::LaserProjection projector_;
+    tf::TransformListener tf_listener_;
     sensor_msgs::PointCloud2 cloud2_;
     sensor_msgs::PointCloud2 cloud2_transformed_;
 
@@ -104,24 +94,31 @@ private:
 
     bool use_sim_time_;
 
-    int last_scan_;
-    int act_scan_;
-    int last_time_sent_;
-
     boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > cloud_xyz_;
     pcl::KdTree<pcl::PointXYZ>::Ptr map_tree_;
 
-
-    int count_sc_;
-
     ros::Time last_processed_scan_;
+    ros::Time last_scan_time_;
+    ros::Time last_time_sent_;
+
+    boost::mutex scan_callback_mutex_;
+
+    ros::NodeHandle nh_, nh_priv_;
+
+    ros::Publisher publisher_initial_pose_;
+    ros::Publisher publisher_scan_points_;
+    ros::Publisher publisher_scan_points_transformed_;
+    ros::Publisher publisher_debug_;
+
+    ros::Subscriber subscriber_map_;
+    ros::Subscriber subscriber_laser_scan_;
 
     dynamic_reconfigure::Server<sd_localization::SnapMapConfig> dynamic_reconfigure_server_;
     dynamic_reconfigure::Server<sd_localization::SnapMapConfig>::CallbackType dynamic_reconfigure_callback_;
 
 public:
     SnapMap() :
-        age_threshold_(1),
+        age_threshold_(0),
         scan_rate_(2),
 
         icp_inlier_dist_(0.1),
@@ -131,13 +128,34 @@ public:
 
         dist_change_threshold_(0.05),
         angle_change_threshold_(0.01),
-        update_age_threshold_(1),
+        update_age_threshold_(0),
         pose_covariance_trans_(1.5),
 
         debug_(false),
 
         odom_frame_(),
         laser_frame_(),
+        base_frame_(),
+        map_frame_(),
+
+        projector_(),
+        tf_listener_(),
+        cloud2_(),
+        cloud2_transformed_(),
+        output_cloud_(new sensor_msgs::PointCloud2()),
+        scan_cloud_(new sensor_msgs::PointCloud2()),
+
+        we_have_a_map_(false),
+        we_have_a_scan_(false),
+        we_have_a_scan_transformed_(false),
+
+        use_sim_time_(false),
+
+        cloud_xyz_(),
+        map_tree_(),
+        last_processed_scan_(ros::Time::now()),
+        last_scan_time_(0),
+        last_time_sent_(0),
 
         scan_callback_mutex_(),
         nh_(),
@@ -151,36 +169,17 @@ public:
         subscriber_map_(nh_.subscribe("map", 1, &SnapMap::mapCallback, this)),
         subscriber_laser_scan_(nh_.subscribe("laser_scan", 1, &SnapMap::scanCallback, this)),
 
-        projector_(new laser_geometry::LaserProjection()),
-        listener_(),
-        cloud2_(),
-        cloud2_transformed_(),
-        output_cloud_(new sensor_msgs::PointCloud2()),
-        scan_cloud_(new sensor_msgs::PointCloud2()),
-
-        we_have_a_map_(false),
-        we_have_a_scan_(false),
-        we_have_a_scan_transformed_(false),
-
-        use_sim_time_(false),
-
-        last_scan_(0),
-        act_scan_(0),
-        cloud_xyz_(),
-        map_tree_(),
-        last_time_sent_(-1000),
-        count_sc_(0),
-        last_processed_scan_(ros::Time::now()),
-
         dynamic_reconfigure_server_(),
         dynamic_reconfigure_callback_(boost::bind(&SnapMap::dynamicReconfigureCallback, this, _1, _2))
     {
-        nh_priv_.param<std::string>("odom_frame", odom_frame_, "/odom_combined");
-        nh_priv_.param<std::string>("laser_frame", laser_frame_, "/base_laser_link");
+        nh_priv_.param<std::string>("odom_frame", odom_frame_, "/odom");
+        nh_priv_.param<std::string>("laser_frame", laser_frame_, "/laser_link");
+        nh_priv_.param<std::string>("base_frame", base_frame_, "/base_link");
+        nh_priv_.param<std::string>("map_frame", map_frame_, "/map");
     }
     
     void dynamicReconfigureCallback(sd_localization::SnapMapConfig &config, uint32_t level) {
-        age_threshold_ = config.age_threshold;
+        age_threshold_ = ros::Duration(config.age_threshold);
         scan_rate_ = config.scan_rate;
 
         icp_inlier_dist_ = config.icp_inlier_dist;
@@ -190,7 +189,7 @@ public:
         
         dist_change_threshold_ = config.dist_change_threshold;
         angle_change_threshold_ = config.angle_change_threshold;
-        update_age_threshold_ = config.update_age_threshold;
+        update_age_threshold_ = ros::Duration(config.update_age_threshold);
         pose_covariance_trans_ = config.pose_covariance_trans;
 
         debug_ = config.debug;
@@ -247,7 +246,7 @@ public:
         cloud_xyz_->is_dense = false;
         std_msgs::Header header;
         header.stamp = ros::Time(0);
-        header.frame_id = "/map";
+        header.frame_id = map_frame_;
         cloud_xyz_->header = pcl_conversions::toPCL(header);
 
         pcl::PointXYZ point_xyz;
@@ -280,7 +279,7 @@ public:
         bool gotTransform = false;
 
         ros::Time before = ros::Time::now();
-        if (!listener_->waitForTransform(parent_frame, child_frame, stamp, ros::Duration(0.5)))
+        if (!tf_listener_.waitForTransform(parent_frame, child_frame, stamp, ros::Duration(0.5)))
         {
             ROS_WARN("DIDNT GET TRANSFORM %s %s IN c at %f", parent_frame.c_str(), child_frame.c_str(), stamp.toSec());
             return false;
@@ -290,7 +289,7 @@ public:
         try
         {
             gotTransform = true;
-            listener_->lookupTransform(parent_frame,child_frame,stamp , trans);
+            tf_listener_.lookupTransform(parent_frame,child_frame,stamp , trans);
         }
         catch (tf::TransformException ex)
         {
@@ -313,14 +312,14 @@ public:
         ros::Time scan_in_time = scan_in->header.stamp;
         ros::Time time_received = ros::Time::now();
 
-        if ( scan_in_time - last_processed_scan_ < ros::Duration(1.0f / scan_rate_) )
+        if (scan_rate_ != 0.0 && scan_in_time - last_processed_scan_ < ros::Duration(1.0f / scan_rate_) )
         {
             ROS_DEBUG("rejected scan, last %f , this %f", last_processed_scan_.toSec() ,scan_in_time.toSec());
             return;
         }
 
 
-        //projector_.transformLaserScanToPointCloud("base_link",*scan_in,cloud,listener_);
+        //projector_.transformLaserScanToPointCloud(base_frame_,*scan_in,cloud,tf_listener_);
         if (!scan_callback_mutex_.try_lock())
             return;
 
@@ -328,25 +327,17 @@ public:
 
         //check if we want to accept this scan, if its older than 1 sec, drop it
         if (!use_sim_time_)
-            if (scan_age.toSec() > age_threshold_)
+            if (!age_threshold_.isZero() && scan_age > age_threshold_)
             {
-                //ROS_WARN("SCAN SEEMS TOO OLD (%f seconds, %f threshold)", scan_age.toSec(), age_threshold_);
-                ROS_WARN("SCAN SEEMS TOO OLD (%f seconds, %f threshold) scan time: %f , now %f", scan_age.toSec(), age_threshold_, scan_in_time.toSec(),ros::Time::now().toSec() );
+                ROS_WARN("SCAN SEEMS TOO OLD (%f seconds, %f threshold) scan time: %f , now %f", scan_age.toSec(), age_threshold_.toSec(), scan_in_time.toSec(),ros::Time::now().toSec() );
                 scan_callback_mutex_.unlock();
 
                 return;
             }
 
-        count_sc_++;
-        //ROS_DEBUG("count_sc %i MUTEX LOCKED", count_sc_);
-
-        //if (count_sc_ > 10)
-        //if (count_sc_ > 10)
         {
-            count_sc_ = 0;
-
             tf::StampedTransform base_at_laser;
-            if (!getTransform(base_at_laser, odom_frame_, "base_link", scan_in_time))
+            if (!getTransform(base_at_laser, odom_frame_, base_frame_, scan_in_time))
             {
                 ROS_WARN("Did not get base pose at laser scan time");
                 scan_callback_mutex_.unlock();
@@ -358,19 +349,19 @@ public:
             sensor_msgs::PointCloud cloud;
             sensor_msgs::PointCloud cloudInMap;
 
-            projector_->projectLaser(*scan_in,cloud);
+            projector_.projectLaser(*scan_in,cloud);
 
             we_have_a_scan_ = false;
             bool gotTransform = false;
 
-            if (!listener_->waitForTransform("/map", cloud.header.frame_id, cloud.header.stamp, ros::Duration(0.05)))
+            if (!tf_listener_.waitForTransform(map_frame_, cloud.header.frame_id, cloud.header.stamp, ros::Duration(0.05)))
             {
                 scan_callback_mutex_.unlock();
                 ROS_WARN("SnapMapICP no map to cloud transform found MUTEX UNLOCKED");
                 return;
             }
 
-            if (!listener_->waitForTransform("/map", "/base_link", cloud.header.stamp, ros::Duration(0.05)))
+            if (!tf_listener_.waitForTransform(map_frame_, base_frame_, cloud.header.stamp, ros::Duration(0.05)))
             {
                 scan_callback_mutex_.unlock();
                 ROS_WARN("SnapMapICP no map to base transform found MUTEX UNLOCKED");
@@ -383,7 +374,7 @@ public:
                 try
                 {
                     gotTransform = true;
-                    listener_->transformPointCloud ("/map",cloud,cloudInMap);
+                    tf_listener_.transformPointCloud (map_frame_,cloud,cloudInMap);
                 }
                 catch (...)
                 {
@@ -405,7 +396,7 @@ public:
                 try
                 {
                     gotTransform = true;
-                    listener_->lookupTransform("/map", "/base_link",
+                    tf_listener_.lookupTransform(map_frame_, base_frame_,
                                             cloud.header.stamp , oldPose);
                 }
                 catch (tf::TransformException ex)
@@ -418,8 +409,6 @@ public:
             {
                 sensor_msgs::convertPointCloudToPointCloud2(cloudInMap,cloud2_);
                 we_have_a_scan_ = true;
-
-                act_scan_++;
 
                 //pcl::IterativeClosestPointNonLinear<pcl::PointXYZ, pcl::PointXYZ> reg;
                 pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> reg;
@@ -487,7 +476,7 @@ public:
                 t =  t * oldPose;
 
                 tf::StampedTransform base_after_icp;
-                if (!getTransform(base_after_icp, odom_frame_, "base_link", ros::Time(0)))
+                if (!getTransform(base_after_icp, odom_frame_, base_frame_, ros::Time(0)))
                 {
                     ROS_WARN("Did not get base pose at now");
                     scan_callback_mutex_.unlock();
@@ -505,7 +494,7 @@ public:
 
                 //ROS_DEBUG("SCAN_AGE seems to be %f", scan_age.toSec());
                 char msg_c_str[2048];
-                sprintf(msg_c_str,"INLIERS %f (%f) scan_age %f (%f age_threshold) dist %f angleDist %f axis(%f %f %f) fitting %f",inlier_perc, icp_inlier_threshold_, scan_age.toSec(), age_threshold_ ,dist, angleDist, rotAxis.x(), rotAxis.y(), rotAxis.z(),reg.getFitnessScore());
+                sprintf(msg_c_str,"INLIERS %f (%f) scan_age %f (%f age_threshold) dist %f angleDist %f axis(%f %f %f) fitting %f",inlier_perc, icp_inlier_threshold_, scan_age.toSec(), age_threshold_.toSec() ,dist, angleDist, rotAxis.x(), rotAxis.y(), rotAxis.z(),reg.getFitnessScore());
                 std_msgs::String strmsg;
                 strmsg.data = msg_c_str;
 
@@ -513,11 +502,11 @@ public:
 
                 double cov = pose_covariance_trans_;
 
-                if ((act_scan_ - last_time_sent_ > update_age_threshold_) && ((dist > dist_change_threshold_) || (angleDist > angle_change_threshold_)) && (inlier_perc > icp_inlier_threshold_) && (angleDist < angle_upper_threshold_))
+                if ((update_age_threshold_.isZero() || (ros::Time::now() - last_time_sent_ > update_age_threshold_)) && ((dist > dist_change_threshold_) || (angleDist > angle_change_threshold_)) && (inlier_perc > icp_inlier_threshold_) && (angleDist < angle_upper_threshold_))
                 {
-                    last_time_sent_ = act_scan_;
+                    last_time_sent_ = last_scan_time_;
                     geometry_msgs::PoseWithCovarianceStamped pose;
-                    pose.header.frame_id = "map";
+                    pose.header.frame_id = map_frame_;
                     pose.pose.pose.position.x = t.getOrigin().x();
                     pose.pose.pose.position.y = t.getOrigin().y();
 
