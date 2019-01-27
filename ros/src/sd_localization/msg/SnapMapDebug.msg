@@ -1,0 +1,10 @@
+float64 inlier_percentage
+float64 inlier_percentage_threshold
+float64 scan_age
+float64 scan_age_threshold
+float64 distance
+float64 angle
+geometry_msgs/Point rotation_axis
+bool regression_converged
+float64 fitness_score
+bool sent

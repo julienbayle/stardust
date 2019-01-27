@@ -54,6 +54,7 @@
 
 #include <dynamic_reconfigure/server.h>
 #include <sd_localization/SnapMapConfig.h>
+#include <sd_localization/SnapMapDebug.h>
 
 namespace sd_localization {
 class SnapMap {
@@ -80,8 +81,6 @@ private:
 
     laser_geometry::LaserProjection projector_;
     tf::TransformListener tf_listener_;
-    sensor_msgs::PointCloud2 cloud2_;
-    sensor_msgs::PointCloud2 cloud2_transformed_;
 
     typedef pcl::PointCloud<pcl::PointXYZ> PointCloudT;
 
@@ -89,8 +88,6 @@ private:
     boost::shared_ptr< sensor_msgs::PointCloud2> scan_cloud_;
 
     bool we_have_a_map_;
-    bool we_have_a_scan_;
-    bool we_have_a_scan_transformed_;
 
     bool use_sim_time_;
 
@@ -140,14 +137,10 @@ public:
 
         projector_(),
         tf_listener_(),
-        cloud2_(),
-        cloud2_transformed_(),
         output_cloud_(new sensor_msgs::PointCloud2()),
         scan_cloud_(new sensor_msgs::PointCloud2()),
 
         we_have_a_map_(false),
-        we_have_a_scan_(false),
-        we_have_a_scan_transformed_(false),
 
         use_sim_time_(false),
 
@@ -164,7 +157,7 @@ public:
         publisher_initial_pose_(nh_.advertise<geometry_msgs::PoseWithCovarianceStamped>("initialpose", 1)),
         publisher_scan_points_(nh_priv_.advertise<sensor_msgs::PointCloud2> ("scan_points", 1)),
         publisher_scan_points_transformed_(nh_priv_.advertise<sensor_msgs::PointCloud2> ("scan_points_transformed", 1)),
-        publisher_debug_(nh_priv_.advertise<std_msgs::String> ("SnapMapICP", 1)),
+        publisher_debug_(nh_priv_.advertise<sd_localization::SnapMapDebug> ("debug", 1)),
 
         subscriber_map_(nh_.subscribe("map", 1, &SnapMap::mapCallback, this)),
         subscriber_laser_scan_(nh_.subscribe("laser_scan", 1, &SnapMap::scanCallback, this)),
@@ -176,6 +169,8 @@ public:
         nh_priv_.param<std::string>("laser_frame", laser_frame_, "/laser_link");
         nh_priv_.param<std::string>("base_frame", base_frame_, "/base_link");
         nh_priv_.param<std::string>("map_frame", map_frame_, "/map");
+
+        dynamic_reconfigure_server_.setCallback(dynamic_reconfigure_callback_);
     }
     
     void dynamicReconfigureCallback(sd_localization::SnapMapConfig &config, uint32_t level) {
@@ -218,16 +213,6 @@ public:
         bt = tf::Transform(basis,origin);
     }
 
-    pcl::KdTree<pcl::PointXYZ>::Ptr getTree(pcl::PointCloud<pcl::PointXYZ>::Ptr cloudb)
-    {
-        pcl::KdTree<pcl::PointXYZ>::Ptr tree;
-        tree.reset (new pcl::KdTreeFLANN<pcl::PointXYZ>);
-
-        tree->setInputCloud (cloudb);
-        return tree;
-    }
-
-
     void mapCallback(const nav_msgs::OccupancyGrid& msg)
     {
         ROS_DEBUG("I heard frame_id: [%s]", msg.header.frame_id.c_str());
@@ -266,39 +251,13 @@ public:
             }
         cloud_xyz_->width = cloud_xyz_->points.size();
 
-        map_tree_ = getTree(cloud_xyz_);
+        map_tree_.reset (new pcl::KdTreeFLANN<pcl::PointXYZ>);
+        map_tree_->setInputCloud (cloud_xyz_);
 
         pcl::toROSMsg (*cloud_xyz_, *output_cloud_);
         ROS_DEBUG("Publishing PointXYZ cloud with %ld points in frame %s", cloud_xyz_->points.size(),output_cloud_->header.frame_id.c_str());
 
         we_have_a_map_ = true;
-    }
-
-    bool getTransform(tf::StampedTransform &trans , const std::string parent_frame, const std::string child_frame, const ros::Time stamp)
-    {
-        bool gotTransform = false;
-
-        ros::Time before = ros::Time::now();
-        if (!tf_listener_.waitForTransform(parent_frame, child_frame, stamp, ros::Duration(0.5)))
-        {
-            ROS_WARN("DIDNT GET TRANSFORM %s %s IN c at %f", parent_frame.c_str(), child_frame.c_str(), stamp.toSec());
-            return false;
-        }
-        //ROS_INFO("waited for transform %f", (ros::Time::now() - before).toSec());
-
-        try
-        {
-            gotTransform = true;
-            tf_listener_.lookupTransform(parent_frame,child_frame,stamp , trans);
-        }
-        catch (tf::TransformException ex)
-        {
-            gotTransform = false;
-            ROS_WARN("DIDNT GET TRANSFORM %s %s IN B", parent_frame.c_str(), child_frame.c_str());
-        }
-
-
-        return gotTransform;
     }
 
     void scanCallback (const sensor_msgs::LaserScan::ConstPtr& scan_in)
@@ -318,224 +277,172 @@ public:
             return;
         }
 
-
         //projector_.transformLaserScanToPointCloud(base_frame_,*scan_in,cloud,tf_listener_);
-        if (!scan_callback_mutex_.try_lock())
-            return;
+        boost::mutex::scoped_lock scoped_lock(scan_callback_mutex_);
 
         ros::Duration scan_age = ros::Time::now() - scan_in_time;
 
         //check if we want to accept this scan, if its older than 1 sec, drop it
-        if (!use_sim_time_)
-            if (!age_threshold_.isZero() && scan_age > age_threshold_)
-            {
-                ROS_WARN("SCAN SEEMS TOO OLD (%f seconds, %f threshold) scan time: %f , now %f", scan_age.toSec(), age_threshold_.toSec(), scan_in_time.toSec(),ros::Time::now().toSec() );
-                scan_callback_mutex_.unlock();
-
-                return;
-            }
-
+        if (!age_threshold_.isZero() && scan_age > age_threshold_)
         {
-            tf::StampedTransform base_at_laser;
-            if (!getTransform(base_at_laser, odom_frame_, base_frame_, scan_in_time))
-            {
-                ROS_WARN("Did not get base pose at laser scan time");
-                scan_callback_mutex_.unlock();
+            ROS_WARN("SCAN SEEMS TOO OLD (%f seconds, %f threshold) scan time: %f , now %f", scan_age.toSec(), age_threshold_.toSec(), scan_in_time.toSec(),ros::Time::now().toSec() );
 
-                return;
+            return;
+        }
+
+        if (!tf_listener_.waitForTransform(odom_frame_, base_frame_, scan_in_time, ros::Duration(0.05)))
+        {
+            ROS_WARN("SnapMapICP no odom to base transform found");
+            return;
+        }
+
+        tf::StampedTransform base_at_laser;
+        tf_listener_.lookupTransform(odom_frame_, base_frame_, scan_in_time, base_at_laser);
+
+        sensor_msgs::PointCloud cloud;
+        sensor_msgs::PointCloud cloudInMap;
+
+        projector_.projectLaser(*scan_in,cloud);
+
+        if (!tf_listener_.waitForTransform(map_frame_, cloud.header.frame_id, cloud.header.stamp, ros::Duration(0.05)))
+        {
+            ROS_WARN("SnapMapICP no map to cloud transform found");
+            return;
+        }
+
+        if (!tf_listener_.waitForTransform(map_frame_, base_frame_, cloud.header.stamp, ros::Duration(0.05)))
+        {
+            ROS_WARN("SnapMapICP no map to base transform found");
+            return;
+        }
+
+        tf_listener_.transformPointCloud (map_frame_, cloud, cloudInMap);
+
+        // Set zero altitude
+        for (size_t k =0; k < cloudInMap.points.size(); k++)
+        {
+            cloudInMap.points[k].z = 0;
+        }
+  
+        tf::StampedTransform oldPose;
+        tf_listener_.lookupTransform(map_frame_, base_frame_, cloud.header.stamp , oldPose);
+
+        sensor_msgs::PointCloud2 cloud2;
+        sensor_msgs::convertPointCloudToPointCloud2(cloudInMap,cloud2);
+
+        last_scan_time_ = ros::Time::now();
+
+        //pcl::IterativeClosestPointNonLinear<pcl::PointXYZ, pcl::PointXYZ> reg;
+        pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> reg;
+        reg.setTransformationEpsilon (1e-6);
+        // Set the maximum distance between two correspondences (src<->tgt) to 10cm
+        // Note: adjust this based on the size of your datasets
+        reg.setMaxCorrespondenceDistance(0.5);
+        reg.setMaximumIterations (icp_num_iter_);
+        // Set the point representation
+
+        PointCloudT::Ptr myMapCloud (new PointCloudT());
+        PointCloudT::Ptr myScanCloud (new PointCloudT());
+
+        pcl::fromROSMsg(*output_cloud_,*myMapCloud);
+        pcl::fromROSMsg(cloud2,*myScanCloud);
+
+        reg.setInputSource(myScanCloud);
+        reg.setInputTarget(myMapCloud);
+
+        PointCloudT unused;
+        int i = 0;
+
+        reg.align (unused);
+
+        const Eigen::Matrix4f &transf = reg.getFinalTransformation();
+        tf::Transform t;
+        matrixAsTransfrom(transf,t);
+
+        PointCloudT transformedCloud;
+        pcl::transformPointCloud (*myScanCloud, transformedCloud, reg.getFinalTransformation());
+
+        double inlier_perc = 0;
+        {
+            // count inliers
+            std::vector<int> nn_indices (1);
+            std::vector<float> nn_sqr_dists (1);
+
+            size_t numinliers = 0;
+
+            for (size_t k = 0; k < transformedCloud.points.size(); ++k )
+            {
+                if (map_tree_->radiusSearch (transformedCloud.points[k], icp_inlier_dist_, nn_indices,nn_sqr_dists, 1) != 0)
+                    numinliers += 1;
             }
-
-
-            sensor_msgs::PointCloud cloud;
-            sensor_msgs::PointCloud cloudInMap;
-
-            projector_.projectLaser(*scan_in,cloud);
-
-            we_have_a_scan_ = false;
-            bool gotTransform = false;
-
-            if (!tf_listener_.waitForTransform(map_frame_, cloud.header.frame_id, cloud.header.stamp, ros::Duration(0.05)))
+            if (transformedCloud.points.size() > 0)
             {
-                scan_callback_mutex_.unlock();
-                ROS_WARN("SnapMapICP no map to cloud transform found MUTEX UNLOCKED");
-                return;
-            }
-
-            if (!tf_listener_.waitForTransform(map_frame_, base_frame_, cloud.header.stamp, ros::Duration(0.05)))
-            {
-                scan_callback_mutex_.unlock();
-                ROS_WARN("SnapMapICP no map to base transform found MUTEX UNLOCKED");
-                return;
-            }
-
-
-            while (!gotTransform && (ros::ok()))
-            {
-                try
-                {
-                    gotTransform = true;
-                    tf_listener_.transformPointCloud (map_frame_,cloud,cloudInMap);
-                }
-                catch (...)
-                {
-                    gotTransform = false;
-                    ROS_WARN("DIDNT GET TRANSFORM IN A");
-                }
-            }
-
-            for (size_t k =0; k < cloudInMap.points.size(); k++)
-            {
-                cloudInMap.points[k].z = 0;
-            }
-
-
-            gotTransform = false;
-            tf::StampedTransform oldPose;
-            while (!gotTransform && (ros::ok()))
-            {
-                try
-                {
-                    gotTransform = true;
-                    tf_listener_.lookupTransform(map_frame_, base_frame_,
-                                            cloud.header.stamp , oldPose);
-                }
-                catch (tf::TransformException ex)
-                {
-                    gotTransform = false;
-                    ROS_WARN("DIDNT GET TRANSFORM IN B");
-                }
-            }
-            if (we_have_a_map_ && gotTransform)
-            {
-                sensor_msgs::convertPointCloudToPointCloud2(cloudInMap,cloud2_);
-                we_have_a_scan_ = true;
-
-                //pcl::IterativeClosestPointNonLinear<pcl::PointXYZ, pcl::PointXYZ> reg;
-                pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> reg;
-                reg.setTransformationEpsilon (1e-6);
-                // Set the maximum distance between two correspondences (src<->tgt) to 10cm
-                // Note: adjust this based on the size of your datasets
-                reg.setMaxCorrespondenceDistance(0.5);
-                reg.setMaximumIterations (icp_num_iter_);
-                // Set the point representation
-
-                //ros::Time bef = ros::Time::now();
-
-                PointCloudT::Ptr myMapCloud (new PointCloudT());
-                PointCloudT::Ptr myScanCloud (new PointCloudT());
-
-                pcl::fromROSMsg(*output_cloud_,*myMapCloud);
-                pcl::fromROSMsg(cloud2_,*myScanCloud);
-
-                reg.setInputSource(myScanCloud);
-                reg.setInputTarget(myMapCloud);
-
-                PointCloudT unused;
-                int i = 0;
-
-                reg.align (unused);
-
-                const Eigen::Matrix4f &transf = reg.getFinalTransformation();
-                tf::Transform t;
-                matrixAsTransfrom(transf,t);
-
-                //ROS_ERROR("proc time %f", (ros::Time::now() - bef).toSec());
-
-                we_have_a_scan_transformed_ = false;
-                PointCloudT transformedCloud;
-                pcl::transformPointCloud (*myScanCloud, transformedCloud, reg.getFinalTransformation());
-
-                double inlier_perc = 0;
-                {
-                    // count inliers
-                    std::vector<int> nn_indices (1);
-                    std::vector<float> nn_sqr_dists (1);
-
-                    size_t numinliers = 0;
-
-                    for (size_t k = 0; k < transformedCloud.points.size(); ++k )
-                    {
-                        if (map_tree_->radiusSearch (transformedCloud.points[k], icp_inlier_dist_, nn_indices,nn_sqr_dists, 1) != 0)
-                            numinliers += 1;
-                    }
-                    if (transformedCloud.points.size() > 0)
-                    {
-                        //ROS_INFO("Inliers in dist %f: %zu of %zu percentage %f (%f)", icp_inlier_dist_, numinliers, transformedCloud.points.size(), (double) numinliers / (double) transformedCloud.points.size(), icp_inlier_threshold_);
-                        inlier_perc = (double) numinliers / (double) transformedCloud.points.size();
-                    }
-                }
-
-                last_processed_scan_ = scan_in_time;
-
-                pcl::toROSMsg (transformedCloud, cloud2_transformed_);
-                we_have_a_scan_transformed_ = true;
-
-                double dist = sqrt((t.getOrigin().x() * t.getOrigin().x()) + (t.getOrigin().y() * t.getOrigin().y()));
-                double angleDist = t.getRotation().getAngle();
-                tf::Vector3 rotAxis  = t.getRotation().getAxis();
-                t =  t * oldPose;
-
-                tf::StampedTransform base_after_icp;
-                if (!getTransform(base_after_icp, odom_frame_, base_frame_, ros::Time(0)))
-                {
-                    ROS_WARN("Did not get base pose at now");
-                    scan_callback_mutex_.unlock();
-
-                    return;
-                }
-                else
-                {
-                    tf::Transform rel = base_at_laser.inverseTimes(base_after_icp);
-                    ROS_DEBUG("relative motion of robot while doing icp: %fcm %fdeg", rel.getOrigin().length(), rel.getRotation().getAngle() * 180 / M_PI);
-                    t= t * rel;
-                }
-
-                //ROS_DEBUG("dist %f angleDist %f",dist, angleDist);
-
-                //ROS_DEBUG("SCAN_AGE seems to be %f", scan_age.toSec());
-                char msg_c_str[2048];
-                sprintf(msg_c_str,"INLIERS %f (%f) scan_age %f (%f age_threshold) dist %f angleDist %f axis(%f %f %f) fitting %f",inlier_perc, icp_inlier_threshold_, scan_age.toSec(), age_threshold_.toSec() ,dist, angleDist, rotAxis.x(), rotAxis.y(), rotAxis.z(),reg.getFitnessScore());
-                std_msgs::String strmsg;
-                strmsg.data = msg_c_str;
-
-                //ROS_DEBUG("%s", msg_c_str);
-
-                double cov = pose_covariance_trans_;
-
-                if ((update_age_threshold_.isZero() || (ros::Time::now() - last_time_sent_ > update_age_threshold_)) && ((dist > dist_change_threshold_) || (angleDist > angle_change_threshold_)) && (inlier_perc > icp_inlier_threshold_) && (angleDist < angle_upper_threshold_))
-                {
-                    last_time_sent_ = last_scan_time_;
-                    geometry_msgs::PoseWithCovarianceStamped pose;
-                    pose.header.frame_id = map_frame_;
-                    pose.pose.pose.position.x = t.getOrigin().x();
-                    pose.pose.pose.position.y = t.getOrigin().y();
-
-                    tf::Quaternion quat = t.getRotation();
-                    //quat.setRPY(0.0, 0.0, theta);
-                    tf::quaternionTFToMsg(quat,pose.pose.pose.orientation);
-                    float factorPos = 0.03;
-                    float factorRot = 0.1;
-                    pose.pose.covariance[6*0+0] = (cov * cov) * factorPos;
-                    pose.pose.covariance[6*1+1] = (cov * cov) * factorPos;
-                    pose.pose.covariance[6*3+3] = (M_PI/12.0 * M_PI/12.0) * factorRot;
-                    ROS_DEBUG("i %i converged %i SCORE: %f", i,  reg.hasConverged (),  reg.getFitnessScore()  );
-                    ROS_DEBUG("PUBLISHING A NEW INITIAL POSE dist %f angleDist %f Setting pose: %.3f %.3f  [frame=%s]",dist, angleDist , pose.pose.pose.position.x  , pose.pose.pose.position.y , pose.header.frame_id.c_str());
-                    publisher_initial_pose_.publish(pose);
-                    strmsg.data += " << SENT";
-                }
-
-                //ROS_INFO("processing time : %f", (ros::Time::now() - time_received).toSec());
-
-                if (debug_) {
-                    publisher_scan_points_.publish(cloud2_);
-                    publisher_scan_points_transformed_.publish(cloud2_transformed_);
-                    publisher_debug_.publish(strmsg);
-                }
-                //ROS_DEBUG("map width %i height %i size %i, %s", myMapCloud.width, myMapCloud.height, (int)myMapCloud.points.size(), myMapCloud.header.frame_id.c_str());
-                //ROS_DEBUG("scan width %i height %i size %i, %s", myScanCloud.width, myScanCloud.height, (int)myScanCloud.points.size(), myScanCloud.header.frame_id.c_str());
+                //ROS_INFO("Inliers in dist %f: %zu of %zu percentage %f (%f)", icp_inlier_dist_, numinliers, transformedCloud.points.size(), (double) numinliers / (double) transformedCloud.points.size(), icp_inlier_threshold_);
+                inlier_perc = (double) numinliers / (double) transformedCloud.points.size();
             }
         }
-        scan_callback_mutex_.unlock();
+
+        last_processed_scan_ = scan_in_time;
+
+        double dist = sqrt((t.getOrigin().x() * t.getOrigin().x()) + (t.getOrigin().y() * t.getOrigin().y()));
+        double angleDist = t.getRotation().getAngle();
+        tf::Vector3 rotAxis  = t.getRotation().getAxis();
+        t =  t * oldPose;
+
+        tf::StampedTransform base_after_icp;
+        tf_listener_.lookupTransform(odom_frame_, base_frame_, ros::Time(0), base_after_icp);
+
+        tf::Transform rel = base_at_laser.inverseTimes(base_after_icp);
+        ROS_DEBUG("relative motion of robot while doing icp: %fcm %fdeg", rel.getOrigin().length(), rel.getRotation().getAngle() * 180 / M_PI);
+        t= t * rel;
+
+
+        double cov = pose_covariance_trans_;
+        bool sent = false;
+
+        if ((update_age_threshold_.isZero() || (last_scan_time_ - last_time_sent_ > update_age_threshold_)) && ((dist > dist_change_threshold_) || (angleDist > angle_change_threshold_)) && (inlier_perc > icp_inlier_threshold_) && (angleDist < angle_upper_threshold_))
+        {
+            last_time_sent_ = last_scan_time_;
+            geometry_msgs::PoseWithCovarianceStamped pose;
+            pose.header.frame_id = map_frame_;
+            pose.pose.pose.position.x = t.getOrigin().x();
+            pose.pose.pose.position.y = t.getOrigin().y();
+
+            tf::Quaternion quat = t.getRotation();
+            tf::quaternionTFToMsg(quat,pose.pose.pose.orientation);
+            float factorPos = 0.03;
+            float factorRot = 0.1;
+            pose.pose.covariance[6*0+0] = (cov * cov) * factorPos;
+            pose.pose.covariance[6*1+1] = (cov * cov) * factorPos;
+            pose.pose.covariance[6*3+3] = (M_PI/12.0 * M_PI/12.0) * factorRot;
+            publisher_initial_pose_.publish(pose);
+
+            sent = true;
+        }
+
+        if (debug_) {
+            publisher_scan_points_.publish(cloud2);
+
+            sensor_msgs::PointCloud2 cloud2_transformed;
+            pcl::toROSMsg (transformedCloud, cloud2_transformed);
+            publisher_scan_points_transformed_.publish(cloud2_transformed);
+
+            // Publish debug info
+            sd_localization::SnapMapDebug debug;
+            debug.inlier_percentage = inlier_perc;
+            debug.inlier_percentage_threshold = icp_inlier_threshold_;
+            debug.scan_age = scan_age.toSec();
+            debug.scan_age_threshold = age_threshold_.toSec();
+            debug.distance = dist;
+            debug.angle = angleDist;
+            debug.rotation_axis.x = rotAxis.x();
+            debug.rotation_axis.y = rotAxis.y();
+            debug.rotation_axis.z = rotAxis.z();
+            debug.regression_converged = reg.hasConverged();
+            debug.fitness_score = reg.getFitnessScore();
+            debug.sent = sent;
+            publisher_debug_.publish(debug);
+        }
     }
 };
 }
