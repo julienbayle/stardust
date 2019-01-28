@@ -36,7 +36,7 @@ namespace sd_hardware_interface
 		}
 
 		double steps = encoder_position - last_encoder_position_;
-
+		
 		// Encoder overflows
 		if (last_encoder_position_ > max_position_/2 and encoder_position < min_position_/2)	
 			steps += max_position_ - min_position_;
@@ -48,11 +48,12 @@ namespace sd_hardware_interface
 		angle_ += direction_ * steps * encoder_resolution_;
 
 		// Get change in time
-    	clock_gettime(CLOCK_MONOTONIC, &current_time_);
-    	elapsed_time_ = ros::Duration(
-	      current_time_.tv_sec - last_time_.tv_sec + 
-	      (current_time_.tv_nsec - last_time_.tv_nsec) / BILLION);
-    	last_time_ = current_time_;
+    		clock_gettime(CLOCK_MONOTONIC, &current_time_);
+    		elapsed_time_ = ros::Duration(
+	      		current_time_.tv_sec - last_time_.tv_sec + 
+	      		(current_time_.tv_nsec - last_time_.tv_nsec) / BILLION);
+    		last_time_ = current_time_;
+		last_encoder_position_ = encoder_position;
 
 		speed_ = (angle_ - last_angle) / elapsed_time_.toSec();
 		speed_acc_(speed_);
