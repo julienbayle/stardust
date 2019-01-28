@@ -1,9 +1,9 @@
 r1:
   teleop:
-    max_linear_x_velocity: 0.3
-    max_linear_y_velocity: 0.3
-    max_angular_z_velocity: 3.0
-    boost_velocity_ratio: 2.0
+    max_linear_x_velocity: 1.0
+    max_linear_y_velocity: 1.0
+    max_angular_z_velocity: 2.0
+    boost_velocity_ratio: 3.0
     joy_topic: joy
 
 r2:
