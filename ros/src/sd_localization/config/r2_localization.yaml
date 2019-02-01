@@ -28,10 +28,10 @@ r2_localization:
                 false, false, true,
                 true, false, false]
   imu0_queue_size: 2 # Imu is 50Hz
-  imu0_relative: true
+  imu0_relative: false
   imu0_nodelay: true
   
-  initial_state: [0.0, 0.0, 0.605,
+  initial_state: [0.0, 0.0, 0.0,
                   0.0, 0.0, 0.0,
                   0.0, 0.0, 0.0,
                   0.0, 0.0, 0.0,
@@ -46,10 +46,10 @@ r2_localization:
   control_timeout: 0.1 # cmd_vel is 20Hz
   control_config: [true, false, false,
                     false, false, true]
-  acceleration_limits: [1.0, 0.0, 0.0,
-                        0.0, 0.0, 0.5] # See velocity_smoother_controller
-  deceleration_limits: [2.0, 0.0, 0.0,
-                        0.0, 0.0, 1.0] # See velocity_smoother_controller
+  acceleration_limits: [0.8, 0.0, 0.0,
+                        0.0, 0.0, 1.5] # See velocity_smoother_controller
+  deceleration_limits: [0.8, 0.0, 0.0,
+                        0.0, 0.0, 1.5] # See velocity_smoother_controller
   
   smooth_lagged_data: false
   history_length: false
