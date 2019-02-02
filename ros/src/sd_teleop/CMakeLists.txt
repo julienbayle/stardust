@@ -41,6 +41,10 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
+add_executable(joy_convert_node 
+	src/joy_convert_node.cpp
+)
+
 add_executable(joy_switcher_node 
 	src/joy_switcher_node.cpp
 )
@@ -62,6 +66,10 @@ add_dependencies(teleop_node
 )
 
 ## Specify libraries to link a library or executable target against
+target_link_libraries(joy_convert_node
+  ${catkin_LIBRARIES}
+)
+
 target_link_libraries(joy_switcher_node
   ${catkin_LIBRARIES}
 )
