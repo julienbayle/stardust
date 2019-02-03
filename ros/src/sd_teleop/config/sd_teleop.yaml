@@ -1,18 +1,25 @@
 r1:
   teleop:
+    double_click_minimum_interval: 0.0
+    double_click_maximum_interval: 0.2
     max_linear_x_velocity: 1.0
     max_linear_y_velocity: 1.0
     max_angular_z_velocity: 2.0
     boost_velocity_ratio: 3.0
     joy_topic: joy
+    rate: 10.0
+    servo_increment: 10 # inc/s
 
 r2:
   teleop:
+    double_click_minimum_interval: 0.0
+    double_click_maximum_interval: 0.2
     max_linear_x_velocity: 0.2
     max_linear_y_velocity: 0.0
     max_angular_z_velocity: 3.0
     boost_velocity_ratio: 2.0
     joy_topic: joy
+    rate: 10.0
 
 joy_xbox:
   dev: /dev/input/by-id/usb-©Microsoft_Xbox_360_Wireless_Receiver_for_Windows_E1B7FC80-joystick
