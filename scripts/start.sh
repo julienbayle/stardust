@@ -4,6 +4,11 @@
 BASE=$(dirname "$0")
 IP=`ip addr | grep 'inet .* wlan0' | awk '{print $2}' | cut -f1 -d'/'`
 
+# If network is board (cable)
+if [ -z "$IP" ]; then
+        IP=`ip addr | grep 'inet .* brd' | awk '{print $2}' | cut -f1 -d'/'`
+fi
+
 # If network is down then works in isolated mode
 if [ -z "$IP" ]; then 
 	IP="127.0.0.1"
