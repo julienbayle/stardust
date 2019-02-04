@@ -244,7 +244,7 @@ Pour mettre à jour ROS :
 Exemple pour lancer rviz depuis un poste distant (ROS doit être lancé sur le robot via le script ci-dessus et le robot et l'ordinateur doivent être sur le même réseau) :
 
 ```bash
-export ROS_MASTER=http://RASPBERRY_IP:11311
+export ROS_MASTER_URI=http://RASPBERRY_IP:11311
 export ROS_IP=COMPUTER_IP
 rosrun rviz rviz
 ```
