@@ -7,8 +7,8 @@ r1:
     max_angular_z_velocity: 2.0
     boost_velocity_ratio: 3.0
     joy_topic: joy
-    rate: 10.0
-    servo_increment: 10 # inc/s
+    timer_frequency: 10.0
+    servo_increment: 20 # inc/s
 
 r2:
   teleop:
@@ -19,20 +19,4 @@ r2:
     max_angular_z_velocity: 3.0
     boost_velocity_ratio: 2.0
     joy_topic: joy
-    rate: 10.0
-
-joy_xbox:
-  dev: /dev/input/by-id/usb-©Microsoft_Xbox_360_Wireless_Receiver_for_Windows_E1B7FC80-joystick
-  deadzone: 0.20
-  # Hertz
-  autorepeat_rate: 20.0
-  # Seconds
-  coalesce_interval: 0.0
-
-joy_ps:
-  dev: /dev/input/by-id/usb-Sony_Computer_Entertainment_Wireless_Controller-joystick
-  deadzone: 0.05
-  # Hertz
-  autorepeat_rate: 20.0
-  # Seconds
-  coalesce_interval: 0.0
+    timer_frequency: 10.0

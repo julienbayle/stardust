@@ -11,7 +11,10 @@
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/deadline_timer.hpp>
 
+#include <dynamic_reconfigure/server.h>
+
 #include "xbox_pad.h"
+#include "sd_teleop/TeleopConfig.h"
 
 class TeleopNode {
 	private:
@@ -28,11 +31,11 @@ class TeleopNode {
 		ros::Publisher servo2_publisher;
 
 		// Config
-		double max_linear_x_velocity;
-		double max_linear_y_velocity;
-		double max_angular_z_velocity;
-		double boost_velocity_ratio;
-		std::string joy_topic_name;
+		double max_linear_x_velocity_;
+		double max_linear_y_velocity_;
+		double max_angular_z_velocity_;
+		double boost_velocity_ratio_;
+		std::string joy_topic_name_;
 		ros::Duration double_click_minimum_interval_;
 		ros::Duration double_click_maximum_interval_;
 		int32_t servo_increment_;
@@ -43,13 +46,14 @@ class TeleopNode {
 		// State
 		double linear_x_, linear_y_, angular_z_;
 		bool pump_on_;
+		bool left_valve_on_, center_valve_on_, right_valve_on_;
 		double servo1_pos_;
 		bool servo1_up_, servo1_down_;
 		double servo2_pos_;
 		bool servo2_up_, servo2_down_;
 
 		// Timer
-		double rate_;
+		double timer_frequency_;
 		boost::asio::io_service service_;
 		boost::scoped_ptr<boost::thread> service_thread_;
 		boost::asio::io_service::work work_;
@@ -64,6 +68,10 @@ class TeleopNode {
 		std::vector<bool> buttons_long_click_;
 		std::vector<bool> buttons_double_click_;
 
+		// Dynamic reconfigure
+		dynamic_reconfigure::Server<sd_teleop::TeleopConfig> dynamic_reconfigure_server_;
+		dynamic_reconfigure::Server<sd_teleop::TeleopConfig>::CallbackType dynamic_reconfigure_callback_;
+
 	public:
 		TeleopNode() :
 			double_click_minimum_interval_(0.0),
@@ -74,6 +82,9 @@ class TeleopNode {
 			angular_z_(0.0),
 
 			pump_on_(false),
+			left_valve_on_(false),
+			center_valve_on_(false),
+			right_valve_on_(false),
 			servo1_pos_(0.0),
 			servo1_up_(false),
 			servo1_down_(false),
@@ -91,27 +102,33 @@ class TeleopNode {
 			buttons_last_release_(),
 			buttons_click_(),
 			buttons_long_click_(),
-			buttons_double_click_()
+			buttons_double_click_(),
+
+			dynamic_reconfigure_server_(),
+			dynamic_reconfigure_callback_(boost::bind(&TeleopNode::dynamicReconfigureCallback, this, _1, _2))
 		
 		{
 			ros::NodeHandle nh;
 			ros::NodeHandle nh_priv("~");
+;
+			nh_priv.param("joy_topic", joy_topic_name_, std::string("joy"));
+			nh_priv.param("timer_frequency", timer_frequency_, 10.0);
 
-			double double_click_minimum_interval;
-			nh_priv.param("double_click_minimum_interval", double_click_minimum_interval, 0.0);
-			double_click_minimum_interval_ = ros::Duration(double_click_minimum_interval);
-			double double_click_maximum_interval;
-			nh_priv.param("double_click_maximum_interval", double_click_maximum_interval, 0.2);
-			double_click_maximum_interval_ = ros::Duration(double_click_maximum_interval);
-			nh_priv.param("max_linear_x_velocity", max_linear_x_velocity, 0.1);
-			nh_priv.param("max_linear_y_velocity", max_linear_y_velocity, 0.0);
-			nh_priv.param("max_angular_z_velocity", max_angular_z_velocity, 1.0);
-			nh_priv.param("boost_velocity_ratio", boost_velocity_ratio, 2.0);
-			nh_priv.param("joy_topic", joy_topic_name, std::string("joy"));
-			nh_priv.param("rate", rate_, 10.0);
-			nh_priv.param("servo_increment", servo_increment_, 0);
+			cmd_vel_teleop_publisher = nh_priv.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+			mode_auto_publisher = nh.advertise<std_msgs::Bool>("mode_auto", 1);
 
-			timer_rate_ = boost::posix_time::millisec(1000.0/rate_);
+			pump_publisher = nh.advertise<std_msgs::Int16>("pwm/pompe", 1);
+			left_valve_publisher = nh.advertise<std_msgs::Int16>("pwm/vanne1", 1);
+			center_valve_publisher = nh.advertise<std_msgs::Int16>("pwm/vanne2", 1);
+			right_valve_publisher = nh.advertise<std_msgs::Int16>("pwm/vanne3", 1);
+			servo1_publisher = nh.advertise<std_msgs::Int16>("servo1", 1);
+			servo2_publisher = nh.advertise<std_msgs::Int16>("servo2", 1);
+			
+			joy_subscriber = nh.subscribe<sensor_msgs::Joy>(joy_topic_name_, 1, &TeleopNode::joy_handler, this);
+
+        	dynamic_reconfigure_server_.setCallback(dynamic_reconfigure_callback_);
+
+			timer_rate_ = boost::posix_time::millisec(1000.0/timer_frequency_);
 
 			// Start service
 			service_thread_.reset(new boost::thread(boost::bind(static_cast<std::size_t(boost::asio::io_service::*)(void)>(&boost::asio::io_service::run), &service_)));
@@ -119,18 +136,6 @@ class TeleopNode {
 			// Init timer
 			timer_.expires_from_now(timer_rate_);
 			timer_.async_wait(boost::bind(&TeleopNode::timerCallback, this, _1));
-			
-			cmd_vel_teleop_publisher = nh_priv.advertise<geometry_msgs::Twist>("cmd_vel", 1);
-			mode_auto_publisher = nh.advertise<std_msgs::Bool>("mode_auto", 1);
-
-			pump_publisher = nh.advertise<std_msgs::Int16>("pompe", 1);
-			left_valve_publisher = nh.advertise<std_msgs::Int16>("vanne/gauche", 1);
-			center_valve_publisher = nh.advertise<std_msgs::Int16>("vanne/milieu", 1);
-			right_valve_publisher = nh.advertise<std_msgs::Int16>("vanne/droite", 1);
-			servo1_publisher = nh.advertise<std_msgs::Int16>("servo1", 1);
-			servo2_publisher = nh.advertise<std_msgs::Int16>("servo2", 1);
-			
-			joy_subscriber = nh.subscribe<sensor_msgs::Joy>(joy_topic_name, 1, &TeleopNode::joy_handler, this);
 		}
 
 		virtual ~TeleopNode()
@@ -144,6 +149,16 @@ class TeleopNode {
 
 			// Cancel timer
 			timer_.cancel();
+		}
+
+    	void dynamicReconfigureCallback(sd_teleop::TeleopConfig &config, uint32_t level) {
+			double_click_minimum_interval_ = ros::Duration(config.double_click_minimum_interval);
+			double_click_maximum_interval_ = ros::Duration(config.double_click_maximum_interval);
+			max_linear_x_velocity_ = config.max_linear_x_velocity;
+			max_linear_y_velocity_ = config.max_linear_y_velocity;
+			max_angular_z_velocity_ = config.max_angular_z_velocity;
+			boost_velocity_ratio_ = config.boost_velocity_ratio;
+			servo_increment_ = config.servo_increment;
 		}
 
 		void buttonsBehaviourHandler(const sensor_msgs::Joy::ConstPtr& joy)
@@ -242,17 +257,17 @@ class TeleopNode {
 
 			current_boost_ratio = 1;
 			if(!joy_msg->buttons[XBOX_BUTTON_RB]) {
-				current_boost_ratio /= boost_velocity_ratio;
+				current_boost_ratio /= boost_velocity_ratio_;
 			}
 
 			linear_x_ = joy_msg->axes[XBOX_AXIS_UP_DOWN_STICK_LEFT];
-			linear_x_ *= max_linear_x_velocity * current_boost_ratio;
+			linear_x_ *= max_linear_x_velocity_ * current_boost_ratio;
 
 			linear_y_ = joy_msg->axes[XBOX_AXIS_LEFT_RIGHT_STICK_LEFT];
-			linear_y_ *= max_linear_y_velocity * current_boost_ratio;
+			linear_y_ *= max_linear_y_velocity_ * current_boost_ratio;
 
 			angular_z_ = joy_msg->axes[XBOX_AXIS_LEFT_RIGHT_STICK_RIGHT];
-			angular_z_ *= max_angular_z_velocity * current_boost_ratio;
+			angular_z_ *= max_angular_z_velocity_ * current_boost_ratio;
 
 			// Mode auto
 			if (buttons_click_[XBOX_BUTTON_BACK]) {
@@ -265,14 +280,64 @@ class TeleopNode {
 				mode_auto_publisher.publish(bool_msg);
 			}
 
-			// Pompe/vannes
-			pump_on_ = buttons_click_[XBOX_BUTTON_LB];
+			// Pompe
+			bool new_pump_on = buttons_click_[XBOX_BUTTON_X] || buttons_long_click_[XBOX_BUTTON_X];
+			if (!pump_on_ && new_pump_on) {
+				pump_on_ = true;
+				std_msgs::Int16 msg;
+				msg.data = 4096;
+				pump_publisher.publish(msg);
+			} else if (pump_on_ && !new_pump_on) {
+				pump_on_ = false;
+				std_msgs::Int16 msg;
+				msg.data = 0;
+				pump_publisher.publish(msg);
+			}
+			// Vanne gauche
+			bool new_left_valve_on = buttons_click_[XBOX_BUTTON_Y] || buttons_long_click_[XBOX_BUTTON_Y];
+			if (!left_valve_on_ && new_left_valve_on) {
+				left_valve_on_ = true;
+				std_msgs::Int16 msg;
+				msg.data = 4096;
+				left_valve_publisher.publish(msg);
+			} else if (left_valve_on_ && !new_left_valve_on) {
+				left_valve_on_ = false;
+				std_msgs::Int16 msg;
+				msg.data = 0;
+				left_valve_publisher.publish(msg);
+			}
+			// Vanne milieu
+			bool new_center_valve_on = buttons_click_[XBOX_BUTTON_B] || buttons_long_click_[XBOX_BUTTON_B];
+			if (!center_valve_on_ && new_center_valve_on) {
+				center_valve_on_ = true;
+				std_msgs::Int16 msg;
+				msg.data = 4096;
+				center_valve_publisher.publish(msg);
+			} else if (center_valve_on_ && !new_center_valve_on) {
+				center_valve_on_ = false;
+				std_msgs::Int16 msg;
+				msg.data = 0;
+				center_valve_publisher.publish(msg);
+			}
+			// Vanne droite
+			bool new_right_valve_on = buttons_click_[XBOX_BUTTON_A] || buttons_long_click_[XBOX_BUTTON_A];
+			if (!right_valve_on_ && new_right_valve_on) {
+				right_valve_on_ = true;
+				std_msgs::Int16 msg;
+				msg.data = 4096;
+				right_valve_publisher.publish(msg);
+			} else if (right_valve_on_ && !new_right_valve_on) {
+				right_valve_on_ = false;
+				std_msgs::Int16 msg;
+				msg.data = 0;
+				right_valve_publisher.publish(msg);
+			}
 
 			// Servos
-			servo1_up_ = buttons_click_[XBOX_BUTTON_Y];
-			servo1_down_ = buttons_click_[XBOX_BUTTON_A];
-			servo2_up_ = buttons_click_[XBOX_BUTTON_X];
-			servo2_down_ = buttons_click_[XBOX_BUTTON_B];
+			servo1_up_ = buttons_click_[XBOX_BUTTON_CROSS_UP] || buttons_long_click_[XBOX_BUTTON_CROSS_UP];
+			servo1_down_ = buttons_click_[XBOX_BUTTON_CROSS_DOWN] || buttons_long_click_[XBOX_BUTTON_CROSS_DOWN];
+			servo2_up_ = buttons_click_[XBOX_BUTTON_CROSS_LEFT] || buttons_long_click_[XBOX_BUTTON_CROSS_LEFT];
+			servo2_down_ = buttons_click_[XBOX_BUTTON_CROSS_RIGHT] || buttons_long_click_[XBOX_BUTTON_CROSS_RIGHT];
 		}
 
 		void timerCallback(const boost::system::error_code& error) {
@@ -285,41 +350,36 @@ class TeleopNode {
 			
 			cmd_vel_teleop_publisher.publish(twist);
 
-			// Pompe/vannes
-			if (pump_on_) {
-				std_msgs::Int16 msg;
-				msg.data = 4096;
-				pump_publisher.publish(msg);
-				left_valve_publisher.publish(msg);
-				center_valve_publisher.publish(msg);
-				right_valve_publisher.publish(msg);
-			} else {
-				std_msgs::Int16 msg;
-				msg.data = 0;
-				pump_publisher.publish(msg);
-				left_valve_publisher.publish(msg);
-				center_valve_publisher.publish(msg);
-				right_valve_publisher.publish(msg);
-			}
-
 			// Servos
 			if (servo1_up_)
-				servo1_pos_ += servo_increment_ / rate_;
+				servo1_pos_ += servo_increment_ / timer_frequency_;
 			else if (servo1_down_)
-				servo1_pos_ -= servo_increment_ / rate_;
+				servo1_pos_ -= servo_increment_ / timer_frequency_;
+			if (servo1_pos_ < 0)
+				servo1_pos_ = 0;
+			else if (servo1_pos_ > 270)
+				servo1_pos_ = 270;
 
 			std_msgs::Int16 servo1_msg;
 			servo1_msg.data = servo1_pos_;
 			servo1_publisher.publish(servo1_msg);
 
 			if (servo2_up_)
-				servo2_pos_ += servo_increment_ / rate_;
+				servo2_pos_ += servo_increment_ / timer_frequency_;
 			else if (servo2_down_)
-				servo2_pos_ -= servo_increment_ / rate_;
+				servo2_pos_ -= servo_increment_ / timer_frequency_;
+			if (servo2_pos_ < 0)
+				servo2_pos_ = 0;
+			else if (servo2_pos_ > 270)
+				servo2_pos_ = 270;
 
 			std_msgs::Int16 servo2_msg;
 			servo2_msg.data = servo2_pos_;
 			servo2_publisher.publish(servo2_msg);
+
+			// Trigger timer
+			timer_.expires_from_now(timer_rate_);
+			timer_.async_wait(boost::bind(&TeleopNode::timerCallback, this, _1));
 		}
 };
 
