@@ -20,7 +20,7 @@ namespace sd_control
   public:
 
     // sqrt(3)/3
-    static const double SQRT3_3 = 0.577350269;
+    static const double SQRT3_3;
 
     /// Integration function, used to integrate the odometry:
     typedef boost::function<void(double, double, double)> IntegrationFunction;

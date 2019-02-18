@@ -2,6 +2,8 @@
 
 namespace sd_hardware_interface
 {
+	const double Encoder::BILLION = 1000000000.0;
+
 	Encoder::Encoder(
 		double encoder_steps_for_one_joint_revolution,
         double timeout,

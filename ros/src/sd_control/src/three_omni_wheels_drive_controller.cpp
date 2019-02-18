@@ -7,6 +7,7 @@
 #include <sd_control/three_omni_wheels_drive_controller.h>
 
 namespace sd_control {
+  const double ThreeOmniWheelsDriveController::SQRT3_2 = 0.866025404;
 
   ThreeOmniWheelsDriveController::ThreeOmniWheelsDriveController()
     : open_loop_(false)

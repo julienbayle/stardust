@@ -43,7 +43,7 @@ namespace sd_hardware_interface
   private:
 
     // Used to convert seconds elapsed to nanoseconds
-    static const double BILLION = 1000000000.0;
+    static const double BILLION;
 
     // Max encoder value
     double max_position_;

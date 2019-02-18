@@ -64,7 +64,7 @@ namespace sd_control {
   private:
 
     // sqrt(3)/2
-    static const double SQRT3_2 = 0.866025404;
+    static const double SQRT3_2;
 
     std::string name_;
 

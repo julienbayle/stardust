@@ -6,6 +6,8 @@ namespace sd_control
 {
   namespace bacc = boost::accumulators;
 
+  const double Odometry::SQRT3_3 = 0.577350269;
+
   Odometry::Odometry(size_t velocity_rolling_window_size)
   : timestamp_(0.0)
   , x_(0.0)
