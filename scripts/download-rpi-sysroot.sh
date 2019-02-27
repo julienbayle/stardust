@@ -1,27 +1,37 @@
 #!/bin/bash
 
-if [ "$#" -ne 1 ]; then
-    echo "Illegal number of parameters, use syntax : $0 <address>"
+if [ "$#" -lt 2 ]; then
+    echo "Illegal number of parameters, use syntax : $0 -s <user>@<address> | -f <path>"
     exit 1
 fi
 
-export ADDRESS=$1
+while getopts "s:f:" opt; do
+    case "$opt" in
+    s)  address=$OPTARG
+        ;;
+    f)  path=$OPTARG
+        ;;
+    esac
+done
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 export SYSROOT_PATH=$( readlink -f ${SCRIPT_DIR}/../rpi-sysroot )
 
-echo "Rsync to path ${SYSROOT_PATH}"
 
 mkdir -p ${SYSROOT_PATH}
-rsync -e ssh -avzr --progress ubuntu@${ADDRESS}:/lib ubuntu@${ADDRESS}:/usr ubuntu@${ADDRESS}:/opt ${SYSROOT_PATH}
-
-if [ $? -ne 0 ]; then
-    echo "Error while rsyncing sysroot"
+if [ ! -z ${address} ]; then
+    echo "Rsync to path ${SYSROOT_PATH} using remote address ${address}"
+    rsync -e ssh -avzr --progress ${address}:/lib ${address}:/usr ${address}:/opt ${SYSROOT_PATH} && \
+    rsync -e ssh -avzr --progress ubuntu@${ADDRESS}:/etc/alternatives ${SYSROOT_PATH}/etc
+elif [ ! -z ${path} ]; then
+    echo "Rsync to path ${SYSROOT_PATH} using path ${path}"
+    rsync -avzr --progress ${path}/lib ${path}/usr ${path}/opt ${SYSROOT_PATH} && \
+    rsync -avzr --progress ${path}/etc/alternatives ${SYSROOT_PATH}/etc
+else
+    echo "Either -f or -s option should be set"
     exit 1
 fi
-
-rsync -e ssh -avzr --progress ubuntu@${ADDRESS}:/etc/alternatives ${SYSROOT_PATH}/etc
 
 if [ $? -ne 0 ]; then
     echo "Error while rsyncing sysroot"
