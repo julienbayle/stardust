@@ -1,44 +1,42 @@
-# Installation sur Raspberry Pi 3 modèle B
+# Installation sur Raspberry Pi 3 modèle B+
 
-Ubuntu 16.04 doit être utilisé car cette distribution et version de linux propose directement les dépôts ARM de ROS Kinetic, compatible sur raspberry pi 3.
+Ubuntu 18.04 doit être utilisé car cette distribution et version de linux propose directement les dépôts ARM de ROS Melodic, compatible sur raspberry pi 3 b+.
 
 L'utilisation de Raspbian a été testé mais l'outil "rosdep" ne trouve pas dans les dépôts de cette distribution tous les paquets nécessaires. Aussi, il faut les compiler manuellement, ce qui est super pénible et prend beaucoup de temps.
 
-Deux distributions d'Ubuntu pour Raspberry 3 ont été testées.
-
-La première est issue de la page https://wiki.ubuntu.com/ARM/RaspberryPi. Ce fût une total castastrophe (apt-upgrade bugue, démarrage en échec après un simple apt-get install, wifi non stable, ping lents, ...)
-
-La seconde était la bonne : https://ubuntu-mate.org/download/
-
 **Compter à peu près 2 heures pour réaliser cette installation**
 
-## Installation de la distribution Ubuntu 16.04
+## Installation de la distribution Ubuntu 18.04 sur clé USB
 
-Récupérer l'image "Ubuntu 16.04" depuis https://ubuntu-mate.org/download/
-Ecrire l'image sur une SD CARD (Mac OS version) :
+Récupérer l'image "Ubuntu 18.04" depuis http://cdimage.ubuntu.com/releases/18.04/beta/
+Ecrire l'image sur une clé USB
 
+### Ubuntu
+```bash
+xzcat ubuntu-18.04-beta-preinstalled-server-arm64+raspi3.img.xz | sudo dd bs=4M of=/dev/sdb
+```
+
+### Mac OS 
 ```bash
 brew install xz
 diskutil umountDisk /dev/disk2
-xzcat ubuntu-mate-16.04.2-desktop-armhf-raspberry-pi.img.xz | sudo dd bs=4m of=/dev/rdisk2
+xzcat ubuntu-18.04-beta-preinstalled-server-arm64+raspi3.img.xz | sudo dd bs=4m of=/dev/rdisk2
 ```
 
-Mettre la carte dans le Raspberry Pi et l'allumer. Connecter une câble ethernet, un écran via le port HDMI et une souris. Compléter alors la procédure d'installation qui s'affiche à l'écran.
+Mettre la carte dans le Raspberry Pi et l'allumer. Connecter une câble ethernet, un écran via le port HDMI et un clavier.
 
-> Attention, **si le Raspberry Pi est un modèle B+**, la procédure d'installation doit être réalisée sur un modèle B. Puis, en fin de procédure, exécuter *rpi-update* pour mettre à jour les drivers firmware. La carte ainsi préparée pourra être ensuite être insérée dans un modèle B ou B+.
+## Boot sur la clé USB
 
-## Activation du SSH
-
-```bash
-sudo apt-get install openssh-server
-sudo systemctl enable ssh.service
-sudo ufw allow 22
-sudo systemctl restart ssh.service
+Branchez la clé USB sur un PC, et éditez le fichier cmdline.txt sur la partition "system-boot":
 ```
+console=tty0 console=ttyS1,115200 root=LABEL=writable rw elevator=deadline fsck.repair=yes net.ifnames=0 cma=64M rootwait rootdelay=10
+```
+
+Si le Raspberry ne réussi pas à booter, formater une carte SD en FAT32 et copiez dessus le contenu de la partition "system-boot".
 
 ## Mise à jour du système
 
-Puis, mise à jour du système et redémarrage :
+Mise à jour du système et redémarrage :
 
 ```bash
 sudo apt-get update
@@ -46,23 +44,12 @@ sudo apt-get upgrade
 sudo reboot
 ```
 
-Optionnel (dépend dans la taile de la taille SD) : Si le partitionnement par défaut de la carte SD ne permet pas la mise à jour du système. Il faut utiliser gparted pour remedier à cela.
+## Installation de NetworkManager
 
 ```bash
-sudo apt-get install gparted
-sudo gparted
-```
-
-## Support réseau
-
-Depuis le bureau Ubuntu, connecter votre raspberry au réseau wifi.
-(Il est également possible de le faire en ligne de commande ou via SSH en utilisant *nmtui*)
-
-Prendre note de votre IP, débrancher le câble réseau et redémarrer. Vérifier que le raspberry se connecte bien au WIFI au redémarrage.
-
-```bash
-ifconfig
-sudo reboot
+sudo apt install network-manager
+sudo systemctl start NetworkManager
+sudo nmtui
 ```
 
 ## Installation de ROS
@@ -73,48 +60,23 @@ Source : http://wiki.ros.org/Installation/UbuntuARM
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 sudo apt-get update
-sudo apt-get install -y ros-kinetic-desktop-full git python-wstool vim
+sudo apt-get install -y ros-melodic-desktop-full git python-wstool vim
 sudo rosdep init
 rosdep update
-echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
+echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
 
 ## Installation et compilation du code source du robot
 
-La première compilation du projet nécessite l'activation de la SWAP car la mémoire du Raspberry est insuffisante. Pour compiler une simple modification locale du code, ceci n'est nécessaire.
-
-Création d'un fichier SWAP de 512Mo :
-
-```bash
-sudo fallocate -l 512m /512m.swap
-sudo chmod 600 /512m.swap 
-sudo mkswap /512m.swap 
+Téléchargement des paquets nécessaires:
+```shell
+$ git clone https://github.com/julienbayle/stardust.git
+$ cd stardust/ros
+$ rosdep install --from-paths src --ignore-src --rosdistro melodic -r -y
 ```
 
-Ce fichier sera conservé car il re-servira souvent par la suite.
-
-Installation des sources du projet :
-
-```bash
-git clone https://github.com/julienbayle/stardust
-```
-
-Compilation du projet ROS :
-
-```bash
-sudo swapon /512m.swap
-~/stardust/scripts/update.sh
-sudo swapoff /512m.swap
-cd ~/stardust/ros/
-source devel/setup.bash
-```
-
-Tester que le projet démarre (remplacer r1 par r2 pour le robot secondaire) :
-
-```bash
-roslaunch sd_main r1.launch
-```
+[Cross compilation et déploiement sur le raspberry](cross_compilation_raspberry.md).
 
 ## Configuration du Raspberry
 
