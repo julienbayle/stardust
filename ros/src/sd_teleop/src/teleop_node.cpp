@@ -121,8 +121,8 @@ class TeleopNode {
 			left_valve_publisher = nh.advertise<std_msgs::Int16>("pwm/vanne1", 1);
 			center_valve_publisher = nh.advertise<std_msgs::Int16>("pwm/vanne2", 1);
 			right_valve_publisher = nh.advertise<std_msgs::Int16>("pwm/vanne3", 1);
-			servo1_publisher = nh.advertise<std_msgs::Int16>("servo1", 1);
-			servo2_publisher = nh.advertise<std_msgs::Int16>("servo2", 1);
+			servo1_publisher = nh.advertise<std_msgs::Int16>("servo/F", 1);
+			servo2_publisher = nh.advertise<std_msgs::Int16>("servo/E", 1);
 			
 			joy_subscriber = nh.subscribe<sensor_msgs::Joy>(joy_topic_name_, 1, &TeleopNode::joy_handler, this);
 
