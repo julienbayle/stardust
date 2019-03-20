@@ -5,7 +5,7 @@
 	<arg name="r2" default="true"/>
 	<arg name="ground_truth" default="false"/>
 
-	<machine name="localhost" address="localhost" env-loader="/opt/ros/melodic/env.sh"/>
+	<machine name="localhost" address="localhost" env-loader="/opt/ros/kinetic/env.sh"/>
 
 	<include file="$(find sd_gazebo)/launch/sd_gazebo.launch">
 		<arg name="gui" value="$(arg gui)" />

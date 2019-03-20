@@ -15,5 +15,5 @@ cd $PROJECTDIR/ros/
 echo "Updating WSTOOL dependencies (.rosinstall)"
 wstool update -t src
 echo "Updating ROSDEPS (package dependencies)"
-rosdep install --from-paths src --ignore-src --rosdistro melodic -r -y
+rosdep install --from-paths src --ignore-src --rosdistro kinetic -r -y
 catkin_make

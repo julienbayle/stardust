@@ -3,7 +3,7 @@
 	<arg name="sim" default="false"/>
 	<arg name="ground_truth" default="false"/>
 	
-	<machine name="localhost" address="localhost" env-loader="/opt/ros/melodic/env.sh"/>
+	<machine name="localhost" address="localhost" env-loader="/opt/ros/kinetic/env.sh"/>
 
 	<!-- Common nodes between r1 and r2 robot  -->
 	<include file="$(find sd_main)/launch/rx.launch">
