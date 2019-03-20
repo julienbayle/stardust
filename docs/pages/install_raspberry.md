@@ -1,6 +1,6 @@
-# Installation sur Raspberry Pi 3 modèle B+
+# Installation sur Raspberry Pi 3 modèle B ou B+
 
-Ubuntu 18.04 doit être utilisé car cette distribution et version de linux propose directement les dépôts ARM de ROS Melodic, compatible sur raspberry pi 3 b+.
+Ubuntu 18.04 doit être utilisé car cette distribution et version de linux propose directement les dépôts ARM de ROS Melodic, compatible sur raspberry pi 3 B et B+.
 
 L'utilisation de Raspbian a été testé mais l'outil "rosdep" ne trouve pas dans les dépôts de cette distribution tous les paquets nécessaires. Aussi, il faut les compiler manuellement, ce qui est super pénible et prend beaucoup de temps.
 
@@ -69,16 +69,55 @@ source ~/.bashrc
 
 ## Installation et compilation du code source du robot
 
-Téléchargement des paquets nécessaires:
 ```shell
+$ cd ~
 $ git clone https://github.com/julienbayle/stardust.git
-$ cd stardust/ros
+```
+
+### Deploiement du projet sans cross compilation :
+
+La première compilation du projet nécessite l'activation de la SWAP car la mémoire du Raspberry est insuffisante. Pour compiler une simple modification locale du code, ceci n'est pas nécessaire ensuite.
+	
+Création d'un fichier SWAP de 512Mo (Ce fichier sera conservé car il re-servira souvent par la suite) :
+	
+```bash
+sudo fallocate -l 512m /512m.swap
+sudo chmod 600 /512m.swap 
+sudo mkswap /512m.swap 
+```
+
+Compilation du projet ROS :
+	
+```bash
+sudo swapon /512m.swap
+~/stardust/scripts/update.sh
+sudo swapoff /512m.swap
+```
+
+### Deploiement du projet par cross compilation :
+
+Téléchargement des paquets nécessaires:
+
+```shell
+$ cd ~/stardust/ros
 $ rosdep install --from-paths src --ignore-src --rosdistro melodic -r -y
 ```
 
+Puis :
+
 [Cross compilation et déploiement sur le raspberry](cross_compilation_raspberry.md).
 
-## Configuration du Raspberry
+### Configuration du Raspberry
+
+### Lancer le programme (premier démarrage)
+
+Tester que le projet démarre (remplacer r1 par r2 pour le robot secondaire) :
+	
+```bash
+cd ~/stardust/ros/
+source devel/setup.bash
+roslaunch sd_main r1.launch
+```
 
 ### LIDAR (UART)
 
