@@ -252,46 +252,45 @@ void HWInterface::write(ros::Duration &elapsed_time)
 {
   for (std::size_t joint_id = 0; joint_id < num_joints_; ++joint_id) 
   {
+
+    double cmd_effort = joint_effort_command_[joint_id];
+    double cmd_speed = 0.0;
+    bool security = false;
+
     if (velocity_controller_enabled_) {
-      double cmd = joint_effort_command_[joint_id];
-      
-      cmd += joint_velocity_controllers_[joint_id]->velocityToEffort(
+      cmd_effort = joint_velocity_controllers_[joint_id]->velocityToEffort(
           joint_velocity_[joint_id],
           joint_velocity_command_[joint_id],
           elapsed_time);
+    } else {
+      cmd_speed = joint_velocity_command_[joint_id];
+    }
+   
+    // Safety
+    if(!joint_encoders_[joint_id]->isAlive()) {
+        ROS_ERROR_STREAM_THROTTLE(1, "Encoder do not emit data. By security, actuator control commannd is set to velocicity = 0 (stay on place)");
+        cmd_effort = 0.0;
+        cmd_speed = 0.0;
+	security = true;
+    }
 
-      // Safety
-      if(!joint_encoders_[joint_id]->isAlive())
-      {
-        ROS_ERROR_STREAM_THROTTLE(1, "Encoder do not emit data. By security, actuator control is disabled");
-        cmd = 0.0;
-      }
-
-      // Send data
+    if (!security && cmd_speed > -0.1 && cmd_speed < 0.1) {
+      // Send effort command to hardware
       std_msgs::Int16 effort;
-      effort.data = cmd;  
+      effort.data = cmd_effort;  
       effort_publishers_[joint_id].publish(effort);
 
-      // set effort
-      joint_effort_[joint_id] = cmd;
+      // Set joint effort
+      joint_effort_[joint_id] = cmd_effort;
 
-      // Direction for simple encoders
+      // Direction (for simple encoders)
       if(!is_quadrature_encoder_)
         joint_encoders_[joint_id]->setDirection(effort_publishers_[joint_id] > 0);
     }
     else {
-      double cmd = joint_velocity_command_[joint_id];
-
-      // Safety
-      if(!joint_encoders_[joint_id]->isAlive())
-      {
-        ROS_ERROR_STREAM_THROTTLE(1, "Encoder do not emit data. By security, actuator control is disabled");
-        cmd = 0.0;
-      }
-
-      // Send data
+      // Send velocity to hardware (use hardware internal PID)
       std_msgs::Int32 speed;
-      speed.data = cmd;  
+      speed.data = cmd_speed;  
       speed_publishers_[joint_id].publish(speed);
     }
   }
