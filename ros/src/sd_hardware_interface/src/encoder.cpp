@@ -6,9 +6,10 @@ namespace sd_hardware_interface
 
 	Encoder::Encoder(
 		double encoder_steps_for_one_joint_revolution,
-        double timeout,
-        double max_position,
-        double min_position)
+        	double encoder_speed_steps_for_one_rad_per_second,
+		double timeout,
+        	double max_position,
+        	double min_position)
 	  : last_encoder_position_(BILLION + 1)
 	  , angle_(0.0)
 	  , direction_(1.0)
@@ -18,6 +19,7 @@ namespace sd_hardware_interface
 	  , max_position_(max_position)
 	  , min_position_(min_position)
 	  , encoder_resolution_(6.28318530718 / encoder_steps_for_one_joint_revolution)
+	  , encoder_speed_steps_for_one_rad_per_second_(encoder_speed_steps_for_one_rad_per_second)
 	{
 	}
 
@@ -26,13 +28,22 @@ namespace sd_hardware_interface
 		update((double) encoder_position->data);
 	}
 
+	void Encoder::updateSpeedFromInt32Topic(const std_msgs::Int32ConstPtr &encoder_speed)
+	{
+    		clock_gettime(CLOCK_MONOTONIC, &current_time_);
+    		last_speed_time_ = current_time_;
+		
+		speed_ = ((double) encoder_speed->data) / encoder_speed_steps_for_one_rad_per_second_;
+		speed_acc_(speed_);
+	}
+
 	void Encoder::update(double encoder_position)
 	{
 		// First iteration : Init encoder value and return
 		if (!isAlive())
 		{
 			last_encoder_position_ = encoder_position;
-			clock_gettime(CLOCK_MONOTONIC, &last_time_);
+			clock_gettime(CLOCK_MONOTONIC, &last_position_time_);
 			ROS_INFO_STREAM("One encoder ready. Initial position: " << last_encoder_position_);
 			return;
 		}
@@ -49,21 +60,9 @@ namespace sd_hardware_interface
 		double last_angle = angle_;
 		angle_ += direction_ * steps * encoder_resolution_;
 
-		// Get change in time
     		clock_gettime(CLOCK_MONOTONIC, &current_time_);
-    		elapsed_time_ = ros::Duration(
-	      		current_time_.tv_sec - last_time_.tv_sec + 
-	      		(current_time_.tv_nsec - last_time_.tv_nsec) / BILLION);
-    		last_time_ = current_time_;
+    		last_position_time_ = current_time_;
 		last_encoder_position_ = encoder_position;
-
-		speed_ = (angle_ - last_angle) / elapsed_time_.toSec();
-		speed_acc_(speed_);
-
-		// low speed relative to encoder resolution and encoder refresh rate
-		if (steps < 2) {
-			speed_ = bacc::rolling_mean(speed_acc_);
-		}
 	}
 
 	void Encoder::setDirection(bool direction) 
@@ -82,24 +81,40 @@ namespace sd_hardware_interface
 		if (!isAlive())
 			return 0.0;
 
-		// is time out ?
+		checkTimeOut(last_speed_time_);
+		
+		return speed_;
+	}
+
+	bool Encoder::checkTimeOut(timespec& last_time)
+	{
 		clock_gettime(CLOCK_MONOTONIC, &current_time_);
 		elapsed_time_ = ros::Duration(
-	      current_time_.tv_sec - last_time_.tv_sec + 
-	      (current_time_.tv_nsec - last_time_.tv_nsec) / BILLION);
-    	if (elapsed_time_.toSec() > timeout_) {
-    		ROS_WARN_STREAM("One encoder is down");
+	      		current_time_.tv_sec - last_time.tv_sec + 
+	        	(current_time_.tv_nsec - last_time.tv_nsec) / BILLION);
+		
+		if (elapsed_time_.toSec() > timeout_) {
+    		  	ROS_WARN_STREAM("One encoder is down");
 
-    		// set this encoder has dead (timeout)
-    		last_encoder_position_ = BILLION+1;
+    			// set this encoder has dead (timeout)
+    			last_encoder_position_ = BILLION+1;
 
-    		// resert speed accumulator
-    		speed_acc_ = RollingMeanAcc(RollingWindow::window_size = 10);
+    			// reset speed accumulator
+    			speed_acc_ = RollingMeanAcc(RollingWindow::window_size = 10);
 
-    		speed_ = 0.0;
-    	}
+    			speed_ = 0.0;
+    		}
+	}
 
-		return speed_;
+	double Encoder::getFilteredSpeed()
+	{
+		// Encoder has not yet received any adata
+		if (!isAlive())
+			return 0.0;
+
+		checkTimeOut(last_speed_time_);
+		
+		return bacc::rolling_mean(speed_acc_);
 	}
 
 	bool Encoder::isAlive() 

@@ -30,6 +30,7 @@ HWInterface::HWInterface(ros::NodeHandle &nh)
   error += !rosparam_shortcuts::get(name_, rpnh, "timeout", timeout_);
   error += !rosparam_shortcuts::get(name_, rpnh, "joints", joint_names_);
   error += !rosparam_shortcuts::get(name_, rpnh, "encoder_topics", encoder_topics_);
+  error += !rosparam_shortcuts::get(name_, rpnh, "encoder_speed_topics", encoder_speed_topics_);
   error += !rosparam_shortcuts::get(name_, rpnh, "pwm_topics", pwm_topics_);
   error += !rosparam_shortcuts::get(name_, rpnh, "speed_topics", speed_topics_);
   error += !rosparam_shortcuts::get(name_, rpnh, "pwm_max", velocity_controllers_pwm_max_);
@@ -39,6 +40,7 @@ HWInterface::HWInterface(ros::NodeHandle &nh)
   error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_pid_i", velocity_controllers_pid_i_);
   error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_pid_d", velocity_controllers_pid_d_);
   error += !rosparam_shortcuts::get(name_, rpnh, "encoder_steps_for_one_wheel_revolution", encoder_steps_for_one_wheel_revolution_);
+  error += !rosparam_shortcuts::get(name_, rpnh, "encoder_speed_steps_for_one_rad_per_second", encoder_speed_steps_for_one_rad_per_second_);
   rosparam_shortcuts::shutdownIfError(name_, error);
 }
 
@@ -64,6 +66,11 @@ void HWInterface::init()
     return;
   }
 
+  if (num_joints_ != encoder_speed_topics_.size()) {
+    ROS_ERROR_STREAM_NAMED(name_, "encoder_speed_topics parameter must be the same size as joints");
+    return;
+  }
+
   if (num_joints_ != pwm_topics_.size()) {
     ROS_ERROR_STREAM_NAMED(name_, "pwm_topics parameter must be the same size as joints");
     return;
@@ -79,6 +86,10 @@ void HWInterface::init()
     return;
   }
 
+  if (num_joints_ != encoder_speed_steps_for_one_rad_per_second_.size()) {
+    ROS_ERROR_STREAM_NAMED(name_, "encoder_steps_for_one_wheel_revolution parameter must be the same size as joints");
+    return;
+  }
   if (num_joints_ != velocity_controllers_pwm_max_.size()) {
     ROS_ERROR_STREAM_NAMED(name_, "pwm_max parameter must be the same size as joints");
     return;
@@ -143,17 +154,20 @@ void HWInterface::init()
 
     // Hardware related topics
     std::string encoder_topic = encoder_topics_[joint_id];
+    std::string encoder_speed_topic = encoder_speed_topics_[joint_id];
     std::string pwm_topic = pwm_topics_[joint_id];
     std::string speed_topic = speed_topics_[joint_id];
 
     boost::shared_ptr<Encoder> joint_encoder( 
       new Encoder(
         encoder_steps_for_one_wheel_revolution_[joint_id],
+	encoder_speed_steps_for_one_rad_per_second_[joint_id],
         timeout_,
         32767.0,
         -32768.0));
     joint_encoders_.push_back(joint_encoder);
     encoder_subscribers_.push_back(nh_.subscribe(encoder_topic, 1, &Encoder::updateFromInt16Topic, joint_encoder));
+    encoder_speed_subscribers_.push_back(nh_.subscribe(encoder_speed_topic, 1, &Encoder::updateSpeedFromInt32Topic, joint_encoder));
 
     boost::shared_ptr<VelocityController> joint_velocity_controller( 
       new VelocityController(

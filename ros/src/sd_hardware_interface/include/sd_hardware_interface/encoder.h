@@ -3,6 +3,7 @@
 
 #include <ros/ros.h>
 #include <std_msgs/Int16.h>
+#include <std_msgs/Int32.h>
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/rolling_mean.hpp>
@@ -20,13 +21,15 @@ namespace sd_hardware_interface
     /** \brief Constructor */
     Encoder(
         double encoder_steps_for_one_joint_revolution,
-        double timeout,
+        double encoder_speed_steps_for_one_rad_per_second,
+	double timeout,
         double max_position,
         double min_position);
 
     /** \brief Update encoder position callbacks */
     virtual void update(double encoder_position);
     virtual void updateFromInt16Topic(const std_msgs::Int16ConstPtr &encoder_position);
+    virtual void updateSpeedFromInt32Topic(const std_msgs::Int32ConstPtr &encoder_speed);
 
     /** \brief Return current joint angle (rad) */
     double getAngle();
@@ -34,6 +37,9 @@ namespace sd_hardware_interface
     /** \brief Return current joint speed (rad/s) */
     double getSpeed();
 
+    /** \brief Return current filtered joint speed (rad/s) */
+    double getFilteredSpeed();
+    
     /** \brief Set current joint direction (for simple encoders without quadrature) */
     void setDirection(bool direction);
 
@@ -57,6 +63,12 @@ namespace sd_hardware_interface
     // Encoder resolution (rad/step)
     double encoder_resolution_;
 
+    // Encode speed coed (steps to rad/s)
+    double encoder_speed_steps_for_one_rad_per_second_;
+
+    // Check time out on position or speed value
+    bool checkTimeOut(timespec& last_time);
+
     // Current joint angle
     double angle_;
 
@@ -73,13 +85,14 @@ namespace sd_hardware_interface
 
     // Timestamp for speed and timout computation
     ros::Duration elapsed_time_;
-    struct timespec last_time_;
+    struct timespec last_position_time_;
+    struct timespec last_speed_time_;
     struct timespec current_time_;
 
     // Encoder timeout in seconds
     double timeout_;
   };
 
-}	// sd_hardware_interface
+}
 
 #endif	// SD_HARDWARE_INTERFACE_MOTOR_ENCODER_H

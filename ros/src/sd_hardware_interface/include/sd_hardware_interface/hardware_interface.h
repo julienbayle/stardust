@@ -83,9 +83,11 @@ namespace sd_hardware_interface
 
     // Topics
     std::vector<std::string> encoder_topics_;
+    std::vector<std::string> encoder_speed_topics_;
     std::vector<std::string> pwm_topics_;
     std::vector<std::string> speed_topics_;
     std::vector<double> encoder_steps_for_one_wheel_revolution_;
+    std::vector<double> encoder_speed_steps_for_one_rad_per_second_;
 
     // Open loop (feed forward + friction model)
     std::vector<double> velocity_controllers_pwm_max_;
@@ -100,6 +102,7 @@ namespace sd_hardware_interface
     std::vector<boost::shared_ptr<Encoder> > joint_encoders_;
     std::vector<boost::shared_ptr<VelocityController> > joint_velocity_controllers_;
     std::vector<ros::Subscriber> encoder_subscribers_;
+    std::vector<ros::Subscriber> encoder_speed_subscribers_;
     std::vector<ros::Publisher> effort_publishers_;
     std::vector<ros::Publisher> speed_publishers_;
 

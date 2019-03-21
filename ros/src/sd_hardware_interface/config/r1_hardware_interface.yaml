@@ -1,5 +1,5 @@
 control_loop:
-  loop_hz: 100 # in Hz
+  loop_hz: 50 # in Hz
   cycle_time_error_threshold: 0.1 # in seconds (Means an 10% error threshold for 100Hz)
   print_state: true   # true to see controller state in console (every second)
   publish_state: true # publish regulator state to topics
@@ -16,6 +16,10 @@ hardware_interface:
     - encoder/right
     - encoder/left
     - encoder/back
+  encoder_speed_topics:
+    - encoder/right/speed
+    - encoder/left/speed
+    - encoder/back/speed
   pwm_topics:
     - pwm/right
     - pwm/left
@@ -29,30 +33,34 @@ hardware_interface:
     - 4096
     - 4096
   encoder_steps_for_one_wheel_revolution:
-    - 206.0
-    - 206.0
-    - 206.0
+    - 823.0
+    - 823.0
+    - 823.0
+  encoder_speed_steps_for_one_rad_per_second:
+    - 7863.0
+    - 7863.0
+    - 7863.0
   velocity_controllers_velocity_to_pwm: 
-    - 725.0  # Unit : if pwm = velocity_controllers_velocity_to_pwm, wheel rotates at 1 rad/s
-    - 725.0
-    - 725.0
+    - 60.0  # Unit : if pwm = velocity_controllers_velocity_to_pwm, wheel should rotate at 1 rad/s
+    - 60.0
+    - 60.0
   velocity_controllers_friction_pwm: 
     - 450.0 # Minimum PWM allowing the wheel to turn
     - 450.0
     - 450.0  
   velocity_controllers_pid_p:
-    - 124.0
-    - 124.0
-    - 124.0
+    - 80.0
+    - 80.0
+    - 80.0
   velocity_controllers_pid_i:
-    - 0.0010
-    - 0.0010
-    - 0.0010
+    - 1.0
+    - 1.0
+    - 1.0
   velocity_controllers_pid_d:
-    - 0.001
-    - 0.001
-    - 0.001
+    - 0.0
+    - 0.0
+    - 0.0
 
 rosserial_server:
-  baud: 1000000
-  port: /dev/ttyUSB0
+  baud: 115200
+  port: /dev/ttyUSBMotor
