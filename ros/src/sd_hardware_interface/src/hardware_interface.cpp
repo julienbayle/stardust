@@ -316,4 +316,25 @@ void HWInterface::publishVelocityControllerState()
     joint_velocity_controllers_[joint_id]->publishState();
 }
 
+void HWInterface::updateParameters(sd_hardware_interface::PIDConfig &config, uint32_t level)
+{
+  for (std::size_t joint_id = 0; joint_id < num_joints_; ++joint_id)
+  {
+    ROS_INFO_STREAM("Reconfigure velocity controler for joint: " << joint_names_[joint_id]);
+
+    // Configure feed forward and friction compensation
+    joint_velocity_controllers_[joint_id]->setFeedforwardAndFrictionGains(
+      config.velocity_to_pwm, 
+      config.friction_pwm);
+    
+    // Limit I to 30% of PWM max
+    joint_velocity_controllers_[joint_id]->setGains(
+      config.pid_p,
+      config.pid_i,
+      config.pid_d,
+      0.3 * velocity_controllers_pwm_max_[joint_id], 
+      true);
+  }
+}
+
 }  // namespace

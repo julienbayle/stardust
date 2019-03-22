@@ -19,6 +19,9 @@
 #include <sd_hardware_interface/encoder.h>
 #include <sd_hardware_interface/velocity_controller.h>
 
+// Dynamic reconfigure
+#include "sd_hardware_interface/PIDConfig.h"
+
 namespace sd_hardware_interface
 {
 
@@ -50,6 +53,9 @@ namespace sd_hardware_interface
 
     /** \brief Helper for settings PID values */
     virtual void publishVelocityControllerState();
+    
+    // Dynamic reconfigure
+    virtual void updateParameters(sd_hardware_interface::PIDConfig &config, uint32_t level);
 
   protected:
 
@@ -114,7 +120,7 @@ namespace sd_hardware_interface
 
     // Topic read timeout
     double timeout_;
-  
+
   };  // class
 
 }  // sd_hardware_interface

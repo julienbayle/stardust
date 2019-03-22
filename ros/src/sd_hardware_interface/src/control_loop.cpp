@@ -13,7 +13,9 @@ namespace sd_hardware_interface
     boost::shared_ptr<sd_hardware_interface::HWInterface> hardware_interface): 
         nh_(nh), 
         name_(name),
-        hardware_interface_(hardware_interface)
+        hardware_interface_(hardware_interface),
+        dynamic_reconfigure_server_(),
+        dynamic_reconfigure_callback_(boost::bind(&ControlLoop::updateParameters, this, _1, _2))
   {
     // Create the controller manager
     controller_manager_.reset(new controller_manager::ControllerManager(hardware_interface_.get(), nh_));
@@ -31,6 +33,9 @@ namespace sd_hardware_interface
     clock_gettime(CLOCK_MONOTONIC, &last_time_);
 
     desired_update_period_ = ros::Duration(1 / loop_hz_);
+
+    // Dynamic reconfigure callback binding
+    dynamic_reconfigure_server_.setCallback(dynamic_reconfigure_callback_);
   }
 
   void ControlLoop::run()
@@ -38,8 +43,15 @@ namespace sd_hardware_interface
     ros::Rate rate(loop_hz_);
     while(ros::ok()) {
       update();
+      ros::spinOnce();
       rate.sleep();
     }
+  }
+
+  void ControlLoop::updateParameters(sd_hardware_interface::PIDConfig &config, uint32_t level)
+  {
+     ROS_INFO("Reconfigure Request");
+     hardware_interface_->updateParameters(config, level);
   }
 
   void ControlLoop::update()

@@ -7,12 +7,18 @@ find_package(catkin REQUIRED
 	control_msgs
 	sensor_msgs
 	urdf
-  joint_limits_interface
-  transmission_interface
-  control_toolbox
+  	joint_limits_interface
+  	transmission_interface
+  	control_toolbox
 	controller_manager
 	hardware_interface
 	rosparam_shortcuts
+  	dynamic_reconfigure
+)
+
+## Generate dynamic reconfigure parameters in the 'cfg' folder
+generate_dynamic_reconfigure_options(
+  cfg/PID.cfg
 )
 
 catkin_package(

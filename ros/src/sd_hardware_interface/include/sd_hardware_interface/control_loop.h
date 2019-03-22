@@ -6,6 +6,10 @@
 #include <sd_hardware_interface/hardware_interface.h>
 #include <controller_manager/controller_manager.h>
 
+// Dynamic reconfigure
+#include <dynamic_reconfigure/server.h>
+#include "sd_hardware_interface/PIDConfig.h"
+
 namespace sd_hardware_interface
 {
     // Used to convert seconds elapsed to nanoseconds
@@ -40,6 +44,11 @@ namespace sd_hardware_interface
 
       // Update function called with loop_hz_ rate
       void update();
+
+      // Dynamic reconfigure      
+      void updateParameters(sd_hardware_interface::PIDConfig &config, uint32_t level);
+      dynamic_reconfigure::Server<sd_hardware_interface::PIDConfig> dynamic_reconfigure_server_;
+      dynamic_reconfigure::Server<sd_hardware_interface::PIDConfig>::CallbackType dynamic_reconfigure_callback_;
 
       // Startup and shutdown of the internal node inside a roscpp program
       ros::NodeHandle nh_;
