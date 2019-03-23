@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>sd_calibration</name>
+  <version>0.0.1</version>
+  <description>Robot calibration tools</description>
+  <maintainer email="julienbayle@github.com">Julien BAYLE</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  
+  <depend>rospy</depend>
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  
+  <exec_depend>message_runtime</exec_depend>
+
+</package>
