@@ -40,26 +40,31 @@ hardware_interface:
     - 7863.0
     - 7863.0
     - 7863.0
-  velocity_controllers_velocity_to_pwm: 
-    - 60.0  # Unit : if pwm = velocity_controllers_velocity_to_pwm, wheel should rotate at 1 rad/s
-    - 60.0
-    - 60.0
-  velocity_controllers_friction_pwm: 
-    - 450.0 # Minimum PWM allowing the wheel to turn
-    - 450.0
-    - 450.0  
-  velocity_controllers_pid_p:
-    - 80.0
-    - 80.0
-    - 80.0
-  velocity_controllers_pid_i:
-    - 1.0
-    - 1.0
-    - 1.0
-  velocity_controllers_pid_d:
-    - 0.0
-    - 0.0
-    - 0.0
+
+  # As rqt-reconfigure does not support array, direct names 
+  # are used for the next parameters:
+
+  # Feedfordward gain (If pwm increases by "pwm_max*velocity_controllers_feedforward_x"
+  # the wheel x speed up by 1 rad/s)
+  velocity_controllers_feedforward_right: 0.01
+  velocity_controllers_feedforward_left: 0.01
+  velocity_controllers_feedforward_back: 0.01
+
+  # Minimum torque allowing the wheel to turn (percentage of pwm_max)
+  velocity_controllers_static_friction_right: 0.3
+  velocity_controllers_static_friction_left: 0.3
+  velocity_controllers_static_friction_back: 0.3
+
+  # PID 
+  velocity_controllers_pid_p_right: 0.01
+  velocity_controllers_pid_p_left: 0.01
+  velocity_controllers_pid_p_back: 0.01
+  velocity_controllers_pid_i_right: 0.01
+  velocity_controllers_pid_i_left: 0.01
+  velocity_controllers_pid_i_back: 0.01
+  velocity_controllers_pid_d_right: 0.005
+  velocity_controllers_pid_d_left: 0.005
+  velocity_controllers_pid_d_back: 0.005
 
 rosserial_server:
   baud: 115200

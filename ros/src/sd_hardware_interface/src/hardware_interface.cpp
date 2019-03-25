@@ -34,13 +34,34 @@ HWInterface::HWInterface(ros::NodeHandle &nh)
   error += !rosparam_shortcuts::get(name_, rpnh, "pwm_topics", pwm_topics_);
   error += !rosparam_shortcuts::get(name_, rpnh, "speed_topics", speed_topics_);
   error += !rosparam_shortcuts::get(name_, rpnh, "pwm_max", velocity_controllers_pwm_max_);
-  error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_velocity_to_pwm", velocity_controllers_velocity_to_pwm_);
-  error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_friction_pwm", velocity_controllers_friction_pwm_);
-  error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_pid_p", velocity_controllers_pid_p_);
-  error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_pid_i", velocity_controllers_pid_i_);
-  error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_pid_d", velocity_controllers_pid_d_);
   error += !rosparam_shortcuts::get(name_, rpnh, "encoder_steps_for_one_wheel_revolution", encoder_steps_for_one_wheel_revolution_);
   error += !rosparam_shortcuts::get(name_, rpnh, "encoder_speed_steps_for_one_rad_per_second", encoder_speed_steps_for_one_rad_per_second_);
+  
+  velocity_controllers_feedforward_ = std::vector<double>(joint_names_.size());
+  velocity_controllers_static_friction_ = std::vector<double>(joint_names_.size());
+  velocity_controllers_pid_p_ = std::vector<double>(joint_names_.size());
+  velocity_controllers_pid_i_ = std::vector<double>(joint_names_.size());
+  velocity_controllers_pid_d_ = std::vector<double>(joint_names_.size());
+
+  error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_feedforward_right", velocity_controllers_feedforward_[0]);
+  error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_feedforward_left", velocity_controllers_feedforward_[1]);
+  error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_static_friction_right", velocity_controllers_static_friction_[0]);
+  error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_static_friction_left", velocity_controllers_static_friction_[1]);
+  error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_pid_p_right", velocity_controllers_pid_p_[0]);
+  error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_pid_p_left", velocity_controllers_pid_p_[1]);
+  error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_pid_i_right", velocity_controllers_pid_i_[0]);
+  error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_pid_i_left", velocity_controllers_pid_i_[1]);
+  error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_pid_d_right", velocity_controllers_pid_d_[0]);
+  error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_pid_d_left", velocity_controllers_pid_d_[1]);
+
+  if (joint_names_.size() > 2) {
+    error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_feedforward_back", velocity_controllers_feedforward_[2]);
+    error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_static_friction_back", velocity_controllers_static_friction_[2]);
+    error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_pid_p_back", velocity_controllers_pid_p_[2]);
+    error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_pid_i_back", velocity_controllers_pid_i_[2]);
+    error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_pid_d_back", velocity_controllers_pid_d_[2]);
+  }
+  
   rosparam_shortcuts::shutdownIfError(name_, error);
 }
 
@@ -95,31 +116,6 @@ void HWInterface::init()
     return;
   }
 
-  if (num_joints_ != velocity_controllers_velocity_to_pwm_.size()) {
-    ROS_ERROR_STREAM_NAMED(name_, "velocity_controllers_velocity_to_pwm parameter must be the same size as joints");
-    return;
-  }
-
-  if (num_joints_ != velocity_controllers_friction_pwm_.size()) {
-    ROS_ERROR_STREAM_NAMED(name_, "velocity_controllers_friction_pwm parameter must be the same size as joints");
-    return;
-  }
-
-  if (num_joints_ != velocity_controllers_pid_p_.size()) {
-    ROS_ERROR_STREAM_NAMED(name_, "velocity_controllers_pid_p parameter must be the same size as joints");
-    return;
-  }
-
-  if (num_joints_ != velocity_controllers_pid_i_.size()) {
-    ROS_ERROR_STREAM_NAMED(name_, "velocity_controllers_pid_i parameter must be the same size as joints");
-    return;
-  }
-
-  if (num_joints_ != velocity_controllers_pid_d_.size()) {
-    ROS_ERROR_STREAM_NAMED(name_, "velocity_controllers_pid_d parameter must be the same size as joints");
-    return;
-  }
-
   // Initialize interfaces for each joint
   for (std::size_t joint_id = 0; joint_id < num_joints_; ++joint_id)
   {
@@ -161,7 +157,7 @@ void HWInterface::init()
     boost::shared_ptr<Encoder> joint_encoder( 
       new Encoder(
         encoder_steps_for_one_wheel_revolution_[joint_id],
-	encoder_speed_steps_for_one_rad_per_second_[joint_id],
+	      encoder_speed_steps_for_one_rad_per_second_[joint_id],
         timeout_,
         32767.0,
         -32768.0));
@@ -176,19 +172,9 @@ void HWInterface::init()
         velocity_controllers_pwm_max_[joint_id],
         -1.0 * velocity_controllers_pwm_max_[joint_id]));
 
-    // Configure feed forward and friction compensation
-    joint_velocity_controller->setFeedforwardAndFrictionGains(
-      velocity_controllers_velocity_to_pwm_[joint_id], 
-      velocity_controllers_friction_pwm_[joint_id]);
-    
-    // Limit I to 30% of PWM max
-    joint_velocity_controller->setGains(
-      velocity_controllers_pid_p_[joint_id],
-      velocity_controllers_pid_i_[joint_id],
-      velocity_controllers_pid_d_[joint_id],
-      0.3 * velocity_controllers_pwm_max_[joint_id], true);
-
     joint_velocity_controllers_.push_back(joint_velocity_controller);
+    configureVelocityController(joint_id);
+
     effort_publishers_.push_back(nh_.advertise<std_msgs::Int16>(pwm_topic, 1, false));
     speed_publishers_.push_back(nh_.advertise<std_msgs::Int32>(speed_topic, 1, false));
 
@@ -316,25 +302,49 @@ void HWInterface::publishVelocityControllerState()
     joint_velocity_controllers_[joint_id]->publishState();
 }
 
-void HWInterface::updateParameters(sd_hardware_interface::PIDConfig &config, uint32_t level)
-{
-  for (std::size_t joint_id = 0; joint_id < num_joints_; ++joint_id)
-  {
-    ROS_INFO_STREAM("Reconfigure velocity controler for joint: " << joint_names_[joint_id]);
-
-    // Configure feed forward and friction compensation
-    joint_velocity_controllers_[joint_id]->setFeedforwardAndFrictionGains(
-      config.velocity_to_pwm, 
-      config.friction_pwm);
+void HWInterface::configureVelocityController(int joint_id)
+{ 
+  // Configure feed forward and friction compensation
+  joint_velocity_controllers_[joint_id]->setFeedforwardAndFrictionGains(
+    velocity_controllers_feedforward_[joint_id] * velocity_controllers_pwm_max_[joint_id], 
+    velocity_controllers_static_friction_[joint_id] * velocity_controllers_pwm_max_[joint_id]);
     
-    // Limit I to 30% of PWM max
-    joint_velocity_controllers_[joint_id]->setGains(
-      config.pid_p,
-      config.pid_i,
-      config.pid_d,
-      0.3 * velocity_controllers_pwm_max_[joint_id], 
-      true);
+  // Limit I to 30% of PWM max
+  joint_velocity_controllers_[joint_id]->setGains(
+    velocity_controllers_pid_p_[joint_id] * velocity_controllers_pwm_max_[joint_id],
+    velocity_controllers_pid_i_[joint_id] * velocity_controllers_pwm_max_[joint_id],
+    velocity_controllers_pid_d_[joint_id] * velocity_controllers_pwm_max_[joint_id],
+    0.3 * velocity_controllers_pwm_max_[joint_id], 
+    true);
+}
+
+void HWInterface::updateParameters(sd_hardware_interface::PIDConfig &config, uint32_t level)
+{ 
+  ROS_INFO_STREAM("Reconfigure velocity controller for wheel joints");
+
+  velocity_controllers_feedforward_[0] = config.velocity_controllers_feedforward_right;
+  velocity_controllers_feedforward_[1] = config.velocity_controllers_feedforward_left;
+  velocity_controllers_static_friction_[0] = config.velocity_controllers_static_friction_right;
+  velocity_controllers_static_friction_[1] = config.velocity_controllers_static_friction_left;
+  velocity_controllers_pid_p_[0] = config.velocity_controllers_pid_p_right;
+  velocity_controllers_pid_p_[1] = config.velocity_controllers_pid_p_left;
+  velocity_controllers_pid_i_[0] = config.velocity_controllers_pid_i_right;
+  velocity_controllers_pid_i_[1] = config.velocity_controllers_pid_i_left;
+  velocity_controllers_pid_d_[0] = config.velocity_controllers_pid_d_right;
+  velocity_controllers_pid_d_[1] = config.velocity_controllers_pid_d_left;
+
+  configureVelocityController(0);
+  configureVelocityController(1);
+
+  if (joint_names_.size() > 2) {
+    velocity_controllers_feedforward_[2] = config.velocity_controllers_feedforward_back;
+    velocity_controllers_static_friction_[2] = config.velocity_controllers_static_friction_back;
+    velocity_controllers_pid_p_[2] = config.velocity_controllers_pid_p_back;
+    velocity_controllers_pid_i_[2] = config.velocity_controllers_pid_i_back;
+    velocity_controllers_pid_d_[2] = config.velocity_controllers_pid_d_back;
+    configureVelocityController(2);
   }
+  
 }
 
 }  // namespace

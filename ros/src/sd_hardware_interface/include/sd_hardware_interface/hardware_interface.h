@@ -62,6 +62,9 @@ namespace sd_hardware_interface
     // Load robot URDF
     virtual void loadURDF(ros::NodeHandle &nh, std::string param_name);
 
+    // Update velocity controller parameters from HW parameters
+    void configureVelocityController(int joint_id);
+
     // Short name of this class
     std::string name_;
 
@@ -95,10 +98,12 @@ namespace sd_hardware_interface
     std::vector<double> encoder_steps_for_one_wheel_revolution_;
     std::vector<double> encoder_speed_steps_for_one_rad_per_second_;
 
-    // Open loop (feed forward + friction model)
+    // PWM limiter (-pwm_max / + pwm_max)
     std::vector<double> velocity_controllers_pwm_max_;
-    std::vector<double> velocity_controllers_velocity_to_pwm_;
-    std::vector<double> velocity_controllers_friction_pwm_;
+
+    // Open loop (feed forward + friction model)
+    std::vector<double> velocity_controllers_feedforward_;
+    std::vector<double> velocity_controllers_static_friction_;
 
     //PID
     std::vector<double> velocity_controllers_pid_p_;
