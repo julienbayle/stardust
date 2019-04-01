@@ -31,10 +31,10 @@ public:
         joy_msg.header = ps_joy_msg->header;
 
         joy_msg.buttons.resize(15);
-        joy_msg.buttons[XBOX_BUTTON_A] = ps_joy_msg->buttons[PS_BUTTON_CROSS];
-        joy_msg.buttons[XBOX_BUTTON_B] = ps_joy_msg->buttons[PS_BUTTON_CIRCLE];
+        joy_msg.buttons[XBOX_BUTTON_A] = ps_joy_msg->buttons[PS_BUTTON_CIRCLE];
+        joy_msg.buttons[XBOX_BUTTON_B] = ps_joy_msg->buttons[PS_BUTTON_TRIANGLE];
         joy_msg.buttons[XBOX_BUTTON_X] = ps_joy_msg->buttons[PS_BUTTON_SQUARE];
-        joy_msg.buttons[XBOX_BUTTON_Y] = ps_joy_msg->buttons[PS_BUTTON_TRIANGLE];
+        joy_msg.buttons[XBOX_BUTTON_Y] = ps_joy_msg->buttons[PS_BUTTON_CROSS];
         joy_msg.buttons[XBOX_BUTTON_LB] = ps_joy_msg->buttons[PS_BUTTON_L1];
         joy_msg.buttons[XBOX_BUTTON_RB] = ps_joy_msg->buttons[PS_BUTTON_R1];
         joy_msg.buttons[XBOX_BUTTON_BACK] = ps_joy_msg->buttons[PS_BUTTON_SHARE];

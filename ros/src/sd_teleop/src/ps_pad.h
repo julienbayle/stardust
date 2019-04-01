@@ -5,10 +5,10 @@
 * stick axes go from 0 to +/-1
 **/
 
-#define PS_BUTTON_SQUARE 0
-#define PS_BUTTON_CROSS 1
-#define PS_BUTTON_CIRCLE 2
-#define PS_BUTTON_TRIANGLE 3
+#define PS_BUTTON_SQUARE 3
+#define PS_BUTTON_CROSS 0
+#define PS_BUTTON_CIRCLE 1
+#define PS_BUTTON_TRIANGLE 2
 #define PS_BUTTON_L1 4
 #define PS_BUTTON_R1 5
 #define PS_BUTTON_L2 6

@@ -46,22 +46,22 @@ hardware_interface:
 
   # Feedfordward gain (If pwm increases by "pwm_max*velocity_controllers_feedforward_x"
   # the wheel x speed up by 1 rad/s)
-  velocity_controllers_feedforward_right: 0.007
-  velocity_controllers_feedforward_left: 0.007
-  velocity_controllers_feedforward_back: 0.007
+  velocity_controllers_feedforward_right: 0.014
+  velocity_controllers_feedforward_left: 0.014
+  velocity_controllers_feedforward_back: 0.014
 
   # Minimum torque allowing the wheel to turn (percentage of pwm_max)
-  velocity_controllers_static_friction_right: 0.3
-  velocity_controllers_static_friction_left: 0.3
-  velocity_controllers_static_friction_back: 0.3
+  velocity_controllers_static_friction_right: 0.2
+  velocity_controllers_static_friction_left: 0.2
+  velocity_controllers_static_friction_back: 0.2
 
   # PID 
-  velocity_controllers_pid_p_right: 0.05
-  velocity_controllers_pid_p_left: 0.05
-  velocity_controllers_pid_p_back: 0.05
-  velocity_controllers_pid_i_right: 0.02
-  velocity_controllers_pid_i_left: 0.02
-  velocity_controllers_pid_i_back: 0.02
+  velocity_controllers_pid_p_right: 0.006
+  velocity_controllers_pid_p_left: 0.006
+  velocity_controllers_pid_p_back: 0.006
+  velocity_controllers_pid_i_right: 0.006
+  velocity_controllers_pid_i_left: 0.006
+  velocity_controllers_pid_i_back: 0.006
   velocity_controllers_pid_d_right: 0.0
   velocity_controllers_pid_d_left: 0.0
   velocity_controllers_pid_d_back: 0.0
