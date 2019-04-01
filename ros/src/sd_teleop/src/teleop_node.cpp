@@ -4,6 +4,7 @@
 #include "sensor_msgs/Joy.h"
 #include "std_msgs/String.h"
 #include "std_msgs/Int16.h"
+#include "std_msgs/UInt16.h"
 #include "std_msgs/Bool.h"
 
 #include <boost/thread.hpp>
@@ -85,10 +86,10 @@ class TeleopNode {
 			left_valve_on_(false),
 			center_valve_on_(false),
 			right_valve_on_(false),
-			servo1_pos_(0.0),
+			servo1_pos_(90.0),
 			servo1_up_(false),
 			servo1_down_(false),
-			servo2_pos_(0.0),
+			servo2_pos_(90.0),
 			servo2_up_(false),
 			servo2_down_(false),
 
@@ -121,8 +122,8 @@ class TeleopNode {
 			left_valve_publisher = nh.advertise<std_msgs::Int16>("pwm/vanne1", 1);
 			center_valve_publisher = nh.advertise<std_msgs::Int16>("pwm/vanne2", 1);
 			right_valve_publisher = nh.advertise<std_msgs::Int16>("pwm/vanne3", 1);
-			servo1_publisher = nh.advertise<std_msgs::Int16>("servo/F", 1);
-			servo2_publisher = nh.advertise<std_msgs::Int16>("servo/E", 1);
+			servo1_publisher = nh.advertise<std_msgs::UInt16>("servo/F", 1);
+			servo2_publisher = nh.advertise<std_msgs::UInt16>("servo/E", 1);
 			
 			joy_subscriber = nh.subscribe<sensor_msgs::Joy>(joy_topic_name_, 1, &TeleopNode::joy_handler, this);
 
@@ -355,12 +356,12 @@ class TeleopNode {
 				servo1_pos_ += servo_increment_ / timer_frequency_;
 			else if (servo1_down_)
 				servo1_pos_ -= servo_increment_ / timer_frequency_;
-			if (servo1_pos_ < 0)
-				servo1_pos_ = 0;
-			else if (servo1_pos_ > 270)
-				servo1_pos_ = 270;
+			if (servo1_pos_ < 20)
+				servo1_pos_ = 20;
+			else if (servo1_pos_ > 170)
+				servo1_pos_ = 170;
 
-			std_msgs::Int16 servo1_msg;
+			std_msgs::UInt16 servo1_msg;
 			servo1_msg.data = servo1_pos_;
 			servo1_publisher.publish(servo1_msg);
 
@@ -368,12 +369,12 @@ class TeleopNode {
 				servo2_pos_ += servo_increment_ / timer_frequency_;
 			else if (servo2_down_)
 				servo2_pos_ -= servo_increment_ / timer_frequency_;
-			if (servo2_pos_ < 0)
-				servo2_pos_ = 0;
-			else if (servo2_pos_ > 270)
-				servo2_pos_ = 270;
+			if (servo2_pos_ < 20)
+				servo2_pos_ = 20;
+			else if (servo2_pos_ > 170)
+				servo2_pos_ = 170;
 
-			std_msgs::Int16 servo2_msg;
+			std_msgs::UInt16 servo2_msg;
 			servo2_msg.data = servo2_pos_;
 			servo2_publisher.publish(servo2_msg);
 

@@ -1,0 +1,16 @@
+[Unit]
+Description=Stardust ROS
+After=network-online.target
+
+[Service]
+Type=forking
+ 
+User=r1
+Group=r1
+UMask=007
+ 
+ExecStart=/home/r1/stardust/scripts/start.sh
+ExecStop=/home/r1/stardust/scripts/stop.sh
+
+[Install]
+WantedBy=default.target
