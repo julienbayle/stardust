@@ -34,15 +34,15 @@ if __name__ == '__main__':
     robot = Robot('/r1/mode_auto', '/r1/auto_cmd_vel')
     
     t1 = [Twist()]
-    t1[0].angular.z = 6
+    t1[0].angular.z = 2
 
     t2 = [Twist()]
-    t2[0].angular.z = -6
+    t2[0].angular.z = -2
     t3 = [Twist()]
-    t3[0].angular.z = 3
+    t3[0].angular.z = 1
 
     t4 = [Twist()]
-    t4[0].angular.z = -3
+    t4[0].angular.z = -1
 
 
     # stop robot
