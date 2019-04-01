@@ -22,7 +22,11 @@
         if="$(arg rosserial_cplusplus)"/>
 
     <!-- ROS Serial python -->
-    <node pkg="rosserial_python" type="serial_node.py" name="rosserial_server" 
+    <node pkg="rosserial_python" type="serial_node.py" name="rosserial_server_motor" 
+        unless="$(arg rosserial_cplusplus)"/>
+    
+    <!-- ROS Serial python Pince-->
+    <node pkg="rosserial_python" type="serial_node.py" name="rosserial_server_pince" 
         unless="$(arg rosserial_cplusplus)"/>
 
 </launch>
