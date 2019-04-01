@@ -70,6 +70,6 @@ rosserial_server_motor:
   baud: 115200
   port: /dev/ttyUSBMotor
 
-rosserial_serveur_pince:
+rosserial_server_pince:
   baud: 115200
   port: /dev/ttyAMA0
