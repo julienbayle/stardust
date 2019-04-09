@@ -25,6 +25,11 @@
 				respawn="false" output="screen">
 			<param name="tf_prefix" value="$(arg robot_ns)"/>
 		</node>
+
+		<!-- Lidar -->
+		<include file="$(find sd_lidar)/launch/sd_lidar.launch">
+			<arg name="robot_ns" value="$(arg robot_ns)"/>
+		</include>
 		
 		<!-- Behavior -->
 		<include file="$(find sd_behavior)/launch/sd_behavior.launch">

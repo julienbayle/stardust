@@ -1,0 +1,9 @@
+<launch>
+    <arg name="robot_ns"/>
+
+    <!-- Load controller settings -->
+    <rosparam file="$(find sd_lidar)/config/$(arg robot_ns)_lidar.yaml" command="load"/>
+
+    <node name="ydlidar"  pkg="ydlidar"  type="ydlidar_node" output="screen" respawn="false" >
+    </node>
+</launch>
