@@ -36,6 +36,7 @@ catkin_package(
     std_msgs
     sensor_msgs
     rosparam_shortcuts
+    dynamic_reconfigure
   LIBRARIES
     HWInterface
     ControlLoop
