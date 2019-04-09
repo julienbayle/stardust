@@ -68,7 +68,7 @@ hardware_interface:
 
 rosserial_server_motor:
   baud: 115200
-  port: /dev/ttyUSBMotor
+  port: /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A900LFGP-if00-port0
 
 rosserial_server_pince:
   baud: 115200
