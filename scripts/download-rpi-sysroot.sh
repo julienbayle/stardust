@@ -17,13 +17,14 @@ done
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 export SYSROOT_PATH=$( readlink -f ${SCRIPT_DIR}/../rpi-sysroot )
-
+export ARCH="aarch64-linux-gnu"
+export ROS_DISTRO="melodic"
 
 mkdir -p ${SYSROOT_PATH}
 if [ ! -z ${address} ]; then
     echo "Rsync to path ${SYSROOT_PATH} using remote address ${address}"
-    rsync -e ssh -avzr --progress ${address}:/lib ${address}:/usr ${address}:/opt ${SYSROOT_PATH} && \
-    rsync -e ssh -avzr --progress ubuntu@${ADDRESS}:/etc/alternatives ${SYSROOT_PATH}/etc
+    rsync -e ssh -avzr --progress --exclude '/usr/lib/cups' ${address}:/lib ${address}:/usr ${address}:/opt ${SYSROOT_PATH} && \
+    rsync -e ssh -avzr --progress ${address}:/etc/alternatives ${SYSROOT_PATH}/etc
 elif [ ! -z ${path} ]; then
     echo "Rsync to path ${SYSROOT_PATH} using path ${path}"
     rsync -avzr --progress ${path}/lib ${path}/usr ${path}/opt ${SYSROOT_PATH} && \
@@ -70,13 +71,13 @@ done
  
 echo "Patching cmake scripts"
  
-for i in `find ${SYSROOT_PATH}/opt/ros/melodic/share/ -name *.cmake`; do sed -i "s,/opt/,"${SYSROOT_PATH}"/opt/,g" $i; done
-for i in `find ${SYSROOT_PATH}/opt/ros/melodic/share/ -name *.cmake`; do sed -i "s,/usr/,"${SYSROOT_PATH}"/usr/,g" $i; done
+for i in `find ${SYSROOT_PATH}/opt/ros/${ROS_DISTRO}/share/ -name *.cmake`; do sed -i "s,/opt/,"${SYSROOT_PATH}"/opt/,g" $i; done
+for i in `find ${SYSROOT_PATH}/opt/ros/${ROS_DISTRO}/share/ -name *.cmake`; do sed -i "s,/usr/,"${SYSROOT_PATH}"/usr/,g" $i; done
 for i in `find ${SYSROOT_PATH}/usr -name *.cmake`; do sed -i "s,/usr/,"${SYSROOT_PATH}"/usr/,g" $i; done
 
-sed -i "s,/usr/lib/aarch64-linux-gnu/,,g" ${SYSROOT_PATH}/usr/lib/aarch64-linux-gnu/libpthread.so
-sed -i "s,/lib/aarch64-linux-gnu/,,g" ${SYSROOT_PATH}/usr/lib/aarch64-linux-gnu/libpthread.so
-sed -i "s,/usr/lib/aarch64-linux-gnu/,,g" ${SYSROOT_PATH}/usr/lib/aarch64-linux-gnu/libc.so
-sed -i "s,/lib/aarch64-linux-gnu/,,g" ${SYSROOT_PATH}/usr/lib/aarch64-linux-gnu/libc.so
+sed -i "s,/usr/lib/${ARCH}/,,g" ${SYSROOT_PATH}/usr/lib/${ARCH}/libpthread.so
+sed -i "s,/lib/${ARCH}/,,g" ${SYSROOT_PATH}/usr/lib/${ARCH}/libpthread.so
+sed -i "s,/usr/lib/${ARCH}/,,g" ${SYSROOT_PATH}/usr/lib/${ARCH}/libc.so
+sed -i "s,/lib/${ARCH}/,,g" ${SYSROOT_PATH}/usr/lib/${ARCH}/libc.so
 
 echo "Sysroot ok"

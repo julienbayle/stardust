@@ -3,7 +3,7 @@
 	<arg name="sim" default="false"/>
 	<arg name="ground_truth" default="false"/>
 	
-	<machine name="localhost" address="localhost" env-loader="/opt/ros/kinetic/env.sh"/>
+	<machine name="localhost" address="localhost" env-loader="/opt/ros/melodic/env.sh"/>
 
 	<group ns="/r2">
 		<include file="$(find sd_sensor)/launch/sd_sensor.launch">
