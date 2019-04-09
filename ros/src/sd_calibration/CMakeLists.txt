@@ -13,3 +13,8 @@ catkin_package(
   CATKIN_DEPENDS message_runtime 
 )
 
+install(DIRECTORY
+  config
+  launch
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
