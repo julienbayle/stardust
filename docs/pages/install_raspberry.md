@@ -32,7 +32,46 @@ Branchez la clé USB sur un PC, et éditez le fichier cmdline.txt sur la partiti
 console=tty0 console=ttyS1,115200 root=LABEL=writable rw elevator=deadline fsck.repair=yes net.ifnames=0 cma=64M rootwait rootdelay=10
 ```
 
-Si le Raspberry ne réussi pas à booter, formater une carte SD en FAT32 et copiez dessus le contenu de la partition "system-boot".
+Creez un fichier "boot.scr.txt" avec le contenu suivant:
+```
+setenv fdt_addr_r 0x03000000
+fdt addr ${fdt_addr_r}
+fdt get value bootargs /chosen bootargs
+setenv kernel_addr_r 0x01000000
+setenv ramdisk_addr_r 0x03100000
+fatload usb 0:1 ${kernel_addr_r} vmlinuz
+fatload usb 0:1 ${ramdisk_addr_r} initrd.img
+setenv initrdsize $filesize
+booti ${kernel_addr_r} ${ramdisk_addr_r}:${initrdsize} ${fdt_addr_r}
+```
+
+Remplacez également le contenu du fichier "/etc/flash-kernel/bootscript/bootscr.rpi3" sur la partition "writable" par le contenu ci-dessus.
+
+Entrez les commandes suivantes:
+```shell
+$ sudo apt-get install u-boot-tools
+$ mkimage -A arm -O linux -T script -C none -n boot.scr -d boot.scr.txt boot.scr
+```
+
+Remplacez le fichier "boot.scr" sur la partition "system-boot".
+
+Ajouter une ligne au fichier "/etc/default/raspi3-firmware":
+```
+ROOTPART=LABEL=writable
+```
+
+## Désactivation des mises à jour automatiques
+
+Editer le fichier "/etc/apt/apt.conf.d/20auto-upgrades" et remplacez la ligne:
+```
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Unattended-Upgrade "1";
+```
+par
+```
+APT::Periodic::Update-Package-Lists "0";
+APT::Periodic::Unattended-Upgrade "0";
+```
 
 ## Mise à jour du système
 
