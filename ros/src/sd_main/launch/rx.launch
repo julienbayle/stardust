@@ -19,17 +19,17 @@
 		<include file="$(find sd_hardware_interface)/launch/sd_hardware_interface.launch" unless="$(arg sim)">
 			<arg name="robot_ns" value="$(arg robot_ns)"/>
 		</include>
+
+		<!-- Sensors -->
+		<include file="$(find sd_sensor)/launch/sd_sensor.launch">
+			<arg name="robot_ns" value="$(arg robot_ns)"/>
+		</include>
 		
 		<!-- Combine joint values -->
 		<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
 				respawn="false" output="screen">
 			<param name="tf_prefix" value="$(arg robot_ns)"/>
 		</node>
-
-		<!-- Lidar -->
-		<include file="$(find sd_lidar)/launch/sd_lidar.launch">
-			<arg name="robot_ns" value="$(arg robot_ns)"/>
-		</include>
 		
 		<!-- Behavior -->
 		<include file="$(find sd_behavior)/launch/sd_behavior.launch">

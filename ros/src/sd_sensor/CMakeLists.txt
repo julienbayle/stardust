@@ -10,6 +10,7 @@ project(sd_sensor)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
+  ydlidar
 )
 
 ## System dependencies are found with CMake's conventions
