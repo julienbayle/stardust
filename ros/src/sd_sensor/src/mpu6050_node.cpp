@@ -47,12 +47,12 @@ private:
     double cp_bias_gx_, cp_bias_gy_, cp_bias_gz_, cp_bias_ax_, cp_bias_ay_, cp_bias_az_;
     int bias_count_;
 
-    float read_word_i2c(int addr)
+    double read_word_i2c(int addr)
     {
         int high = i2c_smbus_read_byte_data(file_, addr);
         int low = i2c_smbus_read_byte_data(file_, addr + 1);
         int val = (high << 8) + low;
-        return float((val >= 0x8000) ? -((65535 - val) + 1) : val);
+        return double((val >= 0x8000) ? -((65535 - val) + 1) : val);
     }
 
 public:
@@ -98,7 +98,7 @@ public:
         i2c_smbus_write_byte_data(file_, ACCEL_CONFIG, accel_conf);
 
         // Create publishers
-        imu_publisher_ = nh_.advertise<sensor_msgs::Imu>("imu", 10);
+        imu_publisher_ = nh_.advertise<sensor_msgs::Imu>("imu/data", 10);
 
         // Create services
         get_bias_service_ = nh_priv_.advertiseService("get_bias", &MPU6050::get_bias_callback, this);
@@ -115,30 +115,40 @@ public:
 
         // Read gyroscope values.
         // At default sensitivity of 250deg/s we need to scale by 131.
-        msg.angular_velocity.x = read_word_i2c(0x43) / 131 * M_PI / 180.0 - bias_gx_;
-        msg.angular_velocity.y = read_word_i2c(0x45) / 131 * M_PI / 180.0 - bias_gy_;
-        msg.angular_velocity.z = read_word_i2c(0x47) / 131 * M_PI / 180.0 - bias_gz_;
+        double gx = read_word_i2c(0x43) / 131 * M_PI / 180.0;
+        double gy = read_word_i2c(0x45) / 131 * M_PI / 180.0;
+        double gz = -read_word_i2c(0x47) / 131 * M_PI / 180.0;
 
         // Read accelerometer values.
         // At default sensitivity of 2g we need to scale by 16384.
         // Note: at "level" x = y = 0 but z = 1 (i.e. gravity)
         // But! Imu msg docs say acceleration should be in m/2 so need to *9.807
+        double ax = -read_word_i2c(0x3b) / 16384.0 * 9.807;
+        double ay = read_word_i2c(0x3d) / 16384.0 * 9.807;
+        double az = read_word_i2c(0x3f) / 16384.0 * 9.807;
+
+        // Read gyroscope values.
+        // At default sensitivity of 250deg/s we need to scale by 131.
+        msg.angular_velocity.x = gx - bias_gx_;
+        msg.angular_velocity.y = gy - bias_gy_;
+        msg.angular_velocity.z = gz - bias_gz_;
+
         const float la_rescale = 16384.0 / 9.807;
-        msg.linear_acceleration.x = read_word_i2c(0x3b) / la_rescale - bias_ax_;
-        msg.linear_acceleration.y = read_word_i2c(0x3d) / la_rescale - bias_ay_;
-        msg.linear_acceleration.z = read_word_i2c(0x3f) / la_rescale - bias_az_;
+        msg.linear_acceleration.x = ax - bias_ax_;
+        msg.linear_acceleration.y = ay - bias_ay_;
+        msg.linear_acceleration.z = az - bias_az_;
 
         // Pub & sleep.
         imu_publisher_.publish(msg);
 
         // Compute bias
         if (bias_count_ > 0) {
-            cp_bias_gx_ += msg.angular_velocity.x + bias_gx_;
-            cp_bias_gy_ += msg.angular_velocity.y + bias_gy_;
-            cp_bias_gz_ += msg.angular_velocity.z + bias_gz_;
-            cp_bias_ax_ += msg.linear_acceleration.x + bias_ax_;
-            cp_bias_ay_ += msg.linear_acceleration.y + bias_ay_;
-            cp_bias_az_ += msg.linear_acceleration.z + bias_az_ + 9.807;
+            cp_bias_gx_ += gx;
+            cp_bias_gy_ += gy;
+            cp_bias_gz_ += gz;
+            cp_bias_ax_ += ax;
+            cp_bias_ay_ += ay;
+            cp_bias_az_ += az + 9.807;
             bias_count_--;
         }
     }
