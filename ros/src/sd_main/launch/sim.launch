@@ -4,6 +4,7 @@
 	<arg name="r1" default="true"/>
 	<arg name="r2" default="true"/>
 	<arg name="ground_truth" default="false"/>
+	<arg name="joy_type" default="xbox"/>
 
 	<machine name="localhost" address="localhost" env-loader="/opt/ros/melodic/env.sh"/>
 
@@ -17,10 +18,12 @@
 	<include file="$(find sd_main)/launch/r1.launch" if="$(arg r1)">
 		<arg name="sim" value="true" />
 		<arg name="ground_truth" value="$(arg ground_truth)"/>
+		<arg name="joy_type" value="$(arg joy_type)"/>
 	</include>
 
 	<include file="$(find sd_main)/launch/r2.launch" if="$(arg r2)">
 		<arg name="sim" value="true" /> 
 		<arg name="ground_truth" value="$(arg ground_truth)"/>
+		<arg name="joy_type" value="$(arg joy_type)"/>
 	</include>
 </launch>

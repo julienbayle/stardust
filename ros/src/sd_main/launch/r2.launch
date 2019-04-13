@@ -2,6 +2,7 @@
 <launch>
 	<arg name="sim" default="false"/>
 	<arg name="ground_truth" default="false"/>
+	<arg name="joy_type" default="xbox"/>
 	
 	<machine name="localhost" address="localhost" env-loader="/opt/ros/melodic/env.sh"/>
 
@@ -10,6 +11,7 @@
 		<arg name="sim" value="$(arg sim)"/>
 		<arg name="robot_ns" value="r2"/>
 		<arg name="ground_truth" value="$(arg ground_truth)"/>
+		<arg name="joy_type" value="$(arg joy_type)"/>
 	</include>
 
 </launch>
