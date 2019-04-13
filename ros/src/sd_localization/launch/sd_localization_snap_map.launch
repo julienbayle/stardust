@@ -5,7 +5,7 @@
 	    <rosparam file="$(find sd_localization)/config/$(arg robot_ns)_localization.yaml" command="load"/>
 
         <node pkg="sd_localization" type="sd_localization_snap_map" name="$(arg robot_ns)_snap_map" output="screen">
-            <remap from="map" to="map_attitude"/>
+            <remap from="map" to="map"/>
             <remap from="laser_scan" to="laser/scan_filtered"/>
             <remap from="initialpose" to="snap_pose"/>
         </node>

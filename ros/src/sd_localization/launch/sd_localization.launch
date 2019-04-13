@@ -4,14 +4,18 @@
 
 	<rosparam file="$(find sd_localization)/config/$(arg robot_ns)_localization.yaml" command="load"/>
 	
+	<node pkg="imu_filter_madgwick" type="imu_filter_node" name="$(arg robot_ns)_imu_filter_madgwick"/>
+
 	<node pkg="robot_localization" type="ukf_localization_node" name="$(arg robot_ns)_localization" clear_params="true">
 		<remap from="cmd_vel" to="mobile_base_controller/cmd_vel"/>
 	</node>
 	
 	<node pkg="amcl" type="amcl" name="$(arg robot_ns)_amcl" output="screen">
-		<remap from="map" to="map_attitude"/>
+		<remap from="map" to="map"/>
 		<remap from="scan" to="laser/scan_filtered"/>
 	</node>
 
-	<node pkg="imu_filter_madgwick" type="imu_filter_node" name="$(arg robot_ns)_imu_filter_madgwick"/>
+	<node pkg="sd_localization" type="sd_localization_snap_map" name="$(arg robot_ns)_snap_map">
+		<remap from="laser_scan" to="laser/scan_filtered"/>
+	</node>
 </launch>

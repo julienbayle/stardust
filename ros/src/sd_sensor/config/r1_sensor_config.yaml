@@ -12,7 +12,7 @@ ydlidar:
   range_max: 16.0
   ignore_array: ""
   samp_rate: 9
-  frequency: 7
+  frequency: 10
 
 r1_laser_scan_filter:
   scan_filter_chain:
@@ -23,6 +23,7 @@ r1_laser_scan_filter:
       angles2: [[-0.85, 0.84], [1.24, 2.94]]
 
 mpu6050:
+  frame: 'r1/imu_link'
   bias_gx: -0.0916577642343
   bias_gy: 0.0171695100273
   bias_gz: 0.0133550995184

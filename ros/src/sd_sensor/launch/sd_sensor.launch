@@ -7,6 +7,7 @@
 	</node>
 
 	<node name="mpu6050"  pkg="sd_sensor"  type="mpu6050_node" output="screen" respawn="false" if="$(eval arg('robot_ns') == 'r1')">
+		<remap from="imu/data" to="imu/data_raw"/>
 	</node>
 
 	<node name="ydlidar"  pkg="ydlidar"  type="ydlidar_node" output="screen" respawn="false" if="$(eval arg('robot_ns') == 'r1')">
