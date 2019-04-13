@@ -16,3 +16,4 @@ ${SCRIPT_DIR}/build-rpi.sh
 
 # Deploy
 rsync -e ssh -avzr ${BUILD_PATH}/install ${ADDRESS}:/home/${REMOTE_USER}/stardust_${USER}
+rsync -e ssh -avzr ${SCRIPT_DIR} ${ADDRESS}:/home/${REMOTE_USER}/stardust_${USER}
