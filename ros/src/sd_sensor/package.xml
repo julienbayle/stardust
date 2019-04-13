@@ -54,10 +54,12 @@
   <build_depend>filters</build_depend>
   <build_depend>pluginlib</build_depend>
   <build_depend>ydlidar</build_depend>
+  <build_depend>message_generation</build_depend>
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>sensor_msgs</build_export_depend>
   <build_export_depend>filters</build_export_depend>
   <build_export_depend>pluginlib</build_export_depend>
+  <build_export_depend>message_generation</build_export_depend>
   <exec_depend>roscpp</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>filters</exec_depend>

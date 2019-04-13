@@ -195,11 +195,17 @@ Si le LIDAR fonctionne, il doit se mettre à tourner et sa vitesse de rotation d
 
 ### Activation de l'I2C et du SPI
 
-Activer ces protocoles via l'outil **raspi-config** :
+Editez le fichier **/boot/firmware/config.txt** et ajoutez les lignes:
 
+```
+dtparam=i2c_arm=on
+dtparam=spi=on
+```
+
+Installez les librairies de developpement:
 ```bash
-sudo raspi-config 
-sudo reboot
+sudo apt-get install i2c-tools libi2c-dev
+sudo usermod -a -G i2c r1
 ```
 
 Si une IMU est connectée au robot via I2C, il est possible de vérifier qu'elle est bien disponible sur le port I2C et que celui-ci marche bien :

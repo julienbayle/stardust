@@ -1,9 +1,12 @@
 <launch>
 	<arg name="robot_ns" default=""/>
 
-	<rosparam file="$(find sd_sensor)/config/$(arg robot_ns)_laser_config.yaml" command="load"/>
+	<rosparam file="$(find sd_sensor)/config/$(arg robot_ns)_sensor_config.yaml" command="load"/>
 	
 	<node pkg="sd_sensor" type="$(arg robot_ns)_sensor_node" name="$(arg robot_ns)_sensor_node" if="$(eval arg('robot_ns') == 'r2')">
+	</node>
+
+	<node name="mpu6050"  pkg="sd_sensor"  type="mpu6050_node" output="screen" respawn="false" if="$(eval arg('robot_ns') == 'r1')">
 	</node>
 
 	<node name="ydlidar"  pkg="ydlidar"  type="ydlidar_node" output="screen" respawn="false" if="$(eval arg('robot_ns') == 'r1')">

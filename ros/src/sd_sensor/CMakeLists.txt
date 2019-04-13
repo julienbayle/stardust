@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
   ydlidar
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -53,12 +54,11 @@ find_package(catkin REQUIRED COMPONENTS
 #   Message2.msg
 # )
 
-## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+# Generate services in the 'srv' folder
+add_service_files(
+  FILES
+  GetBias.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -67,11 +67,11 @@ find_package(catkin REQUIRED COMPONENTS
 #   Action2.action
 # )
 
-## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   sensor_msgs
-# )
+# Generate added messages and services with any dependencies listed here
+generate_messages(
+  DEPENDENCIES
+  sensor_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -163,6 +163,20 @@ target_link_libraries(r2_sensor_node
   ${catkin_LIBRARIES}
 )
 
+add_executable(mpu6050_node
+  src/mpu6050_node.cpp
+)
+
+add_dependencies(mpu6050_node
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+)
+
+target_link_libraries(mpu6050_node
+  ${catkin_LIBRARIES}
+  i2c
+)
+
 #############
 ## Install ##
 #############
@@ -178,7 +192,7 @@ target_link_libraries(r2_sensor_node
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS sd_sensor_filters r2_sensor_node
+install(TARGETS sd_sensor_filters r2_sensor_node mpu6050_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
