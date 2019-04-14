@@ -2,7 +2,7 @@
 <launch>
 	<arg name="sim" default="false"/>
 	<arg name="ground_truth" default="false"/>
-	<arg name="joy_type" default="xbox"/>
+	<arg name="joy_type" default="ps"/>
 	
 	<machine name="localhost" address="localhost" env-loader="/opt/ros/melodic/env.sh"/>
 
