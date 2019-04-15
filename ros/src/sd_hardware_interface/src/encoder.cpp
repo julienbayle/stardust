@@ -44,6 +44,7 @@ namespace sd_hardware_interface
 		{
 			last_encoder_position_ = encoder_position;
 			clock_gettime(CLOCK_MONOTONIC, &last_position_time_);
+			clock_gettime(CLOCK_MONOTONIC, &last_speed_time_);
 			ROS_INFO_STREAM("One encoder ready. Initial position: " << last_encoder_position_);
 			return;
 		}
