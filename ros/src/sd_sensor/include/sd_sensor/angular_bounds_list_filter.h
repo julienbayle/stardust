@@ -60,7 +60,7 @@ namespace sd_sensor
           return false;
         }
         if(!getParam("angles2", angles2_)){
-          ROS_ERROR("'angles' parameter must be set to use this filter.");
+          ROS_ERROR("'angles2' parameter must be set to use this filter.");
           return false;
         }
 
