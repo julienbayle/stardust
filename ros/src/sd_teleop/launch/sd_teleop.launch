@@ -4,30 +4,17 @@
 	<arg name="robot_ns" default=""/>
 	<arg name="joy_type" default="xbox"/>
 
-	<rosparam file="$(find sd_teleop)/config/sd_teleop.yaml" command="load"/>
-	
-	<node name="joy_xbox" pkg="joy" type="joy_node" if="$(eval arg('joy_type') == 'xbox' and arg('sim'))">
+	<rosparam file="$(find sd_teleop)/config/$(arg robot_ns)_teleop.yaml" command="load"/>
+
+	<node name="joy_xbox" pkg="joy" type="joy_node" if="$(eval arg('joy_type') == 'xbox' and not arg('sim'))">
 		<rosparam file="$(find sd_teleop)/config/joy_xbox.yaml" command="load"/>
 	</node>
-	<node name="joy_ps" pkg="joy" type="joy_node" if="$(eval arg('joy_type') == 'ps' and arg('sim'))">
+
+	<node name="joy_ps" pkg="joy" type="joy_node" if="$(eval arg('joy_type') == 'ps' and not arg('sim'))">
 		<remap from="joy" to="joy_ps"/>
 		<rosparam file="$(find sd_teleop)/config/joy_ps.yaml" command="load"/>
 	</node>
-	<node name="joy_convert" pkg="sd_teleop" type="joy_convert_node" if="$(eval arg('joy_type') == 'ps' and arg('sim'))"/>
+	<node name="joy_convert" pkg="sd_teleop" type="joy_convert_node" if="$(eval arg('joy_type') == 'ps' and not arg('sim'))"/>
 
-	<node name="joy_switcher" pkg="sd_teleop" type="joy_switcher_node" output="screen" if="$(arg sim)"/>
-
-	<group ns="$(arg robot_ns)">
-		<node name="joy_xbox" pkg="joy" type="joy_node" if="$(eval arg('joy_type') == 'xbox' and not arg('sim'))">
-			<rosparam file="$(find sd_teleop)/config/joy_xbox.yaml" command="load"/>
-		</node>
-
-		<node name="joy_ps" pkg="joy" type="joy_node" if="$(eval arg('joy_type') == 'ps' and not arg('sim'))">
-			<remap from="joy" to="joy_ps"/>
-			<rosparam file="$(find sd_teleop)/config/joy_ps.yaml" command="load"/>
-		</node>
-		<node name="joy_convert" pkg="sd_teleop" type="joy_convert_node" if="$(eval arg('joy_type') == 'ps' and not arg('sim'))"/>
-
-		<node name="teleop" pkg="sd_teleop" type="teleop_node" output="screen"/>
-	</group>
+	<node name="$(arg robot_ns)_teleop" pkg="sd_teleop" type="teleop_node" output="screen"/>
 </launch>

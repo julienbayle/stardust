@@ -97,7 +97,7 @@ r2_imu_filter_madgwick:
   mag_bias_z: 0.0
   orientation_stddev: 0.0
   world_frame: "enu"
-  use_mag: true
+  use_mag: false
   use_magnetic_field_msg: false
   fixed_frame: "odom"
   publish_tf: false

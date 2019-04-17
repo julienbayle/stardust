@@ -33,6 +33,9 @@
 			<gaussianNoise>0.0</gaussianNoise>
 			<updateRate>20.0</updateRate>
 			<robotNamespace>/r2</robotNamespace>
+			<serviceName>r2_imu_service</serviceName>
+			<xyzOffset>0 0 0</xyzOffset>
+			<rpyOffset>0 0 0</rpyOffset>
 		</plugin>
 		<plugin name="mag_plugin" filename="libhector_gazebo_ros_magnetic.so">
 			<alwaysOn>true</alwaysOn>

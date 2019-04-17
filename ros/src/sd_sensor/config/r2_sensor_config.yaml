@@ -1,7 +1,8 @@
 r2_laser_scan_filter:
     scan_filter_chain:
     - name: bounds_repeat
-    type: sd_sensor/LaserScanAngularBoundsListFilter
-    params:
+      type: sd_sensor/LaserScanAngularBoundsListFilter
+      params:
         box_frame: r2/base_link
         angles: [[0.0, 0.8], [2.34, 3.94], [5.48, 6.29]]
+        angles2: [[0.0, 0.8], [2.34, 3.94], [5.48, 6.29]]
