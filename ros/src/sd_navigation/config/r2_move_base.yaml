@@ -18,6 +18,32 @@ local_costmap:
   origin_y: 0.0
   resolution: 0.01
   transform_tolerance: 0.2
+
+  observation_sources: lidar sonar_left sonar_right
+
+  lidar: {
+    sensor_frame: r2/lidar_link,
+    data_type: LaserScan,
+    topic: /r2/laser/scan_filtered,
+    clearing: true,
+    marking: true
+  }
+
+  sonar_left: { 
+    sensor_frame: r2/sonar_left_link,
+    data_type: PointCloud,
+    topic: /r2/sonar/left_point_cloud,
+    clearing: true,
+    marking: true
+  }
+
+  sonar_right: { 
+    sensor_frame: r2/sonar_right_link,
+    data_type: PointCloud,
+    topic: /r2/sonar/right_point_cloud,
+    clearing: true,
+    marking: true
+  }
   
 TrajectoryPlannerROS:
   max_vel_x: 0.45
