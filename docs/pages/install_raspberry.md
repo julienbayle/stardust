@@ -1,36 +1,36 @@
 # Installation sur Raspberry Pi 3 modèle B ou B+
 
-Ubuntu 18.04 doit être utilisé car cette distribution et version de linux propose directement les dépôts ARM de ROS Melodic, compatible sur raspberry pi 3 B et B+.
-
-L'utilisation de Raspbian a été testé mais l'outil "rosdep" ne trouve pas dans les dépôts de cette distribution tous les paquets nécessaires. Aussi, il faut les compiler manuellement, ce qui est super pénible et prend beaucoup de temps.
+Ubuntu 18.04 doit être utilisé car cette distribution et version de linux propose directement les dépôts ARM de ROS Melodic, compatible sur raspberry pi 3 (Modèles B et B+).
 
 **Compter à peu près 2 heures pour réaliser cette installation**
 
 ## Installation de la distribution Ubuntu 18.04 sur clé USB
 
-Récupérer l'image "Ubuntu 18.04" depuis http://cdimage.ubuntu.com/releases/18.04/beta/
+Récupérer l'image "Ubuntu 18.04 - Raspberry Pi 3 (64-bit ARM) preinstalled server image" depuis http://cdimage.ubuntu.com/releases/18.04/release/
+
 Ecrire l'image sur une clé USB
 
-### Ubuntu
+**sous linux**
+
 ```bash
-xzcat ubuntu-18.04-beta-preinstalled-server-arm64+raspi3.img.xz | sudo dd bs=4M of=/dev/sdb
+xzcat ubuntu-18.04.2-preinstalled-server-arm64+raspi3.img.xz | sudo dd bs=4M of=/dev/sdb
 ```
 
-### Mac OS 
+**sous mac os**
+
 ```bash
 brew install xz
 diskutil umountDisk /dev/disk2
-xzcat ubuntu-18.04-beta-preinstalled-server-arm64+raspi3.img.xz | sudo dd bs=4m of=/dev/rdisk2
+xzcat ubuntu-18.04.2-preinstalled-server-arm64+raspi3.img.xz | sudo dd bs=4m of=/dev/rdisk2
 ```
 
-Mettre la carte dans le Raspberry Pi et l'allumer. Connecter une câble ethernet, un écran via le port HDMI et un clavier.
-
-## Boot sur la clé USB
-
-Branchez la clé USB sur un PC, et éditez le fichier cmdline.txt sur la partition "system-boot":
+Monter la clé USB sur un PC, et éditez le fichier cmdline.txt sur la partition "system-boot":
 ```
 console=tty0 console=ttyS1,115200 root=LABEL=writable rw elevator=deadline fsck.repair=yes net.ifnames=0 cma=64M rootwait rootdelay=10
 ```
+
+Brancher la clé USB dans le Raspberry Pi et l'allumer.
+Connecter une câble ethernet, un écran via le port HDMI et un clavier.
 
 Si le Raspberry ne réussi pas à booter, formater une carte SD en FAT32 et copiez dessus le contenu de la partition "system-boot".
 
