@@ -32,6 +32,8 @@
 		
 	<!-- Run a python script to the send a service call to gazebo_ros to spawn robots -->
 	<group ns="r1" if="$(arg r1)">
+		<rosparam file="$(find sd_gazebo)/config/r1_gazebo.yaml" command="load"/>
+
 		<param name="robot_description_gazebo"
 			command="$(find xacro)/xacro '$(find sd_gazebo)/urdf/r1.gazebo.xacro'"/>
 		<node name="urdf_spawner_r1" pkg="gazebo_ros" type="spawn_model" respawn="false"
