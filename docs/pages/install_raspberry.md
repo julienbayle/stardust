@@ -8,7 +8,7 @@ Ubuntu 18.04 doit être utilisé car cette distribution et version de linux prop
 
 Récupérer l'image "Ubuntu 18.04 - Raspberry Pi 3 (64-bit ARM) preinstalled server image" depuis http://cdimage.ubuntu.com/releases/18.04/release/
 
-Ecrire l'image sur une clé USB
+Ecrire l'image sur une clé USB (version B+) ou une carte SD (version B ou B+)
 
 **sous linux**
 
@@ -24,15 +24,19 @@ diskutil umountDisk /dev/disk2
 xzcat ubuntu-18.04.2-preinstalled-server-arm64+raspi3.img.xz | sudo dd bs=4m of=/dev/rdisk2
 ```
 
-Monter la clé USB sur un PC, et éditez le fichier cmdline.txt sur la partition "system-boot":
+**Version clé USB uniquement**
+
+Monter la clé USB sur votre ordinateur et éditez le fichier cmdline.txt sur la partition "system-boot" :
+
 ```
 console=tty0 console=ttyS1,115200 root=LABEL=writable rw elevator=deadline fsck.repair=yes net.ifnames=0 cma=64M rootwait rootdelay=10
 ```
 
-Brancher la clé USB dans le Raspberry Pi et l'allumer.
+Brancher la clé USB ou insérer la carte SD dans le Raspberry Pi et l'allumer. En version USB, si le Raspberry ne réussi pas à booter, formater une carte SD en FAT32 et copiez dessus le contenu de la partition "system-boot".
+
 Connecter une câble ethernet, un écran via le port HDMI et un clavier.
 
-Si le Raspberry ne réussi pas à booter, formater une carte SD en FAT32 et copiez dessus le contenu de la partition "system-boot".
+L'identifiant d'accès par défaut est ubuntu / "pas de mot de passe"
 
 ## Mise à jour du système
 
@@ -44,12 +48,34 @@ sudo apt-get upgrade
 sudo reboot
 ```
 
-## Installation de NetworkManager
+## Installation de NetworkManager et configuration du WIFI
 
 ```bash
 sudo apt install network-manager
 sudo systemctl start NetworkManager
+sudo systemctl enable NetworkManager
 sudo nmtui
+```
+
+Ajouter votre connection WIFI et modifier le nom de la machine
+
+## Optimisation de la vitesse de Boot
+
+Suppression de toutes les services inutiles pour le robot :
+
+```bash
+sudo systemctl stop systemd-networkd-wait-online.service 
+sudo systemctl disable systemd-networkd-wait-online.service
+sudo apt remove cloud-init open-iscsi unattended-upgrades apparmor plymouth apport
+sudo apt autoremove
+```
+
+## Optimisation de la vitesse de connexion en SSH
+
+Suppression de tous les message à la connexion (motd):
+
+```bash
+sudo chmod -x /etc/update-motd.d/*
 ```
 
 ## Installation de ROS
