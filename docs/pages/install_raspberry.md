@@ -61,7 +61,7 @@ Ajouter votre connection WIFI et modifier le nom de la machine
 
 ## Optimisation de la vitesse de Boot
 
-Suppression de toutes les services inutiles pour le robot :
+Suppression de tous les services inutiles pour le robot :
 
 ```bash
 sudo systemctl stop systemd-networkd-wait-online.service 
