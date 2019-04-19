@@ -1,0 +1,32 @@
+ydlidar:
+  port: /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0
+  baudrate: 115200
+  frame_id: r1/laser_frame
+  low_exposure: false
+  resolution_fixed: true
+  auto_reconnect: true
+  reversion: false
+  angle_min: -180
+  angle_max: 180
+  range_min: 0.1
+  range_max: 16.0
+  ignore_array: ""
+  samp_rate: 9
+  frequency: 10
+
+r1_laser_scan_filter:
+  scan_filter_chain:
+  - name: bounds_repeat
+    type: sd_sensor/LaserScanAngularBoundsListFilter
+    params:
+      angles: [[-2.94, -1.25], [-0.85, 0.84], [1.24, 2.94]]
+      angles2: [[-0.85, 0.84], [1.24, 2.94]]
+
+mpu6050:
+  frame: 'r1/imu_link'
+  bias_gx: -0.0916577642343
+  bias_gy: 0.0171695100273
+  bias_gz: 0.0133550995184
+  bias_ax: -0.728509733081
+  bias_ay: -0.191710567018
+  bias_az: -0.206770551682

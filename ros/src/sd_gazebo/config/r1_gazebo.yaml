@@ -1,0 +1,8 @@
+gazebo_ros_control:
+  pid_gains:
+    left_wheel_to_base:
+      p: 0.5
+    right_wheel_to_base:
+      p: 0.5
+    back_wheel_to_base:
+      p: 0.5

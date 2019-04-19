@@ -155,6 +155,11 @@ add_executable(map_from_attitude_node
   src/map_from_attitude_node.cpp
 )
 
+add_dependencies(map_from_attitude_node
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+)
+
 target_link_libraries(map_from_attitude_node
   ${catkin_LIBRARIES}
 )

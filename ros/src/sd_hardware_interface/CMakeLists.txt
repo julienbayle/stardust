@@ -36,6 +36,7 @@ catkin_package(
     std_msgs
     sensor_msgs
     rosparam_shortcuts
+    dynamic_reconfigure
   LIBRARIES
     HWInterface
     ControlLoop
@@ -50,6 +51,10 @@ include_directories(
 
 # HWInterface
 add_library(HWInterface src/hardware_interface.cpp)
+add_dependencies(HWInterface
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+)
 target_link_libraries(HWInterface
   Encoder
   ControlLoop
@@ -58,24 +63,40 @@ target_link_libraries(HWInterface
 
 # Control loop
 add_library(ControlLoop src/control_loop.cpp)
+add_dependencies(ControlLoop
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+)
 target_link_libraries(ControlLoop
   ${catkin_LIBRARIES}
 )
 
 # Encoder
 add_library(Encoder src/encoder.cpp)
+add_dependencies(Encoder
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+)
 target_link_libraries(Encoder
   ${catkin_LIBRARIES}
 )
 
 # Velocity controller
 add_library(VelocityController src/velocity_controller.cpp)
+add_dependencies(VelocityController
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+)
 target_link_libraries(VelocityController
   ${catkin_LIBRARIES}
 )
 
 # HWInterface executable
 add_executable(${PROJECT_NAME} src/hardware_node.cpp)
+add_dependencies(${PROJECT_NAME}
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+)
 target_link_libraries(${PROJECT_NAME}
   HWInterface
   Encoder

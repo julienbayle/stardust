@@ -2,5 +2,5 @@
 <launch>
 	<arg name="robot_ns"/>
 	<param name="robot_description"
-	  command="$(find xacro)/xacro --inorder '$(find sd_description)/urdf/$(arg robot_ns).xacro'" />
+	  command="$(find xacro)/xacro '$(find sd_description)/urdf/$(arg robot_ns).xacro'" />
 </launch>

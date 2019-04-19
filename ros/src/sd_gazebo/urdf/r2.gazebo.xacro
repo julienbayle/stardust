@@ -29,10 +29,13 @@
 			<alwaysOn>true</alwaysOn>
 			<bodyName>base_link</bodyName>
 			<frameName>r2/imu_link</frameName>
-			<topicName>imu/data</topicName>
+			<topicName>imu/data_raw</topicName>
 			<gaussianNoise>0.0</gaussianNoise>
 			<updateRate>20.0</updateRate>
 			<robotNamespace>/r2</robotNamespace>
+			<serviceName>r2_imu_service</serviceName>
+			<xyzOffset>0 0 0</xyzOffset>
+			<rpyOffset>0 0 0</rpyOffset>
 		</plugin>
 		<plugin name="mag_plugin" filename="libhector_gazebo_ros_magnetic.so">
 			<alwaysOn>true</alwaysOn>

@@ -2,7 +2,7 @@
 <launch>
 
     <arg name="robot_ns"/>
-    <arg name="rosserial_cplusplus" default="false"/>
+    <arg name="rosserial_cplusplus" default="true"/>
 
     <!-- Load controller settings -->
     <rosparam file="$(find sd_hardware_interface)/config/$(arg robot_ns)_hardware_interface.yaml" command="load"/>
@@ -16,7 +16,9 @@
     </node>
 
     <!-- ROS Serial (High performance version en C++) -->
-    <node pkg="rosserial_server" type="serial_node" name="rosserial_server" 
+    <node pkg="rosserial_server" type="serial_node" name="rosserial_server_motor" 
+        if="$(arg rosserial_cplusplus)"/>
+    <node pkg="rosserial_server" type="serial_node" name="rosserial_server_pince" 
         if="$(arg rosserial_cplusplus)"/>
     <node pkg="rosserial_python" type="message_info_service.py" name="rosserial_message_info"  
         if="$(arg rosserial_cplusplus)"/>

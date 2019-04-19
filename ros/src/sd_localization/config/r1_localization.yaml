@@ -1,5 +1,5 @@
 r1_localization:
-  frequency: 50
+  frequency: 10
   sensor_timeout: 0.1
   two_d_mode: true
   
@@ -17,19 +17,19 @@ r1_localization:
                   true,  true, false,
                   false, false, true,
                   false, false, false]
-  odom0_queue_size: 2 # Odom is 50Hz
+  odom0_queue_size: 5 # Odom is 50Hz
   odom0_relative: false
   odom0_nodelay: true
   
-#  imu0: imu/data
-#  imu0_config: [false, false, false,
-#                false, false, false,
-#                false, false, false,
-#                false, false, true,
-#                true, false, false]
-#  imu0_queue_size: 2 # Imu is 50Hz
-#  imu0_relative: false
-#  imu0_nodelay: true
+  imu0: imu/data
+  imu0_config: [false, false, false,
+                false, false, false,
+                false, false, false,
+                false, false, true,
+                true, true, false]
+  imu0_queue_size: 1 # Imu is 50Hz
+  imu0_relative: false
+  imu0_nodelay: true
   
   initial_state: [0.0, 0.0, 0.0,
                   0.0, 0.0, 0.0,
@@ -43,13 +43,13 @@ r1_localization:
   
   use_control: true
   stamped_control: false
-  control_timeout: 0.1 # cmd_vel is 20Hz
+  control_timeout: 0.2 # cmd_vel is 10Hz
   control_config: [true, false, false,
                     false, false, true]
-  acceleration_limits: [0.5, 0.5, 0.0,
-                        0.0, 0.0, 1.5] # See velocity_smoother_controller
-  deceleration_limits: [0.5, 0.5, 0.0,
-                        0.0, 0.0, 1.5] # See velocity_smoother_controller
+  acceleration_limits: [2.5, 2.5, 0.0,
+                        0.0, 0.0, 3.2] # See velocity_smoother_controller
+  deceleration_limits: [2.5, 2.5, 0.0,
+                        0.0, 0.0, 3.2] # See velocity_smoother_controller
   
   smooth_lagged_data: false
   history_length: false
@@ -97,11 +97,69 @@ r1_imu_filter_madgwick:
   mag_bias_z: 0.0
   orientation_stddev: 0.0
   world_frame: "enu"
-  use_mag: true
+  use_mag: false
   use_magnetic_field_msg: false
-  fixed_frame: "odom"
+  fixed_frame: "r1/odom"
   publish_tf: false
   reverse_tf: false
   constant_dt: 0.0
   publish_debug_topics: false
   stateless: false
+
+r1_amcl:
+  min_particles: 500
+  max_particles: 5000
+  kld_err: 0.05
+  kld_z: 0.99
+  update_min_d: 0.0
+  update_min_a: 0.0
+  resample_interval: 1
+  transform_tolerance: 0.1
+  recovery_alpha_slow: 0.001
+  recovery_alpha_fast: 0.1
+  initial_pose_x: 0.0
+  initial_pose_y: 0.0
+  initial_pose_a: 0.0
+  initial_cov_xx: 100.0 # 1.0²
+  initial_cov_yy: 1000.0 # 1.5²
+  #initial_cov_aa: 39.47 # (2*pi)²
+  gui_publish_rate: 10.0
+  save_pose_rate: 0.5
+  use_map_topic: true
+  first_map_only: false
+
+  laser_min_range: -1.0
+  laser_max_range: -1.0
+  laser_max_beams: 30
+  laser_z_hit: 0.5
+  laser_z_short: 0.05
+  laser_z_max: 0.05
+  laser_z_rand: 0.5
+  laser_sigma_hit: 0.2
+  laser_lambda_short: 0.1
+  laser_likelihood_max_dist: 2.0
+  laser_model_type: "likelihood_field"
+
+  do_beamskip: false
+  beam_skip_distance: 0.5
+  beam_skip_threshold: 0.3
+  
+  odom_model_type: "diff-corrected"
+  odom_alpha5: 0.1
+  # Publish scans from best pose at a max of 10 Hz
+  odom_alpha1: 0.2
+  odom_alpha2: 0.2
+  # translation std dev, m
+  odom_alpha3: 0.8
+  odom_alpha4: 0.2
+  #odom_alpha5: 0.2
+  odom_frame_id: "r1/odom"
+  base_frame_id: "r1/base_link"
+  global_frame_id: "map"
+  tf_broadcast: true
+
+r1_snap_map:
+  odom_frame: "r1/odom"
+  laser_frame: "r1/laser_frame"
+  base_frame: "r1/base_link"
+  map_frame: "map"

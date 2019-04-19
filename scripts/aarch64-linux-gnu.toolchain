@@ -5,6 +5,7 @@ set(CMAKE_LIBRARY_ARCHITECTURE aarch64-linux-gnu)
 
 # where is the target environment
 #set(CMAKE_SYSROOT "${SYSROOT_DIR}")
+include_directories(${SYSROOT_DIR}/usr/local/include)
 
 # specify the cross compiler
 set(CMAKE_C_COMPILER aarch64-linux-gnu-gcc)

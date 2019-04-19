@@ -11,9 +11,17 @@
     <xacro:property name="wheel_roller_radius" value="${wheel_radius/wheel_roller_number}" />
     <xacro:property name="wheel_roller_length" value="${pi * (wheel_radius - 2 * wheel_roller_radius) / wheel_roller_number}" />
     
-
     <xacro:property name="wheel_effort_max" value="10000" />
     <xacro:property name="wheel_velocity_max" value="10000" />
+
+    <xacro:property name="imu_x" value="0.0" />
+    <xacro:property name="imu_y" value="0.0" />
+    <xacro:property name="imu_z" value="0.12" />
+
+    <xacro:property name="lidar_x" value="0.0" />
+    <xacro:property name="lidar_y" value="0.0" />
+    <xacro:property name="lidar_z" value="0.040" />
+    <xacro:property name="lidar_angle" value="${2 * pi / 3}" />
 
     <xacro:include filename="$(find sd_description)/urdf/materials.xacro" />
 
@@ -158,4 +166,21 @@
     <omni_wheel name="left" angle="${pi / 3}"/>
     <omni_wheel name="right" angle="${-1 * pi / 3}"/>
     <omni_wheel name="back" angle="${pi}"/>
+
+    <link name="imu_link">
+    </link>
+
+    <joint name="imu_to_body" type="fixed">
+        <parent link="body_link"/>
+        <child link="imu_link"/>
+        <origin xyz="${imu_x} ${imu_y} ${imu_z}" rpy="0 0 0"/>
+    </joint>
+
+    <xacro:include filename="$(find ydlidar)/urdf/ydlidar.urdf"/>
+
+    <joint name="lidar_to_body" type="fixed">
+        <parent link="body_link"/>
+        <child link="base_laser"/>
+        <origin xyz="${lidar_x} ${lidar_y} ${lidar_z}" rpy="0 0 ${lidar_angle}"/>
+    </joint>
 </robot>

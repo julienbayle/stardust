@@ -29,6 +29,7 @@
   <depend>rosserial_python</depend>
   <depend>rosserial_server</depend>
   <depend>rqt_controller_manager</depend>
+  <depend>dynamic_reconfigure</depend>
 
   <export>
     <hardware_interface plugin="${prefix}/sd_harware_interface_plugins.xml"/>

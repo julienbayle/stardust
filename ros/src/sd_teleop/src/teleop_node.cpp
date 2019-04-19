@@ -119,9 +119,9 @@ class TeleopNode {
 			mode_auto_publisher = nh.advertise<std_msgs::Bool>("mode_auto", 1);
 
 			pump_publisher = nh.advertise<std_msgs::Int16>("pwm/pompe", 1);
-			left_valve_publisher = nh.advertise<std_msgs::Int16>("pwm/vanne1", 1);
-			center_valve_publisher = nh.advertise<std_msgs::Int16>("pwm/vanne2", 1);
-			right_valve_publisher = nh.advertise<std_msgs::Int16>("pwm/vanne3", 1);
+			left_valve_publisher = nh.advertise<std_msgs::Int16>("pwm/vanne2", 1);
+			center_valve_publisher = nh.advertise<std_msgs::Int16>("pwm/vanne3", 1);
+			right_valve_publisher = nh.advertise<std_msgs::Int16>("pwm/vanne1", 1);
 			servo1_publisher = nh.advertise<std_msgs::UInt16>("servo/F", 1);
 			servo2_publisher = nh.advertise<std_msgs::UInt16>("servo/E", 1);
 			
@@ -281,21 +281,8 @@ class TeleopNode {
 				mode_auto_publisher.publish(bool_msg);
 			}
 
-			// Pompe
-			bool new_pump_on = buttons_click_[XBOX_BUTTON_X] || buttons_long_click_[XBOX_BUTTON_X];
-			if (!pump_on_ && new_pump_on) {
-				pump_on_ = true;
-				std_msgs::Int16 msg;
-				msg.data = 4096;
-				pump_publisher.publish(msg);
-			} else if (pump_on_ && !new_pump_on) {
-				pump_on_ = false;
-				std_msgs::Int16 msg;
-				msg.data = 0;
-				pump_publisher.publish(msg);
-			}
 			// Vanne gauche
-			bool new_left_valve_on = buttons_click_[XBOX_BUTTON_Y] || buttons_long_click_[XBOX_BUTTON_Y];
+			bool new_left_valve_on = buttons_click_[XBOX_BUTTON_X] || buttons_long_click_[XBOX_BUTTON_X];
 			if (!left_valve_on_ && new_left_valve_on) {
 				left_valve_on_ = true;
 				std_msgs::Int16 msg;
@@ -308,7 +295,7 @@ class TeleopNode {
 				left_valve_publisher.publish(msg);
 			}
 			// Vanne milieu
-			bool new_center_valve_on = buttons_click_[XBOX_BUTTON_B] || buttons_long_click_[XBOX_BUTTON_B];
+			bool new_center_valve_on = buttons_click_[XBOX_BUTTON_A] || buttons_long_click_[XBOX_BUTTON_A];
 			if (!center_valve_on_ && new_center_valve_on) {
 				center_valve_on_ = true;
 				std_msgs::Int16 msg;
@@ -321,7 +308,7 @@ class TeleopNode {
 				center_valve_publisher.publish(msg);
 			}
 			// Vanne droite
-			bool new_right_valve_on = buttons_click_[XBOX_BUTTON_A] || buttons_long_click_[XBOX_BUTTON_A];
+			bool new_right_valve_on = buttons_click_[XBOX_BUTTON_B] || buttons_long_click_[XBOX_BUTTON_B];
 			if (!right_valve_on_ && new_right_valve_on) {
 				right_valve_on_ = true;
 				std_msgs::Int16 msg;
@@ -332,6 +319,19 @@ class TeleopNode {
 				std_msgs::Int16 msg;
 				msg.data = 0;
 				right_valve_publisher.publish(msg);
+			}
+			// Pompe
+			bool new_pump_on = left_valve_on_ || center_valve_on_ || right_valve_on_;
+			if (!pump_on_ && new_pump_on) {
+				pump_on_ = true;
+				std_msgs::Int16 msg;
+				msg.data = 4096;
+				pump_publisher.publish(msg);
+			} else if (pump_on_ && !new_pump_on) {
+				pump_on_ = false;
+				std_msgs::Int16 msg;
+				msg.data = 0;
+				pump_publisher.publish(msg);
 			}
 
 			// Servos

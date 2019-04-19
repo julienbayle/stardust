@@ -37,15 +37,20 @@
 #ifndef LASER_SCAN_ANGULAR_BOUNDS_REPEAT_FILTER_H
 #define LASER_SCAN_ANGULAR_BOUNDS_REPEAT_FILTER_H
 
+#include <ros/ros.h>
 #include <filters/filter_base.h>
 #include <sensor_msgs/LaserScan.h>
+#include <std_msgs/Bool.h>
 
 namespace sd_sensor
 {
   class LaserScanAngularBoundsListFilter : public filters::FilterBase<sensor_msgs::LaserScan>
   {
     public:
-      XmlRpc::XmlRpcValue angles_;
+      XmlRpc::XmlRpcValue angles_, angles2_;
+      ros::Subscriber angles2_subscriber_;
+
+      bool use_angles2_;
 
       bool configure()
       {
@@ -54,25 +59,43 @@ namespace sd_sensor
           ROS_ERROR("'angles' parameter must be set to use this filter.");
           return false;
         }
+        if(!getParam("angles2", angles2_)){
+          ROS_ERROR("'angles2' parameter must be set to use this filter.");
+          return false;
+        }
+
+        ros::NodeHandle nh_priv("~");
+        angles2_subscriber_ = nh_priv.subscribe("use_angles2", 1, &LaserScanAngularBoundsListFilter::use_angles2_handler, this);
 
         return true;
       }
 
+      LaserScanAngularBoundsListFilter() :
+        use_angles2_(false)
+      {
+
+      }
+
       virtual ~LaserScanAngularBoundsListFilter(){}
+
+      void use_angles2_handler(const std_msgs::BoolConstPtr& data) {
+        use_angles2_ = data->data;
+      }
 
       bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan) {
         filtered_scan = input_scan; //copy entire message
+        XmlRpc::XmlRpcValue& angles = use_angles2_ ? angles2_ : angles_;
 
         unsigned int current_list_index = 0;
-        XmlRpc::XmlRpcValue current_list_value = angles_[current_list_index];
+        XmlRpc::XmlRpcValue current_list_value = angles[current_list_index];
         double current_angle = input_scan.angle_min;
         unsigned int count = 0;
         //loop through the scan and remove ranges at angles between lower_angle_ and upper_angle_
         for(unsigned int i = 0; i < input_scan.ranges.size(); ++i) {
           // Switch to next range
-          if (current_angle > ((double)current_list_value[1]) && current_list_index < angles_.size() - 1) {
+          if (current_angle > ((double)current_list_value[1]) && current_list_index < angles.size() - 1) {
             current_list_index++;
-            current_list_value = angles_[current_list_index];
+            current_list_value = angles[current_list_index];
           }
 
           // Remove scans

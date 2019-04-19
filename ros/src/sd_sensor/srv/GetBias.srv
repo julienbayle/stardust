@@ -1,0 +1,8 @@
+---
+bool result
+float64 bias_gx
+float64 bias_gy
+float64 bias_gz
+float64 bias_ax
+float64 bias_ay
+float64 bias_az

@@ -3,6 +3,7 @@
 	<arg name="sim" default="false"/>
 	<arg name="robot_ns" default=""/>
 	<arg name="ground_truth" default="false"/>
+	<arg name="joy_type" default=""/>
 
 	<group ns="$(arg robot_ns)">
 		<!-- Description  -->
@@ -18,6 +19,12 @@
 		<!-- Hardware interface  -->
 		<include file="$(find sd_hardware_interface)/launch/sd_hardware_interface.launch" unless="$(arg sim)">
 			<arg name="robot_ns" value="$(arg robot_ns)"/>
+		</include>
+
+		<!-- Sensors -->
+		<include file="$(find sd_sensor)/launch/sd_sensor.launch">
+			<arg name="robot_ns" value="$(arg robot_ns)"/>
+			<arg name="sim" value="$(arg sim)"/>
 		</include>
 		
 		<!-- Combine joint values -->
@@ -44,11 +51,12 @@
 
 		<!-- Show in Rviz   -->
 		<node name="rviz" pkg="rviz" type="rviz" args="-d $(find sd_description)/rviz/$(arg robot_ns).rviz" if="$(arg sim)"/>
-	</group>
 		
-	<!-- Teleop  -->
-	<include file="$(find sd_teleop)/launch/sd_teleop.launch">
-		<arg name="sim" value="$(arg sim)"/>
-		<arg name="robot_ns" value="$(arg robot_ns)"/>
-	</include>
+		<!-- Teleop  -->
+		<include file="$(find sd_teleop)/launch/sd_teleop.launch">
+			<arg name="sim" value="$(arg sim)"/>
+			<arg name="robot_ns" value="$(arg robot_ns)"/>
+			<arg name="joy_type" value="$(arg joy_type)"/>
+		</include>
+	</group>
 </launch>

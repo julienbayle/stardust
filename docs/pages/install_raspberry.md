@@ -31,6 +31,34 @@ Monter la clé USB sur votre ordinateur et éditez le fichier cmdline.txt sur la
 ```
 console=tty0 console=ttyS1,115200 root=LABEL=writable rw elevator=deadline fsck.repair=yes net.ifnames=0 cma=64M rootwait rootdelay=10
 ```
+Creez un fichier "boot.scr.txt" avec le contenu suivant:
+```
+setenv fdt_addr_r 0x03000000
+fdt addr ${fdt_addr_r}
+fdt get value bootargs /chosen bootargs
+setenv kernel_addr_r 0x01000000
+setenv ramdisk_addr_r 0x03100000
+fatload usb 0:1 ${kernel_addr_r} vmlinuz
+fatload usb 0:1 ${ramdisk_addr_r} initrd.img
+setenv initrdsize $filesize
+booti ${kernel_addr_r} ${ramdisk_addr_r}:${initrdsize} ${fdt_addr_r}
+```
+
+Remplacez également le contenu du fichier "/etc/flash-kernel/bootscript/bootscr.rpi3" sur la partition "writable" par le contenu ci-dessus.
+
+Entrez les commandes suivantes:
+
+```shell
+$ sudo apt-get install u-boot-tools
+$ mkimage -A arm -O linux -T script -C none -n boot.scr -d boot.scr.txt boot.scr
+```
+
+Remplacez le fichier "boot.scr" sur la partition "system-boot".
+
+Ajouter une ligne au fichier "/etc/default/raspi3-firmware":
+```
+ROOTPART=LABEL=writable
+```
 
 Brancher la clé USB ou insérer la carte SD dans le Raspberry Pi et l'allumer. En version USB, si le Raspberry ne réussi pas à booter, formater une carte SD en FAT32 et copiez dessus le contenu de la partition "system-boot".
 
@@ -68,6 +96,20 @@ sudo systemctl stop systemd-networkd-wait-online.service
 sudo systemctl disable systemd-networkd-wait-online.service
 sudo apt remove cloud-init open-iscsi unattended-upgrades apparmor plymouth apport
 sudo apt autoremove
+```
+
+## Désactivation des mises à jour automatiques
+
+Editer le fichier "/etc/apt/apt.conf.d/20auto-upgrades" et remplacez la ligne :
+
+```
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Unattended-Upgrade "1";
+```
+par
+```
+APT::Periodic::Update-Package-Lists "0";
+APT::Periodic::Unattended-Upgrade "0";
 ```
 
 ## Optimisation de la vitesse de connexion en SSH
@@ -182,11 +224,17 @@ Si le LIDAR fonctionne, il doit se mettre à tourner et sa vitesse de rotation d
 
 ### Activation de l'I2C et du SPI
 
-Activer ces protocoles via l'outil **raspi-config** :
+Editez le fichier **/boot/firmware/config.txt** et ajoutez les lignes:
 
+```
+dtparam=i2c_arm=on
+dtparam=spi=on
+```
+
+Installez les librairies de developpement:
 ```bash
-sudo raspi-config 
-sudo reboot
+sudo apt-get install i2c-tools libi2c-dev
+sudo usermod -a -G i2c r1
 ```
 
 Si une IMU est connectée au robot via I2C, il est possible de vérifier qu'elle est bien disponible sur le port I2C et que celui-ci marche bien :

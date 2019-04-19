@@ -1,0 +1,3 @@
+- git:
+    local-name: drivers/ydlidar
+    uri: https://github.com/yann-bourrigault/ydlidar.git
