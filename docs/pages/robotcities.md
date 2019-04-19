@@ -163,10 +163,12 @@ Réalisation :
 - bonus estimation du score : 37 pts
 
 Total : 145 points
+
 Réussite sur 5 matchs : 725 points
+
 Classement final : 9ème
 
-Et oui, réussir uniquement les actions les plus simples, à chaque match, aurait permis de finir dans les 10 premiers. Et un seul robot assez rapide suffisait pour cela.
+Et oui, réussir uniquement les actions les plus simples, à chaque match, aurait permis de finir dans les 10 premiers. Et un seul robot assez rudimentaire suffisait pour cela.
 
 **Cas 2 : Actions basiques et quelques actions de jeu**
 
@@ -178,11 +180,17 @@ Exemple de réalisation pour faire ce score :
 - bonus supplémentaire bonne estimation du score : 6 pts
 
 Total : 197 points
+
 Réussite sur 5 matchs : 985 points
+
 Classement final : 4ème
 
 **Conclusion : Rester raisonnable et avoir un système robuste et fiable**
 
 Nous avons marqué 193 points sur 4 matchs. A chaque match, nous avons réussi qu'une seule action (abeille ou panneau).
 
-Comme l'illustre cette étude, il n'est pas nécessaire de faire toutes les actions de jeu pour être qualifié pour les phases finales (16 premiers). Sans faire de piles de cubes et sans envoyer les balles dans le château d'eau par balistique, c'était possible.
+Comme l'illustre cette étude, il n'est pas nécessaire de faire toutes les actions de jeu pour être qualifié pour les phases finales (16 premiers). 
+
+Sans faire de piles de cubes et sans envoyer les balles dans le château d'eau par balistique, c'était possible.
+
+En pratique, beaucoup de robots s'arrêtent à cause d'un système d'évitement d'obstacle qui met l'éxécution en pause en attendant que la voie soit libre... sauf que le robot adverse fait pareil. 
