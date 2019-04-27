@@ -1,0 +1,7 @@
+yellow_x: -0.250
+yellow_y: -1.275
+yellow_yaw: 1.5708 # pi/2
+
+purple_x: -0.250
+purple_y: 1.275
+purple_yaw: -1.5708 # -pi/2

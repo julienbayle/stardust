@@ -11,6 +11,7 @@
 	<arg name="ground_truth_tf_broadcaster" default="false"/>
 	<arg name="r1" default="true"/>
 	<arg name="r2" default="true"/>
+	<arg name="team"/>
 	
 	<!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
 	<include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -36,8 +37,8 @@
 
 		<param name="robot_description_gazebo"
 			command="$(find xacro)/xacro '$(find sd_gazebo)/urdf/r1.gazebo.xacro'"/>
-		<node name="urdf_spawner_r1" pkg="gazebo_ros" type="spawn_model" respawn="false"
-			args="-urdf -model r1 -param robot_description_gazebo -z 0.3 -y -0.5"/>
+		<node name="urdf_spawner_r1" pkg="sd_gazebo" type="spawn_model.py" respawn="false"
+			args="-urdf -model r1 -param robot_description_gazebo -px $(arg team)_x -py $(arg team)_y -z 0.3 -pY $(arg team)_yaw"/>
 
 		<!-- Broadcast ground truth as tf transform from world to robot -->
 		<node name="r1_ground_truth" pkg="sd_gazebo" type="ground_truth_tf_broadcaster" if="$(arg ground_truth_tf_broadcaster)">
@@ -47,8 +48,8 @@
 	<group ns="r2" if="$(arg r2)">
 		<param name="robot_description_gazebo"
 			command="$(find xacro)/xacro '$(find sd_gazebo)/urdf/r2.gazebo.xacro'"/>
-		<node name="urdf_spawner_r2" pkg="gazebo_ros" type="spawn_model" respawn="false"
-			args="-urdf -model r2 -param robot_description_gazebo -z 0.3 -y 0.5"/>
+		<node name="urdf_spawner_r2" pkg="sd_gazebo" type="spawn_model.py" respawn="false"
+			args="-urdf -model r2 -param robot_description_gazebo -px $(arg team)_x -py $(arg team)_y -z 0.3 -pY $(arg team)_yaw"/>
 
 		<!-- Broadcast ground truth as tf transform from world to robot -->
 		<node name="r2_ground_truth" pkg="sd_gazebo" type="ground_truth_tf_broadcaster" if="$(arg ground_truth_tf_broadcaster)">

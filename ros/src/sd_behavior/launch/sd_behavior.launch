@@ -1,6 +1,8 @@
 <launch>
 	<arg name="robot_ns" default=""/>
 
+	<rosparam file="$(find sd_behavior)/config/$(arg robot_ns)_behavior.yaml" command="load"/>
+
 	<node pkg="sd_behavior" type="sd_behavior_base_node.py" name="$(arg robot_ns)_behavior_base_node">
 		<remap from="teleop/cmd_vel" to="$(arg robot_ns)_teleop/cmd_vel"/>
 	</node>

@@ -5,6 +5,7 @@
 	<arg name="r2" default="true"/>
 	<arg name="ground_truth" default="false"/>
 	<arg name="joy_type" default="xbox"/>
+	<arg name="team" default="yellow"/>
 
 	<machine name="localhost" address="localhost" env-loader="/opt/ros/melodic/env.sh"/>
 
@@ -13,6 +14,7 @@
 		<arg name="ground_truth_tf_broadcaster" value="$(arg ground_truth)"/>
 		<arg name="r1" value="$(arg r1)"/>
 		<arg name="r2" value="$(arg r2)"/>
+		<arg name="team" value="$(arg team)"/>
 	</include>
 
 	<include file="$(find sd_main)/launch/r1.launch" if="$(arg r1)">
@@ -37,4 +39,9 @@
 	<node name="joy_convert" pkg="sd_teleop" type="joy_convert_node" if="$(eval arg('joy_type') == 'ps')"/>
 
 	<node name="joy_switcher" pkg="sd_teleop" type="joy_switcher_node" output="screen"/>
+
+	<node pkg="rostopic" type="rostopic" name="r1_start" args="pub -1 /r1/start sd_behavior_msgs/Start '{ team: 1 }'" if="$(eval arg('team') == 'yellow')"/>
+	<node pkg="rostopic" type="rostopic" name="r1_start" args="pub -1 /r1/start sd_behavior_msgs/Start '{ team: 2 }'" if="$(eval arg('team') == 'purple')"/>
+	<node pkg="rostopic" type="rostopic" name="r2_start" args="pub -1 /r2/start sd_behavior_msgs/Start '{ team: 1 }'" if="$(eval arg('team') == 'yellow')"/>
+	<node pkg="rostopic" type="rostopic" name="r2_start" args="pub -1 /r2/start sd_behavior_msgs/Start '{ team: 2 }'" if="$(eval arg('team') == 'purple')"/>
 </launch>
