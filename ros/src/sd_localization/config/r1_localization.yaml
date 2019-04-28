@@ -114,9 +114,9 @@ r1_amcl:
   update_min_d: 0.0 #0.1
   update_min_a: 0.0 #0.5236 # pi/6
   resample_interval: 2
-  transform_tolerance: 0.1
-  recovery_alpha_slow: 0.001
-  recovery_alpha_fast: 0.1
+  transform_tolerance: 0.2
+  recovery_alpha_slow: 0.0 #0.001
+  recovery_alpha_fast: 0.0 #0.1
 #  initial_pose_x: 0.0
 #  initial_pose_y: 0.0
 #  initial_pose_a: 0.0
@@ -168,10 +168,10 @@ r1_snap_map:
   icp_inlier_dist: 0.1
   icp_inlier_threshold: 0.9
   icp_num_iter: 250
-  angle_upper_threshold: 0.5236 #pi/6
+  angle_upper_threshold: 0.1 #0.5236 #pi/6
   dist_change_threshold: 0.05
   angle_change_threshold: 0.01
-  update_age_threshold: 0.0
+  update_age_threshold: 1.0
   pose_covariance_trans: 1.5
 
   debug: false
