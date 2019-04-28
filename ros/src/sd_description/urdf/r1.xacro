@@ -20,7 +20,7 @@
 
     <xacro:property name="lidar_x" value="0.0" />
     <xacro:property name="lidar_y" value="0.0" />
-    <xacro:property name="lidar_z" value="0.040" />
+    <xacro:property name="lidar_z" value="0.020" />
     <xacro:property name="lidar_angle" value="${2 * pi / 3}" />
 
     <xacro:include filename="$(find sd_description)/urdf/materials.xacro" />
