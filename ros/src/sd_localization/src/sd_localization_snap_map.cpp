@@ -59,6 +59,7 @@
 namespace sd_localization {
 class SnapMap {
 private:
+    bool active_;
     ros::Duration age_threshold_;
     double scan_rate_;
 
@@ -115,6 +116,8 @@ private:
 
 public:
     SnapMap() :
+        active_(true),
+
         age_threshold_(0),
         scan_rate_(2),
 
@@ -174,6 +177,8 @@ public:
     }
     
     void dynamicReconfigureCallback(sd_localization::SnapMapConfig &config, uint32_t level) {
+        active_ = config.active;
+        
         age_threshold_ = ros::Duration(config.age_threshold);
         scan_rate_ = config.scan_rate;
 
@@ -262,6 +267,11 @@ public:
 
     void scanCallback (const sensor_msgs::LaserScan::ConstPtr& scan_in)
     {
+        if (!active_)
+        {
+            return;
+        }
+        
         if (!we_have_a_map_)
         {
             ROS_INFO("SnapMapICP waiting for map to be published");
