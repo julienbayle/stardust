@@ -11,36 +11,42 @@ class Robot:
       self.cmd_pub = rospy.Publisher(cmd_vel_topic, Twist, queue_size=10)
       
     def move(self, twist_array):
-
-      self.auto_pub.publish(True)
-      r = rospy.Rate(1)
+      r = rospy.Rate(100)
       i = 0
-      while not (rospy.is_shutdown() and i < len(twist_array) ):
+      hz = 0
+      while (not rospy.is_shutdown()) and i < len(twist_array) :
         twist = twist_array[i]
-        rospy.loginfo("Move %f-%f-%f" % (twist.linear.x, twist.linear.y, twist.angular.z))
-        self.cmd_pub(twist)
+        if hz == 0:
+          rospy.loginfo("Move %f-%f-%f" % (twist.linear.x, twist.linear.y, twist.angular.z))
+        self.auto_pub.publish(Bool(True))
+        self.cmd_pub.publish(twist)
         r.sleep()
-        i = i+1
-
-      self.auto_pub.publish(False)
+        hz = hz + 1
+        if hz == 100:
+          hz = 0
+          i = i+1
+      
+      self.auto_pub.publish(Bool(False))
         
 if __name__ == '__main__':
   
     rospy.init_node('robot')
     robot = Robot('/r1/mode_auto', '/r1/auto_cmd_vel')
     
-    # halt a turn per second
-    t2 = Twist()
-    turn.angular.z = 3.14
+    t1 = [Twist()]
+    t1[0].angular.z = 2
 
-    # a quater a turn per second
-    t4 = Twist()
-    turn.angular.z = 3.14/2
+    t2 = [Twist()]
+    t2[0].angular.z = -2
+    t3 = [Twist()]
+    t3[0].angular.z = 1
+
+    t4 = [Twist()]
+    t4[0].angular.z = -1
+
 
     # stop robot
-    stop = Twist()
+    stop = [Twist()]
 
-    robot.move([stop, t4, t4, stop, t2, t2, stop])
+    robot.move(stop + 3 * t1 + 3 * t3 + 3 * t2 + 3*t4 + stop)
 
-
-    
