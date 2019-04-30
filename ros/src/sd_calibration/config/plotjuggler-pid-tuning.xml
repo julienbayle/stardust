@@ -1,45 +1,45 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <root>
- <tabbed_widget name="Main Window" parent="main_window">
-  <plotmatrix rows="6" columns="1" tab_name="plot">
-   <plot row="0" col="0">
-    <range right="21.181915" top="0.100000" left="16.248704" bottom="-0.100000"/>
+ <tabbed_widget parent="main_window" name="Main Window">
+  <plotmatrix columns="1" tab_name="plot" rows="6">
+   <plot col="0" row="0">
+    <range bottom="-0.100000" right="24.150340" top="0.100000" left="11.645138"/>
     <limitY/>
-    <curve custom_transform="noTransform" B="255" name="/r1/back_wheel_to_base_state/process_value" R="0" G="0"/>
-    <curve custom_transform="noTransform" B="128" name="/r1/back_wheel_to_base_state/set_point" R="0" G="0"/>
+    <curve name="/r1/back_wheel_to_base_state/process_value" custom_transform="" R="0" G="0" B="255"/>
+    <curve name="/r1/back_wheel_to_base_state/set_point" custom_transform="" R="0" G="0" B="128"/>
+    <transform value=""/>
+   </plot>
+   <plot col="0" row="1">
+    <range bottom="-0.100000" right="24.150340" top="0.100000" left="11.645138"/>
+    <limitY/>
+    <curve name="/r1/back_wheel_to_base_state/command" custom_transform="" R="255" G="0" B="255"/>
+    <transform value=""/>
+   </plot>
+   <plot col="0" row="2">
+    <range bottom="-0.100000" right="24.150088" top="0.100000" left="11.645251"/>
+    <limitY/>
+    <curve name="/r1/right_wheel_to_base_state/process_value" custom_transform="noTransform" R="255" G="0" B="255"/>
+    <curve name="/r1/right_wheel_to_base_state/set_point" custom_transform="noTransform" R="0" G="0" B="128"/>
     <transform value="noTransform"/>
    </plot>
-   <plot row="1" col="0">
-    <range right="21.181915" top="0.100000" left="16.248704" bottom="-0.100000"/>
+   <plot col="0" row="3">
+    <range bottom="-0.100000" right="24.150088" top="0.100000" left="11.645251"/>
     <limitY/>
-    <curve custom_transform="noTransform" B="255" name="/r1/back_wheel_to_base_state/command" R="255" G="0"/>
+    <curve name="/r1/right_wheel_to_base_state/command" custom_transform="noTransform" R="0" G="128" B="128"/>
     <transform value="noTransform"/>
    </plot>
-   <plot row="2" col="0">
-    <range right="21.183204" top="0.100000" left="16.247832" bottom="-0.100000"/>
+   <plot col="0" row="4">
+    <range bottom="-0.100000" right="24.150340" top="0.100000" left="11.645138"/>
     <limitY/>
-    <curve custom_transform="" B="255" name="/r1/right_wheel_to_base_state/process_value" R="255" G="0"/>
-    <curve custom_transform="" B="128" name="/r1/right_wheel_to_base_state/set_point" R="0" G="0"/>
-    <transform value=""/>
+    <curve name="/r1/back_wheel_to_base_state/process_value" custom_transform="noTransform" R="0" G="0" B="255"/>
+    <curve name="/r1/back_wheel_to_base_state/set_point" custom_transform="noTransform" R="0" G="128" B="0"/>
+    <transform value="noTransform"/>
    </plot>
-   <plot row="3" col="0">
-    <range right="21.183204" top="0.100000" left="16.247832" bottom="-0.100000"/>
+   <plot col="0" row="5">
+    <range bottom="-0.100000" right="24.150315" top="0.100000" left="11.645165"/>
     <limitY/>
-    <curve custom_transform="" B="128" name="/r1/right_wheel_to_base_state/command" R="0" G="128"/>
-    <transform value=""/>
-   </plot>
-   <plot row="4" col="0">
-    <range right="21.181915" top="0.100000" left="16.248704" bottom="-0.100000"/>
-    <limitY/>
-    <curve custom_transform="" B="255" name="/r1/back_wheel_to_base_state/process_value" R="0" G="0"/>
-    <curve custom_transform="" B="0" name="/r1/back_wheel_to_base_state/set_point" R="0" G="128"/>
-    <transform value=""/>
-   </plot>
-   <plot row="5" col="0">
-    <range right="21.183324" top="0.100000" left="16.247094" bottom="-0.100000"/>
-    <limitY/>
-    <curve custom_transform="" B="164" name="/r1/left_wheel_to_base_state/command" R="160" G="160"/>
-    <transform value=""/>
+    <curve name="/r1/left_wheel_to_base_state/command" custom_transform="noTransform" R="160" G="160" B="164"/>
+    <transform value="noTransform"/>
    </plot>
   </plotmatrix>
   <currentPlotMatrix index="0"/>
