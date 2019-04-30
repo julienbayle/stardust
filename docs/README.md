@@ -12,7 +12,7 @@ Stardust est une équipe de robotique basée en Loire Atlantique qui participe �
 
 [Architecture ROS](https://www.draw.io/#Uhttps%3A%2F%2Fjulienbayle.github.io%2Fstardust%2Farchitecture%2Fros.xml)
 
-[Développer en local sous Win10 ou Ubuntu](pages/install_local.md)
+[Développer en local](pages/install_local.md)
 
 [Déployer et mettre à jour le code sur un raspberry pi](pages/install_raspberry.md)
 
