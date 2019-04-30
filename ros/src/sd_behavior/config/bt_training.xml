@@ -1,0 +1,49 @@
+<root main_tree_to_execute="BehaviorTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="BehaviorTree">
+        <ReactiveFallback>
+            <Condition ID="isNotTimeOut"/>
+            <SubTree ID="violetCamp"/>
+            <SubTree ID="yellowCamp"/>
+        </ReactiveFallback>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="violetCamp">
+        <Fallback>
+            <ReactiveSequence>
+                <Condition ID="isCampViolet"/>
+                <Condition ID="isVoieLibre"/>
+                <Action ID="executerTrajectoire"/>
+            </ReactiveSequence>
+            <Action ID="AttendrePassageLibre"/>
+        </Fallback>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="yellowCamp">
+        <Fallback>
+            <ReactiveSequence>
+                <Inverter>
+                    <Condition ID="isCampViolet"/>
+                </Inverter>
+                <Condition ID="isVoieLibre"/>
+                <Action ID="executerTrajectoire"/>
+            </ReactiveSequence>
+            <Action ID="AttendrePassageLibre"/>
+        </Fallback>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="AttendrePassageLibre"/>
+        <Action ID="executerTrajectoire"/>
+        <Action ID="goToWP2"/>
+        <Action ID="goToWP3"/>
+        <Condition ID="isCampViolet"/>
+        <Condition ID="isNotTimeOut"/>
+        <Condition ID="isTirettePresente"/>
+        <Condition ID="isVoieLibre"/>
+        <SubTree ID="violetCamp"/>
+        <SubTree ID="yellowCamp"/>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>
+
