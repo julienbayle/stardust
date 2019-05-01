@@ -19,22 +19,22 @@ from luma.core.interface.serial import spi, noop
 from luma.core.legacy import text, show_message
 from luma.core.legacy.font import proportional, CP437_FONT, TINY_FONT, SINCLAIR_FONT, LCD_FONT
 from luma.core.sprite_system import framerate_regulator
-from starbaby_led_matrix.msg import Eye
+from sd_led_matrix.msg import Eye
 from std_msgs.msg import Bool
 from luma.core.render import canvas
 
 class RobotEye:
     def __init__(self, img_path):
         rospy.init_node("led_matrix")
-        self.default_text = "?"
-        self.default_image = None
+        self.default_text = ""
+        self.default_image = Image.open(os.path.join(img_path, "stardust.gif"))
         self.default_fps = 24
         self.repeat = 0
         self.img_path = img_path
         rospy.Subscriber("/eye", Eye, self.execute_msg_cb)
         rospy.Subscriber("/default_eye", Eye, self.execute_default_eye_cb)
         serial = spi(port=0, device=0, gpio=noop())
-        self.device = max7219(serial, width=32, height=8)
+        self.device = max7219(serial, width=16, height=16)
         self.device.contrast(0x10)
         rospy.loginfo("Robot eye LCD Matrix ready")
         self.device.preprocess = self.preprocess
@@ -46,10 +46,12 @@ class RobotEye:
         """
         image = image.rotate(-180)
         image = image.copy()
-        for x in range(0, 32, 8):
-            box = (x, 0, x + 8, 8)
-            rotated_block = image.crop(box).rotate(-90)
-            image.paste(rotated_block, box)
+        box1 = (8, 0, 16, 8)
+        block1 = image.crop(box1)
+        box2 = (0, 8, 8, 16)
+        block2 = image.crop(box2)
+        image.paste(block1, box2)
+        image.paste(block2, box1)
         return image
 
     def execute_default_eye_cb(self, msg):
@@ -104,8 +106,8 @@ class RobotEye:
                         b = frame.load()
                         #m =  [""] * 8
                         with canvas(self.device) as draw:
-                            for i in range(32):
-                                for j in range(8):
+                            for i in range(16):
+                                for j in range(16):
                                     if b[i,j]<0.5:
                                         draw.point((i, j), fill="black")
                                     else:

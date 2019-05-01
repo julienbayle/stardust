@@ -14,4 +14,8 @@
 		<arg name="joy_type" value="$(arg joy_type)"/>
 	</include>
 
+	<group ns="r2">
+		<include file="$(find sd_led_matrix)/launch/sd_led_matrix.launch">
+		</include>
+	</group>
 </launch>
