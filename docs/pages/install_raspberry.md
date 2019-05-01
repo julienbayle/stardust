@@ -262,6 +262,7 @@ On voit ici les 3 puces de l'IMU (gyromètre, acceleromètre et magnétomètre)
 Si le robot est connecté via SPI à un ou plusieurs pavés LED, il faut ajouter la librairie nécessaire (pas de paquet rosdep de disponible)
 
 ```bash
+sudo apt install python-pip
 sudo pip install luma.led_matrix
 ```
 
