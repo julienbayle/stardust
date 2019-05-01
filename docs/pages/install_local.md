@@ -16,7 +16,14 @@ Aller sur [Ubuntu realease](http://releases.ubuntu.com/bionic/) et télécharger
 Installer sur votre ordinateur (VM, barebone, dual boot, ...)
 
 Attention, il est conseillé d'avoir ou d'allouer au moins 20Go de disque et 4Go de RAM.
+
 Penser à installer les outils de virtualisations (VMWare tools pour VMWare par exemple) pour optimiser la performance si vous avez choisi d'utiliser une VM.
+
+Exemple pour VMWare :
+
+```bash
+sudo apt install open-vm-tools
+```
 
 ## Installation de ROS et du projet
 
