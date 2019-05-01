@@ -224,7 +224,7 @@ Si le LIDAR fonctionne, il doit se mettre à tourner et sa vitesse de rotation d
 
 ### Activation de l'I2C et du SPI
 
-Editez le fichier **/boot/firmware/config.txt** et ajoutez les lignes:
+Editez le fichier **/boot/firmware/config.txt** et vérifier que les lignes suivantes sont bien présentes (sinon, les ajouter) :
 
 ```
 dtparam=i2c_arm=on
@@ -234,7 +234,7 @@ dtparam=spi=on
 Installez les librairies de developpement:
 ```bash
 sudo apt-get install i2c-tools libi2c-dev
-sudo usermod -a -G i2c r1
+sudo usermod -a -G i2c <user_name>
 ```
 
 Si une IMU est connectée au robot via I2C, il est possible de vérifier qu'elle est bien disponible sur le port I2C et que celui-ci marche bien :
@@ -265,6 +265,21 @@ Si le robot est connecté via SPI à un ou plusieurs pavés LED, il faut ajouter
 sudo apt install python-pip
 sudo pip install luma.led_matrix
 ```
+
+Puis, il faut ajouter les droits d'utilisation le port SPI pour l'utilisateur courrant :
+
+```bash
+sudo groupadd --system spi
+sudo adduser <user_name> spi
+sudo  vim /etc/udev/rules.d/90-spi.rules
+```
+
+Contenu à écrire dans le fichier *90-spi.rules* :
+```
+"SUBSYSTEM=="spidev", GROUP="spi"
+```
+
+Puis, redémarrer le système pour prise en compte des modifications
 
 ## Ajout d'une manette
 
