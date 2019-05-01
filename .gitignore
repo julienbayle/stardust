@@ -1,6 +1,9 @@
 # Mac os
 .DS_Store
 
+# Ignore GIT external dependancies
+/ros/src/drivers
+
 # Ignore catkin_make build files
 /ros/build/
 /ros/devel/
