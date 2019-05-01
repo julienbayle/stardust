@@ -49,4 +49,4 @@ hardware_interface:
 
 rosserial_server:
   baud: 57600
-  port: /dev/ttyUSB0
+  port: /dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_75330303934351306051-if00
