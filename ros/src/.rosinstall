@@ -1,3 +1,6 @@
 - git:
     local-name: drivers/ydlidar
     uri: https://github.com/yann-bourrigault/ydlidar.git
+- git:
+    local-name: drivers/rosserial
+    uri: https://github.com/yann-bourrigault/rosserial.git
