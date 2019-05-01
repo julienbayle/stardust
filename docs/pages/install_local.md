@@ -61,7 +61,7 @@ git clone https://github.com/julienbayle/stardust
 Récupérer les dépendances et compiler :
 
 ```bash
-~/stardust/script/update.sh
+~/stardust/scripts/update.sh
 ```
 
 ## Compiler une modification
@@ -77,7 +77,7 @@ source devel/setup.bash
 ou 
 
 ```bash
-~/stardust/script/update.sh
+~/stardust/scripts/update.sh
 ```
 
 ## Démarage de l'environnement de simulation
