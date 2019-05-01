@@ -11,7 +11,7 @@ ApproachObject::ApproachObject(const std::string& name) :
 
 BT::NodeStatus ApproachObject::tick() 
 {
-	std::cout << "ApproachObject : " << std::endl;
+	std::cout << "ApproachObject : tick" << std::endl;
 	return BT::NodeStatus::SUCCESS;
 }
 }
