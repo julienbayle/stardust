@@ -2,6 +2,7 @@
     <!-- ////////// -->
     <BehaviorTree ID="BehaviorTree">
         <ReactiveFallback>
+            <Condition ID="isTirettePresente"/>
             <Condition ID="isNotTimeOut"/>
             <SubTree ID="violetCamp"/>
             <SubTree ID="yellowCamp"/>

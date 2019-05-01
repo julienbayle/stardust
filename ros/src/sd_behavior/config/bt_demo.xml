@@ -1,9 +1,52 @@
 <root main_tree_to_execute="BehaviorTree">
     <!-- ////////// -->
     <BehaviorTree ID="BehaviorTree">
-         <ReactiveSequence>
-         	<Condition ID="IsTirettePresent"/>
-        	<Action ID="ApproachObject"/>
-         </ReactiveSequence>
+        <ReactiveSequence>
+            <Condition ID="IsTirettePresente"/>
+            <Condition ID="IsTimeOut"/>
+            <ReactiveFallback>
+                <SubTree ID="campJaune"/>
+                <SubTree ID="campViolet"/>
+            </ReactiveFallback>
+        </ReactiveSequence>
     </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="campJaune">
+        <ReactiveFallback>
+            <ReactiveSequence>
+                <Inverter>
+                    <Condition ID="IsCampViolet"/>
+                </Inverter>
+                <Condition ID="IsVoieLibre"/>
+                <Action ID="ApproachObject" direction="1;2;2"/>
+            </ReactiveSequence>
+            <Action ID="ResterSurPlace"/>
+        </ReactiveFallback>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="campViolet">
+        <ReactiveFallback>
+            <ReactiveSequence>
+                <Condition ID="IsCampViolet"/>
+                <Condition ID="IsVoieLibre"/>
+                <Action ID="ApproachObject" direction="1;2;2"/>
+            </ReactiveSequence>
+            <Action ID="ResterSurPlace"/>
+        </ReactiveFallback>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="ApproachObject">
+            <input_port name="direction" default="1;2;2">direction où aller</input_port>
+        </Action>
+        <Condition ID="IsCampViolet"/>
+        <Condition ID="IsTimeOut"/>
+        <Condition ID="IsTirettePresente"/>
+        <Condition ID="IsVoieLibre"/>
+        <Action ID="ResterSurPlace"/>
+        <SubTree ID="campJaune"/>
+        <SubTree ID="campViolet"/>
+    </TreeNodesModel>
+    <!-- ////////// -->
 </root>
+

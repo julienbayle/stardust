@@ -26,11 +26,15 @@ include_directories(
 )
 
 add_executable(maintree src/main.cpp)
-target_link_libraries(maintree ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY} approachobject_nodes)
+target_link_libraries(maintree ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY} approachobject_nodes restersurplace_nodes)
 
 add_library(approachobject_nodes STATIC src/ApproachObject.cpp)
 target_link_libraries(approachobject_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
 target_link_libraries(maintree approachobject_nodes)
+
+add_library(restersurplace_nodes STATIC src/ResterSurPlace.cpp)
+target_link_libraries(restersurplace_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
+target_link_libraries(maintree restersurplace_nodes)
 
 add_library(robot_sensors_nodes STATIC src/robot_sensors_nodes.cpp)
 target_link_libraries(robot_sensors_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})

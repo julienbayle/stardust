@@ -2,5 +2,8 @@
 
 namespace RobotSensors
 {
-	BT::NodeStatus IsTirettePresent();
+	BT::NodeStatus IsTirettePresente();
+	BT::NodeStatus IsTimeOut();
+	BT::NodeStatus IsVoieLibre();
+	BT::NodeStatus IsCampViolet();
 }
