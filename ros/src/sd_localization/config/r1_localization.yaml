@@ -158,6 +158,8 @@ r1_amcl:
   tf_broadcast: true
 
 r1_snap_map:
+  active: false
+
   odom_frame: "r1/odom"
   laser_frame: "r1/laser_frame"
   base_frame: "r1/base_link"
