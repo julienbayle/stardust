@@ -4,8 +4,9 @@
 
 	<rosparam file="$(find sd_sensor)/config/$(arg robot_ns)_sensor_config.yaml" command="load"/>
 	
-	<node pkg="sd_sensor" type="$(arg robot_ns)_sensor_node" name="$(arg robot_ns)_sensor_node" if="$(eval arg('robot_ns') == 'r2')">
-	</node>
+	<!--R2 sonar are not operationnals
+	node pkg="sd_sensor" type="$(arg robot_ns)_sensor_node" name="$(arg robot_ns)_sensor_node" if="$(eval arg('robot_ns') == 'r2')">
+	</node-->
 
 	<node name="mpu6050"  pkg="sd_sensor"  type="mpu6050_node" output="screen" respawn="false" if="$(eval arg('robot_ns') == 'r1' and not arg('sim'))">
 		<remap from="imu/data" to="imu/data_raw"/>
