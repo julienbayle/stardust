@@ -31,8 +31,9 @@ class RobotEye:
         self.default_fps = 24
         self.repeat = 0
         self.img_path = img_path
-        rospy.Subscriber("/eye", Eye, self.execute_msg_cb)
-        rospy.Subscriber("/default_eye", Eye, self.execute_default_eye_cb)
+        ns = rospy.get_namespace()
+        rospy.Subscriber(ns + "eye", Eye, self.execute_msg_cb)
+        rospy.Subscriber(ns + "default_eye", Eye, self.execute_default_eye_cb)
         serial = spi(port=0, device=0, gpio=noop())
         self.device = max7219(serial, width=16, height=16)
         self.device.contrast(0x10)
@@ -115,6 +116,12 @@ class RobotEye:
 
 
 if __name__ == "__main__":
+    # Local version
     img_path = os.path.join(os.path.dirname(__file__), '..', '..', 'images')
+    
+    # Distributed code version
+    if not os.path.isdir(img_path):
+        img_path = os.path.join(os.path.dirname(__file__), '..', '..', 'share', 'sd_led_matrix', 'images')
+    
     robot_eye = RobotEye(img_path)
     robot_eye.spin()
