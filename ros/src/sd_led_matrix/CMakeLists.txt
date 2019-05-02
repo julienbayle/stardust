@@ -21,3 +21,15 @@ generate_messages(
 catkin_package(
   CATKIN_DEPENDS message_runtime
 )
+
+install(PROGRAMS
+  scripts/sd_led_matrix/led_matrix.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+## Mark other files for installation (e.g. launch and bag files, etc.)
+install(DIRECTORY
+  images
+  launch
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
