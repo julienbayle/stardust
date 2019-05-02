@@ -89,14 +89,41 @@ Ajouter votre connection WIFI et modifier le nom de la machine
 
 ## Optimisation de la vitesse de Boot
 
-Suppression de tous les services inutiles pour le robot :
+Suppression de tous les services dont l'on peut se passer afin d'accélérer le démarrage du robot :
 
 ```bash
 sudo systemctl stop systemd-networkd-wait-online.service 
 sudo systemctl disable systemd-networkd-wait-online.service
+sudo systemctl mask apt-daily.service apt-daily-upgrade.service
+sudo systemctl mask ModemManager.service
+sudo systemctl mask pppd-dns.service
+sudo systemctl mask accounts-daemon.service
+sudo systemctl mask avahi-daemon.service
 sudo apt remove cloud-init open-iscsi unattended-upgrades apparmor plymouth apport
 sudo apt autoremove
+sudo systemctl mask plymouth.service
+sudo systemctl mask apport.service
 ```
+
+Puis, ignorer l'attente de la connexion filaire (eth0) :
+
+```bash
+sudo vi /lib/systemd/system/systemd-networkd-wait-online.service
+```
+
+```
+[Service]
+Type=oneshot
+ExecStart=/lib/systemd/systemd-networkd-wait-online --ignore=eth0
+RemainAfterExit=yes
+```
+
+Pour voir le temps pris au démarrage par chaque service :
+```bash
+systemd-analyze blame
+```
+
+Pour en savoir plus : https://www.linux.com/learn/cleaning-your-linux-startup-process
 
 ## Désactivation des mises à jour automatiques
 
