@@ -11,7 +11,7 @@ arduino/lib/ros_lib/
 /ros/.settings/
 /ros/.cproject
 /ros/.project
-/.vscode
+*.vscode
 /ros/Debug/
 /ros/.pydevproject
 /ros/src/CMakeLists.txt
