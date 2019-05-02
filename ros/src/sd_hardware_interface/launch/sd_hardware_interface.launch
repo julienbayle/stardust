@@ -15,20 +15,16 @@
       <param name="tf_prefix" value="$(arg robot_ns)"/>
     </node>
 
-    <!-- ROS Serial (High performance version en C++) -->
+    <!-- ROS Serial (High performance version en C++) for R1 -->
     <node pkg="rosserial_server" type="serial_node" name="rosserial_server_motor" 
-        if="$(arg rosserial_cplusplus)"/>
+        if="$(eval arg('robot_ns') == 'r1')"/>
     <node pkg="rosserial_server" type="serial_node" name="rosserial_server_pince" 
-        if="$(arg rosserial_cplusplus)"/>
+        if="$(eval arg('robot_ns') == 'r1')"/>
     <node pkg="rosserial_python" type="message_info_service.py" name="rosserial_message_info"  
-        if="$(arg rosserial_cplusplus)"/>
+        if="$(eval arg('robot_ns') == 'r1')"/>
 
-    <!-- ROS Serial python -->
+    <!-- ROS Serial python for R2 -->
     <node pkg="rosserial_python" type="serial_node.py" name="rosserial_server_motor" 
-        unless="$(arg rosserial_cplusplus)"/>
-    
-    <!-- ROS Serial python Pince-->
-    <node pkg="rosserial_python" type="serial_node.py" name="rosserial_server_pince" 
-        unless="$(arg rosserial_cplusplus)"/>
+       if="$(eval arg('robot_ns') == 'r2')"/>
 
 </launch>
