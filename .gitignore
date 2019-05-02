@@ -3,6 +3,7 @@
 
 # Ignore GIT external dependancies
 /ros/src/drivers
+arduino/lib/ros_lib/
 
 # Ignore catkin_make build files
 /ros/build/

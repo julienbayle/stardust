@@ -26,7 +26,7 @@
 #ifndef _STARDUST_ENCODER_h
 #define _STARDUST_ENCODER_h
 
-#include "ros_pin_sensor_device.h"
+#include "ros_pin_sensor_device_with_speed.h"
 #include <std_msgs/Int16.h>
 
 namespace stardust
@@ -44,16 +44,17 @@ namespace stardust
    * Hardware must be UNO compatible
    * The pin must support change interrupt (pin 2 or pin 3 on Arduino UNO)
    */
-  class PinCounter : public RosPinSensorDevice<std_msgs::Int16>
+  class PinCounter : public RosPinSensorDeviceWithSpeed<std_msgs::Int16>
   {
     public:
 
-      PinCounter(ros::NodeHandle *nh, const char *topic_name, const byte pin) : 
-        RosPinSensorDevice<std_msgs::Int16>(nh, topic_name, pin) { }
+      PinCounter(ros::NodeHandle *nh, const char *topic_name, 
+		 const char *topic_speed_name, const byte pin) : 
+        RosPinSensorDeviceWithSpeed<std_msgs::Int16>(nh, topic_name, topic_speed_name, pin) { }
       
       virtual void setup()
       {
-        RosPinSensorDevice::setup();
+        RosPinSensorDeviceWithSpeed::setup();
 
         if(pin_ == 2)
           attachInterrupt(0, ISR_0, CHANGE);
@@ -62,11 +63,18 @@ namespace stardust
       }
 
       virtual void update() {
-        if(pin_ == 2 || pin_ == 3)
+	if(pin_ == 2 || pin_ == 3)
+	{
           msg_.data = encoder_counter[pin_ - 2];
+	  speed_msg_.data = encoder_counter[pin_ - 2] - last_counter;
+	  last_counter = msg_.data;
+	}           
         else
           msg_.data = -1;
       }
+    private:
+      
+      int last_counter = 0;
   };
 }
 

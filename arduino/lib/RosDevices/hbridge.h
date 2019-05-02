@@ -70,8 +70,8 @@ namespace stardust
 
       void updatePWM(const std_msgs::Int16& msg) {
         int pwm = msg.data;
-        digitalWrite(dir_pin_, pwm > 0);
-        digitalWrite(brake_pin_, pwm < 0);
+        digitalWrite(dir_pin_, pwm < 0);
+        digitalWrite(brake_pin_, pwm > 0);
         analogWrite(pwm_pin_, abs(pwm) > 255 ? 255 : abs(pwm));
       }
 
