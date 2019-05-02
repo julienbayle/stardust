@@ -14,9 +14,7 @@ Afin de pouvoir compiler et téléverser les codes Arduino, l'outil PlatformIO d
 sudo pip install -U platformio
 ```
 
-Les codes des cartes arduinos dépendent de la librairie de ROS Serial. Le projet s'appuyant uniquement sur des messages standards, il n'est pas nécessaire de la recompiler. A la place, une dépendance vers une librairie ros_lib de PlatformIO est utilisée (voir fichier [platformio.ini](https://github.com/julienbayle/stardust/blob/master/arduino/platformio.ini)).
-
-Pour référence, s'il fallait ajouter le support de messages spécifiques, il faudrait alors générer cette librairie à la main de la manière suivante :
+Les codes des cartes arduino dépendent de la librairie de ROS Serial version 0.8. Malheurement, cette librairie n'est pas encore disponible dans les dépendances de PlatformIO en version 0.8, il est donc nécessaire de la recompiler manuellement.
 
 ```bash
 cd ~/stardust/arduino/lib
@@ -41,6 +39,16 @@ Exemple pour la carte Uno du second robot :
 ```bash
 cd ~/stardust/arduino
 platformio run -e r2-uno -t upload
+```
+
+En cas d'erreur du type : 
+> /home/ubuntu/.platformio/packages/tool-avrdude/avrdude: line 6: /home/ubuntu/.platformio/packages/tool-avrdude/avrdude_bin: No such file or directory
+
+Simplement faire un lien direct vers avrdude :
+```bash
+cd /home/ubuntu/.platformio/packages/tool-avrdude
+mv avrdude_bin avrdude_bin_old
+ln -s /usr/bin/avrdude avrdude_bin
 ```
 
 > La liste des environnements est décrit dans le fichier [platformio.ini](https://github.com/julienbayle/stardust/blob/master/arduino/platformio.ini)
