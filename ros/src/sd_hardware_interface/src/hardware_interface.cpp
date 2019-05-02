@@ -163,8 +163,11 @@ void HWInterface::init()
         -32768.0));
     joint_encoders_.push_back(joint_encoder);
     encoder_subscribers_.push_back(nh_.subscribe(encoder_topic, 1, &Encoder::updateFromInt16Topic, joint_encoder));
-    encoder_speed_subscribers_.push_back(nh_.subscribe(encoder_speed_topic, 1, &Encoder::updateSpeedFromInt32Topic, joint_encoder));
-
+    if (is_quadrature_encoder_)
+      encoder_speed_subscribers_.push_back(nh_.subscribe(encoder_speed_topic, 1, &Encoder::updateSpeedFromInt32Topic, joint_encoder));
+    else
+      encoder_speed_subscribers_.push_back(nh_.subscribe(encoder_speed_topic, 1, &Encoder::updateSpeedFromInt16Topic, joint_encoder));
+    
     boost::shared_ptr<VelocityController> joint_velocity_controller( 
       new VelocityController(
         nh_,

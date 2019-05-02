@@ -28,12 +28,21 @@ namespace sd_hardware_interface
 		update((double) encoder_position->data);
 	}
 
+	void Encoder::updateSpeedFromInt16Topic(const std_msgs::Int16ConstPtr &encoder_speed)
+	{
+    	clock_gettime(CLOCK_MONOTONIC, &current_time_);
+    	last_speed_time_ = current_time_;
+		
+		speed_ = ((double) encoder_speed->data) * direction_ / encoder_speed_steps_for_one_rad_per_second_;
+		speed_acc_(speed_);
+	}
+
 	void Encoder::updateSpeedFromInt32Topic(const std_msgs::Int32ConstPtr &encoder_speed)
 	{
-    		clock_gettime(CLOCK_MONOTONIC, &current_time_);
-    		last_speed_time_ = current_time_;
+    	clock_gettime(CLOCK_MONOTONIC, &current_time_);
+    	last_speed_time_ = current_time_;
 		
-		speed_ = ((double) encoder_speed->data) / encoder_speed_steps_for_one_rad_per_second_;
+		speed_ = ((double) encoder_speed->data) * direction_ / encoder_speed_steps_for_one_rad_per_second_;
 		speed_acc_(speed_);
 	}
 
@@ -61,8 +70,7 @@ namespace sd_hardware_interface
 		double last_angle = angle_;
 		angle_ += direction_ * steps * encoder_resolution_;
 
-    		clock_gettime(CLOCK_MONOTONIC, &current_time_);
-    		last_position_time_ = current_time_;
+    	clock_gettime(CLOCK_MONOTONIC, &last_position_time_);
 		last_encoder_position_ = encoder_position;
 	}
 

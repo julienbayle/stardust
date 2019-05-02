@@ -29,6 +29,7 @@ namespace sd_hardware_interface
     /** \brief Update encoder position callbacks */
     virtual void update(double encoder_position);
     virtual void updateFromInt16Topic(const std_msgs::Int16ConstPtr &encoder_position);
+    virtual void updateSpeedFromInt16Topic(const std_msgs::Int16ConstPtr &encoder_speed);
     virtual void updateSpeedFromInt32Topic(const std_msgs::Int32ConstPtr &encoder_speed);
 
     /** \brief Return current joint angle (rad) */
