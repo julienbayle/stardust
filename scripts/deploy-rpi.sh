@@ -100,7 +100,7 @@ echo "=== New version deployed"
 
 # Install this version as a startup service
 if [[ "$DO_INSTALL" == "YES" ]]; then
-    echo "=== Creating startup service (you'll be prompted to give sudo password)"
+    echo "=== Creating startup service (you could be prompted to give sudo password)"
     cat > /tmp/ros_${VERSION}.service << EOL
 [Unit]
 Description=Stardust ROS
@@ -113,8 +113,8 @@ User=${REMOTE_USER}
 Group=${REMOTE_USER}
 UMask=007
  
-ExecStart=/home/${REMOTE_USER}/stardust/${VERSION}/script/start.sh ${ROBOT_NAME}
-ExecStop=/home/${REMOTE_USER}/stardust/${VERSION}/script/stop.sh
+ExecStart=/home/${REMOTE_USER}/${VERSION}/scripts/start.sh ${ROBOT_NAME}
+ExecStop=/home/${REMOTE_USER}/${VERSION}/scripts/stop.sh
 
 [Install]
 WantedBy=default.target
