@@ -327,22 +327,10 @@ jstest /dev/input/js0
 
 Le répertoire *scripts* contient des scripts pour lancer, mettre à jour et arrêter ROS sur le robot.
 
-Pour identifier le robot, il faut tout d'abord créer un fichier *robot.id* dans le dossier script et mettre dedant **r1** ou **r2** selon qu'il s'agit d'une installation pour le robot principal ou secondaire.
-
-```bash
-echo "r1" > ~/stardust/scripts/robot.id
-```
-
-Activation du démarrage automatique de ROS au démarrage du Raspberry PI :
-
-```bash
-~/stardust/scripts/install.sh
-```
-
 Pour démarrer ROS manuellement (En tâche de fond) :
 
 ```bash
-~/stardust/scripts/start.sh
+~/stardust/scripts/start.sh rX
 ```
 
 Pour arrêter ROS manuellement :
@@ -357,12 +345,19 @@ Pour mettre à jour ROS :
 ~/stardust/scripts/update.sh
 ```
 
-## Accès au robot depuis un PC distant
 
-Exemple pour lancer rviz depuis un poste distant (ROS doit être lancé sur le robot via le script ci-dessus et le robot et l'ordinateur doivent être sur le même réseau) :
+Activation du démarrage automatique de ROS au démarrage du Raspberry PI (on se place dans le dossier script) :
 
 ```bash
-export ROS_MASTER_URI=http://RASPBERRY_IP:11311
-export ROS_IP=COMPUTER_IP
+./deploy-rpi.sh --robot-name=rX --install-on-startup
+```
+
+## Accès au robot depuis un PC distant
+
+Exemple pour lancer rviz depuis un poste distant (ROS doit être lancé sur le robot via le script ci-dessus et le robot et l'ordinateur doivent être sur le même réseau).
+
+Ajouter le nom de la machine du robot dans le fichier /etc/hosts puis :
+```bash
+source ~/stardust/scripts/source-pc-slave.sh <robot_hostname>
 rosrun rviz rviz
 ```
