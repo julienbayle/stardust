@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eu
+
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 PROJECT_DIR=${SCRIPT_DIR}/..
 SYSROOT_DIR=$( readlink -f "${PROJECT_DIR}/rpi-sysroot")
