@@ -17,15 +17,27 @@ fi
 # Get robot identifier
 if [ -f $BASE/../scripts/robot.id ]; then
 	ID=`cat $BASE/../scripts/robot.id`
+elif [ "$#" -eq 1 ]; then
+    ID="$1"
 else
-	echo "Merci de créer un fichier robot.id"
+	echo "Please create a robot.id file or add the robot name as the first parameter of this script"
 	exit 1
 fi
 
-# Start ROS
-source $BASE/../ros/devel/setup.bash
 export ROS_IP=$IP
 export ROS_MASTER=http://$IP:11311
+
+# Start ROS
+if [ -d $BASE/../install ]; then
+    # Start a "cross compiled version"
+    source $BASE/../install/setup.bash
+elif [ -d $BASE/../ros/devel ]; then
+    # Start a "local version"
+    source $BASE/../ros/devel/setup.bash
+else
+    echo "Unable to find ROS project"
+    exit 1
+fi
 
 echo "Starting ROS on $IP for robot $ID"
 roslaunch --pid=/tmp/ros.pid sd_main $ID.launch & 
