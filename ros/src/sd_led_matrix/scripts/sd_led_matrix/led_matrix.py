@@ -27,7 +27,7 @@ class RobotEye:
     def __init__(self, img_path):
         rospy.init_node("led_matrix")
         self.default_text = ""
-        self.default_image = Image.open(os.path.join(img_path, "stardust.gif"))
+        self.default_image = Image.open(os.path.join(img_path, "adam.gif"))
         self.default_fps = 24
         self.repeat = 0
         self.img_path = img_path
