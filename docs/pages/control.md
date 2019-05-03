@@ -116,6 +116,12 @@ En pratique, les batteries au plomb du robot ont été remplacées par des batte
 Démarrer le robot et vérifier que la commande à distance par télécommande fonctionne.
 Passer le robot en mode "alimentation par batterie" (L'alimentation secteur n'étant pas équivalente, les réglages pourraient être erronés)
 
+Installation de plot juggler:
+
+```bash
+sudo apt-get install ros-melodic-plotjuggler
+```
+
 Sur un poste distant avec Ubuntu :
 export ROS_MASTER_URI=http://192.168.0.27:11311
 rosrun rqt_reconfigure rqt_reconfigure &
