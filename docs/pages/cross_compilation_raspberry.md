@@ -29,8 +29,15 @@ $ ./scripts/download-rpi-sysroot.sh -s <robot_user>@<robot_ip>
 $ ./scripts/build-rpi.sh
 ```
 
-## Compilation et déploiement
-
+##  Déploiement
+        
 ```shell
-$ ./scripts/deploy-rpi.sh <robot_user>@<robot_ip> <dossier>
+deploy-rpi.sh "
+        echo "  --remote-user=user         (default: ubuntu)"
+        echo "  --remote-hostname=hostname (default: stardust)"
+        echo "  --version=stardustX        (default: username_current_date)"
+        echo "  --robot-name=rX            (default:r1)"
+        echo "  --ros-restart              (default : no)"
+        echo "  --install-on-startup       (default: no)"
+        echo "  --build                    (default:no)" 
 ```
