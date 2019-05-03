@@ -288,7 +288,7 @@ void HWInterface::write(ros::Duration &elapsed_time)
 
       // Direction (for simple encoders)
       if(!is_quadrature_encoder_)
-        joint_encoders_[joint_id]->setDirection(effort_publishers_[joint_id] > 0);
+        joint_encoders_[joint_id]->setDirection(cmd_effort > 0);
     }
     else {
       // Send velocity to hardware (use hardware internal PID)
