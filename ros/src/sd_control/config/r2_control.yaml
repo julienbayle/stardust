@@ -17,12 +17,13 @@ mobile_base_controller:
   # Wheel separation and diameter. These are both optional.
   # diff_drive_controller will attempt to read either one or both from the
   # URDF if not specified as a parameter
-  wheel_separation : 0.195
+  wheel_separation : 0.190
   wheel_radius : 0.0375
 
   # Wheel separation and radius multipliers
+  # (JB : Calculated using rqt_reconfigure and some tests on the ground with teleop)
   wheel_separation_multiplier: 1.0 # default: 1.0
-  wheel_radius_multiplier    : 1.0 # default: 1.0
+  wheel_radius_multiplier    : 1.02 # default: 1.0
 
   # Velocity commands timeout [s], default 0.5
   cmd_vel_timeout: 0.5
@@ -35,20 +36,17 @@ mobile_base_controller:
   # Whenever a min_* is unspecified, default to -max_*
   linear:
     x:
-      has_velocity_limits    : false
-      max_velocity           : 0.46  # m/s
-      min_velocity           : -0.46 # m/s
-      has_acceleration_limits: false
-      max_acceleration       : 0.8  # m/s^2
-      min_acceleration       : -0.8 # m/s^2
+      has_velocity_limits    : true
+      max_velocity           : 0.27  # m/s
+      min_velocity           : -0.27 # m/s
+      has_acceleration_limits: true
+      max_acceleration       : 0.5  # m/s^2
+      min_acceleration       : -0.5 # m/s^2
       has_jerk_limits        : false
-      max_jerk               : 5.0  # m/s^3
   angular:
     z:
-      has_velocity_limits    : false
-      max_velocity           : 1.7  # rad/s
-      has_acceleration_limits: false
-      max_acceleration       : 1.5  # rad/s^2
+      has_velocity_limits    : true
+      max_velocity           : 2.8  # rad/s
+      has_acceleration_limits: true
+      max_acceleration       : 4.0  # rad/s^2
       has_jerk_limits        : false
-      max_jerk               : 2.5  # rad/s^3
-  

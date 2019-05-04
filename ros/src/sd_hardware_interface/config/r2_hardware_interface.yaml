@@ -1,6 +1,6 @@
 control_loop:
   loop_hz: 20 # in Hz
-  cycle_time_error_threshold: 0.01 # in seconds (Means an 20% error threshold for 20Hz)
+  cycle_time_error_threshold: 0.06 # in seconds (Means an 20% error threshold for 20Hz)
   print_state: false # true to see controller state in console (every second)
   publish_state: true # publish regulator state to topics
 
@@ -14,6 +14,9 @@ hardware_interface:
   encoder_topics:
     - right/encoder
     - left/encoder
+  encoder_speed_topics:
+    - right/encoder/speed
+    - left/encoder/speed
   pwm_topics:
     - right/pwm
     - left/pwm
@@ -24,29 +27,36 @@ hardware_interface:
     - 255
     - 255
   encoder_steps_for_one_wheel_revolution:
-    - 140.0
-    - 140.0
+    - 556
+    - 556
+  encoder_speed_steps_for_one_rad_per_second:
+    - 2.95
+    - 2.95
 
   # As rqt-reconfigure does not support array, direct names 
   # are used for the next parameters:
 
+  # Coefficient to apply to pid and feedforward gain 
+  # as different robot do not have the same wheel speeds
+  velocity_controllers_pid_and_feedforward_coef: 0.5
+
   # Feedfordward gain (If pwm increases by "pwm_max*velocity_controllers_feedforward_x"
   # the wheel x speed up by 1 rad/s)
-  velocity_controllers_feedforward_right: 0.01
-  velocity_controllers_feedforward_left: 0.01
+  velocity_controllers_feedforward_right: 0.18
+  velocity_controllers_feedforward_left: 0.18
 
   # Minimum torque allowing the wheel to turn (percentage of pwm_max)
-  velocity_controllers_static_friction_right: 0.3
-  velocity_controllers_static_friction_left: 0.3
+  velocity_controllers_static_friction_right: 0.19
+  velocity_controllers_static_friction_left: 0.22
 
   # PID 
-  velocity_controllers_pid_p_right: 0.01
-  velocity_controllers_pid_p_left: 0.01
-  velocity_controllers_pid_i_right: 0.01
-  velocity_controllers_pid_i_left: 0.01
-  velocity_controllers_pid_d_right: 0.005
-  velocity_controllers_pid_d_left: 0.005
+  velocity_controllers_pid_p_right: 0.22
+  velocity_controllers_pid_p_left: 0.22
+  velocity_controllers_pid_i_right: 0.45
+  velocity_controllers_pid_i_left: 0.45
+  velocity_controllers_pid_d_right: 0.0
+  velocity_controllers_pid_d_left: 0.0
 
-rosserial_server:
+rosserial_server_motor:
   baud: 57600
   port: /dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_75330303934351306051-if00

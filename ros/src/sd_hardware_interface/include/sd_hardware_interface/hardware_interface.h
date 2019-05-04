@@ -101,6 +101,9 @@ namespace sd_hardware_interface
     // PWM limiter (-pwm_max / + pwm_max)
     std::vector<double> velocity_controllers_pwm_max_;
 
+    // PID and feedword coeficient
+    double pid_fw_mul_;
+
     // Open loop (feed forward + friction model)
     std::vector<double> velocity_controllers_feedforward_;
     std::vector<double> velocity_controllers_static_friction_;

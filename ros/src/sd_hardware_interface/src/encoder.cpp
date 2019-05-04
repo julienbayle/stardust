@@ -14,7 +14,7 @@ namespace sd_hardware_interface
 	  , angle_(0.0)
 	  , direction_(1.0)
 	  , speed_(0.0)
-	  , speed_acc_(RollingWindow::window_size = 10)
+	  , speed_acc_(RollingWindow::window_size = 3)
 	  , timeout_(timeout)
 	  , max_position_(max_position)
 	  , min_position_(min_position)
@@ -74,7 +74,7 @@ namespace sd_hardware_interface
 		last_encoder_position_ = encoder_position;
 	}
 
-	void Encoder::setDirection(bool direction) 
+	void Encoder::setDirection(bool direction)
 	{
 		direction_ = direction ? 1.0 : -1.0;
 	}

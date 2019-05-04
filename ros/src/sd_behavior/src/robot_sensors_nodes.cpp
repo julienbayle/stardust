@@ -27,3 +27,7 @@ BT::NodeStatus RobotSensors::IsVoieLibre()
         return _is_voie_libre ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
 }
 
+void RobotSensors::rosUpdateTirettePresent(const std_msgs::BoolConstPtr &tirette)
+{
+	_is_tirette = (bool) tirette->data;
+}

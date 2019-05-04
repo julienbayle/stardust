@@ -3,16 +3,19 @@ project(sd_behavior)
 
 find_package(catkin REQUIRED COMPONENTS
   rospy
+  roscpp
+  std_msgs
   sensor_msgs
   geometry_msgs
   behaviortree_cpp_v3
 )
 
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES sd_behavior
-#  CATKIN_DEPENDS rospy sensor_msgs smach
-#  DEPENDS system_lib
+  INCLUDE_DIRS
+    include
+  CATKIN_DEPENDS
+    roscpp
+    std_msgs
 )
 
 ###########
@@ -21,12 +24,13 @@ catkin_package(
 
 include_directories(
   ${catkin_INCLUDE_DIRS}
-  ./include/
-  ./src/
+  include
+  src
 )
 
 add_executable(maintree src/main.cpp)
 target_link_libraries(maintree ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY} approachobject_nodes afficherlescore_nodes)
+add_dependencies(maintree ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_library(approachobject_nodes STATIC src/ApproachObject.cpp)
 target_link_libraries(approachobject_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})

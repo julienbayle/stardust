@@ -41,7 +41,7 @@ namespace sd_hardware_interface
     /** \brief Return current filtered joint speed (rad/s) */
     double getFilteredSpeed();
     
-    /** \brief Set current joint direction (for simple encoders without quadrature) */
+    /** \brief Set joint direction (for simple encoders without quadrature) */
     void setDirection(bool direction);
 
     /** \brief Returns if current joint encoder emits data */

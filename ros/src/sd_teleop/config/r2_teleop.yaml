@@ -1,9 +1,9 @@
 r2_teleop:
   double_click_minimum_interval: 0.0
   double_click_maximum_interval: 0.2
-  max_linear_x_velocity: 0.2
+  max_linear_x_velocity: 0.25
   max_linear_y_velocity: 0.0
-  max_angular_z_velocity: 3.0
-  boost_velocity_ratio: 2.0
+  max_angular_z_velocity: 2.5
+  boost_velocity_ratio: 1
   joy_topic: joy
   timer_frequency: 10.0

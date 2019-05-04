@@ -1,4 +1,5 @@
 #include <string>
+#include <ros/ros.h>
 #include "behaviortree_cpp/bt_factory.h"
 
 #include "ApproachObject.h"
@@ -12,10 +13,14 @@ using namespace BT;
 // catkin_make then
 // rosrun sd_behavior maintree src/sd_behavior/config/bt_demo.xml
 
+ros::Subscriber test_subscriber_;
+
 int main(int argc, char* argv[])
 {
-	BehaviorTreeFactory factory;
+	ros::init(argc, argv, "robot_behavior");
+  	ros::NodeHandle nh;
 
+  	BehaviorTreeFactory factory;
 	factory.registerNodeType<RobotNodes::ApproachObject>("ApproachObject");
 	factory.registerNodeType<RobotNodes::IsNotTimeOut>("IsNotTimeOut");
 	factory.registerNodeType<RobotNodes::AfficherLeScore>("AfficherLeScore");
@@ -23,6 +28,9 @@ int main(int argc, char* argv[])
 	factory.registerSimpleCondition("IsTimeOut", std::bind(RobotSensors::IsTimeOut));
 	factory.registerSimpleCondition("IsCampViolet", std::bind(RobotSensors::IsCampViolet));
 	factory.registerSimpleCondition("IsVoieLibre", std::bind(RobotSensors::IsVoieLibre));
+	
+	//RobotSensors::init(factory, nh);
+	test_subscriber_ = nh.subscribe("/test_topic", 1, RobotSensors::rosUpdateTirettePresent);
 
 	//	GripperInterface gripper;
 	//	factory.registerSimpleAction("OpenGripper", std:bind(&GripperInteface::open, &gripper));
@@ -31,10 +39,17 @@ int main(int argc, char* argv[])
 	std::string fn = argv[1];
 	auto tree = factory.createTreeFromFile(fn);
 
-	while( tree.root_node->executeTick() != NodeStatus::FAILURE)
-	{
-        	std::this_thread::sleep_for( std::chrono::milliseconds(10) );
-	}
+	BT::NodeStatus status = NodeStatus::RUNNING;
+	
+	ros::Rate rate(100);
+    while(ros::ok() && status != NodeStatus::FAILURE) {
+      ros::spinOnce();
+      tree.root_node->executeTick();
+      rate.sleep();
+    }
+
+    // Wait for ROS threads to terminate
+  	ros::waitForShutdown();
 
 	return 0;
 }

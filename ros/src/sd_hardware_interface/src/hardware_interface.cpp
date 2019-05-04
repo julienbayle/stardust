@@ -43,6 +43,7 @@ HWInterface::HWInterface(ros::NodeHandle &nh)
   velocity_controllers_pid_i_ = std::vector<double>(joint_names_.size());
   velocity_controllers_pid_d_ = std::vector<double>(joint_names_.size());
 
+  error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_pid_and_feedforward_coef", pid_fw_mul_);
   error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_feedforward_right", velocity_controllers_feedforward_[0]);
   error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_feedforward_left", velocity_controllers_feedforward_[1]);
   error += !rosparam_shortcuts::get(name_, rpnh, "velocity_controllers_static_friction_right", velocity_controllers_static_friction_[0]);
@@ -246,7 +247,10 @@ void HWInterface::read(ros::Duration &elapsed_time)
   for (std::size_t joint_id = 0; joint_id < num_joints_; ++joint_id)
   {
     joint_position_[joint_id] = joint_encoders_[joint_id]->getAngle();
-    joint_velocity_[joint_id] = joint_encoders_[joint_id]->getSpeed();
+    if (is_quadrature_encoder_) 
+      joint_velocity_[joint_id] = joint_encoders_[joint_id]->getFilteredSpeed();
+    else
+      joint_velocity_[joint_id] = joint_encoders_[joint_id]->getSpeed();
   }
 }
 
@@ -274,10 +278,11 @@ void HWInterface::write(ros::Duration &elapsed_time)
         ROS_ERROR_STREAM_THROTTLE(1, "Encoder do not emit data. By security, actuator control commannd is set to velocicity = 0 (stay on place)");
         cmd_effort = 0.0;
         cmd_speed = 0.0;
-	security = true;
+	      security = true;
     }
 
-    if (!security && cmd_speed > -0.1 && cmd_speed < 0.1) {
+    // Effort mode
+    if (!security && cmd_speed > -0.01 && cmd_speed < 0.01) {
       // Send effort command to hardware
       std_msgs::Int16 effort;
       effort.data = cmd_effort;  
@@ -286,10 +291,11 @@ void HWInterface::write(ros::Duration &elapsed_time)
       // Set joint effort
       joint_effort_[joint_id] = cmd_effort;
 
-      // Direction (for simple encoders)
-      if(!is_quadrature_encoder_)
-        joint_encoders_[joint_id]->setDirection(cmd_effort > 0);
+      // Direction from effort (for simple encoders)
+      if(!is_quadrature_encoder_ )
+        joint_encoders_[joint_id]->setDirection(joint_velocity_command_[joint_id] > 0);
     }
+    // Velocity mode
     else {
       // Send velocity to hardware (use hardware internal PID)
       std_msgs::Int32 speed;
@@ -309,14 +315,14 @@ void HWInterface::configureVelocityController(int joint_id)
 { 
   // Configure feed forward and friction compensation
   joint_velocity_controllers_[joint_id]->setFeedforwardAndFrictionGains(
-    velocity_controllers_feedforward_[joint_id] * velocity_controllers_pwm_max_[joint_id], 
+    velocity_controllers_feedforward_[joint_id] * pid_fw_mul_ * velocity_controllers_pwm_max_[joint_id], 
     velocity_controllers_static_friction_[joint_id] * velocity_controllers_pwm_max_[joint_id]);
     
   // Limit I to 30% of PWM max
   joint_velocity_controllers_[joint_id]->setGains(
-    velocity_controllers_pid_p_[joint_id] * velocity_controllers_pwm_max_[joint_id],
-    velocity_controllers_pid_i_[joint_id] * velocity_controllers_pwm_max_[joint_id],
-    velocity_controllers_pid_d_[joint_id] * velocity_controllers_pwm_max_[joint_id],
+    velocity_controllers_pid_p_[joint_id] * pid_fw_mul_ * velocity_controllers_pwm_max_[joint_id],
+    velocity_controllers_pid_i_[joint_id] * pid_fw_mul_ * velocity_controllers_pwm_max_[joint_id],
+    velocity_controllers_pid_d_[joint_id] * pid_fw_mul_ * velocity_controllers_pwm_max_[joint_id],
     0.3 * velocity_controllers_pwm_max_[joint_id], 
     true);
 }
@@ -325,6 +331,7 @@ void HWInterface::updateParameters(sd_hardware_interface::PIDConfig &config, uin
 { 
   ROS_INFO_STREAM("Reconfigure velocity controller for wheel joints");
 
+  pid_fw_mul_ = config.velocity_controllers_pid_and_feedforward_coef;
   velocity_controllers_feedforward_[0] = config.velocity_controllers_feedforward_right;
   velocity_controllers_feedforward_[1] = config.velocity_controllers_feedforward_left;
   velocity_controllers_static_friction_[0] = config.velocity_controllers_static_friction_right;
