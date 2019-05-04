@@ -1,7 +1,6 @@
 #include "robot_sensors_nodes.h"
 
 static bool _is_tirette = true;
-static bool _is_time_out = true;
 static bool _is_voie_libre = true;
 static bool _is_camp_violet = true;
 
@@ -13,8 +12,7 @@ BT::NodeStatus RobotSensors::IsTirettePresente()
 
 BT::NodeStatus RobotSensors::IsTimeOut()
 {
-	std::cout << "isTimeOut : " << _is_time_out << std::endl;
-	return _is_time_out ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
+    return BT::NodeStatus::SUCCESS;
 }
 
 BT::NodeStatus RobotSensors::IsCampViolet()

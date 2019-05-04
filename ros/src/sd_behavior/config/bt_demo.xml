@@ -4,6 +4,7 @@
         <ReactiveSequence>
             <Condition ID="IsTirettePresente"/>
             <Condition ID="IsTimeOut"/>
+            <Action score="0" ID="AfficherLeScore"/>
             <ReactiveFallback>
                 <SubTree ID="campJaune"/>
                 <SubTree ID="campViolet"/>
@@ -17,10 +18,8 @@
                 <Inverter>
                     <Condition ID="IsCampViolet"/>
                 </Inverter>
-                <Condition ID="IsVoieLibre"/>
-                <Action ID="ApproachObject" direction="1;2;2"/>
+                <Action ID="ApproachObject" location="1;2;2"/>
             </ReactiveSequence>
-            <Action ID="ResterSurPlace"/>
         </ReactiveFallback>
     </BehaviorTree>
     <!-- ////////// -->
@@ -28,18 +27,21 @@
         <ReactiveFallback>
             <ReactiveSequence>
                 <Condition ID="IsCampViolet"/>
-                <Condition ID="IsVoieLibre"/>
-                <Action ID="ApproachObject" direction="1;2;2"/>
+                <Action ID="IsNotTimeOut"/>
+                <Action ID="ApproachObject" location="2;2;1"/>
             </ReactiveSequence>
-            <Action ID="ResterSurPlace"/>
         </ReactiveFallback>
     </BehaviorTree>
     <!-- ////////// -->
     <TreeNodesModel>
+        <Action ID="AfficherLeScore">
+            <input_port name="score" default="0">Le Score du Robot</input_port>
+        </Action>
         <Action ID="ApproachObject">
-            <input_port name="direction" default="1;2;2">direction où aller</input_port>
+            <input_port name="location" default="1;2;2">direction où aller</input_port>
         </Action>
         <Condition ID="IsCampViolet"/>
+        <Action ID="IsNotTimeOut"/>
         <Condition ID="IsTimeOut"/>
         <Condition ID="IsTirettePresente"/>
         <Condition ID="IsVoieLibre"/>

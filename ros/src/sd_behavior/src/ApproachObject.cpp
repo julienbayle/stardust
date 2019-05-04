@@ -10,11 +10,11 @@ ApproachObject::ApproachObject(const std::string& name, const BT::NodeConfigurat
 
 BT::NodeStatus ApproachObject::tick() 
 {
-	BT::Optional<std::string> msg = getInput<std::string>("direction");
+	BT::Optional<std::string> msg = getInput<std::string>("location");
 	// Check if optional is valid. If not, throw its error
         if (!msg)
         {
-            throw BT::RuntimeError("missing required input [direction]: ", 
+            throw BT::RuntimeError("missing required input [location]: ", 
                                    msg.error() );
         }
 

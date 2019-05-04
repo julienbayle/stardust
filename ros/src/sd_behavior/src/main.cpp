@@ -2,7 +2,8 @@
 #include "behaviortree_cpp/bt_factory.h"
 
 #include "ApproachObject.h"
-#include "ResterSurPlace.h"
+#include "IsNotTimeOut.h"
+#include "AfficherLeScore.h"
 #include "robot_sensors_nodes.h"
 
 using namespace BT;
@@ -16,7 +17,8 @@ int main(int argc, char* argv[])
 	BehaviorTreeFactory factory;
 
 	factory.registerNodeType<RobotNodes::ApproachObject>("ApproachObject");
-	factory.registerNodeType<RobotNodes::ResterSurPlace>("ResterSurPlace");
+	factory.registerNodeType<RobotNodes::IsNotTimeOut>("IsNotTimeOut");
+	factory.registerNodeType<RobotNodes::AfficherLeScore>("AfficherLeScore");
 	factory.registerSimpleCondition("IsTirettePresente", std::bind(RobotSensors::IsTirettePresente));
 	factory.registerSimpleCondition("IsTimeOut", std::bind(RobotSensors::IsTimeOut));
 	factory.registerSimpleCondition("IsCampViolet", std::bind(RobotSensors::IsCampViolet));
@@ -28,11 +30,10 @@ int main(int argc, char* argv[])
 	
 	std::string fn = argv[1];
 	auto tree = factory.createTreeFromFile(fn);
-	int i = 0;
-	while(i < 10)
+
+	while( tree.root_node->executeTick() != NodeStatus::FAILURE)
 	{
-		tree.root_node->executeTick();
-		i++;
+        	std::this_thread::sleep_for( std::chrono::milliseconds(10) );
 	}
 
 	return 0;

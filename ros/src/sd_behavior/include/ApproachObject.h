@@ -10,12 +10,12 @@ class ApproachObject : public BT::SyncActionNode
 
 		BT::NodeStatus tick() override;
 
-		    // It is mandatory to define this static method.
+    // It is mandatory to define this static method
     static BT::PortsList providedPorts()
     {
-      // This action has a single input port called "direction"
+      // This action has a single input port called "locaion"
       // Any port must have a name. The type is optional.
-      return { BT::InputPort<std::string>("direction") };
+      return { BT::InputPort<std::string>("location") };
     }
 
 };
