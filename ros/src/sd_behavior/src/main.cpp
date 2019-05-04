@@ -11,6 +11,7 @@ using namespace BT;
 
 // WORK :
 // catkin_make then
+// roscore &
 // rosrun sd_behavior maintree src/sd_behavior/config/bt_demo.xml
 
 ros::Subscriber test_subscriber_;
