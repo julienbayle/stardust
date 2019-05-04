@@ -15,6 +15,7 @@ using namespace BT;
 // rosrun sd_behavior maintree src/sd_behavior/config/bt_demo.xml
 
 ros::Subscriber test_subscriber_;
+ros::Subscriber subscriber_camp;
 
 int main(int argc, char* argv[])
 {
@@ -26,12 +27,11 @@ int main(int argc, char* argv[])
 	factory.registerNodeType<RobotNodes::IsNotTimeOut>("IsNotTimeOut");
 	factory.registerNodeType<RobotNodes::AfficherLeScore>("AfficherLeScore");
 	factory.registerSimpleCondition("IsTirettePresente", std::bind(RobotSensors::IsTirettePresente));
-	factory.registerSimpleCondition("IsTimeOut", std::bind(RobotSensors::IsTimeOut));
 	factory.registerSimpleCondition("IsCampViolet", std::bind(RobotSensors::IsCampViolet));
-	factory.registerSimpleCondition("IsVoieLibre", std::bind(RobotSensors::IsVoieLibre));
 	
 	//RobotSensors::init(factory, nh);
 	test_subscriber_ = nh.subscribe("/test_topic", 1, RobotSensors::rosUpdateTirettePresent);
+	subscriber_camp = nh.subscribe("/test_topic2", 1, RobotSensors::rosUpdateCampViolet);
 
 	//	GripperInterface gripper;
 	//	factory.registerSimpleAction("OpenGripper", std:bind(&GripperInteface::open, &gripper));
@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
 	ros::Rate rate(100);
     while(ros::ok() && status != NodeStatus::FAILURE) {
       ros::spinOnce();
-      tree.root_node->executeTick();
+      status = tree.root_node->executeTick();
       rate.sleep();
     }
 

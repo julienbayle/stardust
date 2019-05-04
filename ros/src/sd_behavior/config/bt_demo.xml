@@ -3,7 +3,6 @@
     <BehaviorTree ID="BehaviorTree">
         <ReactiveSequence>
             <Condition ID="IsTirettePresente"/>
-            <Condition ID="IsTimeOut"/>
             <Action score="0" ID="AfficherLeScore"/>
             <ReactiveFallback>
                 <SubTree ID="campJaune"/>
@@ -19,6 +18,7 @@
                     <Condition ID="IsCampViolet"/>
                 </Inverter>
                 <Action ID="ApproachObject" location="1;2;2"/>
+                <Action ID="IsNotTimeOut"/>
             </ReactiveSequence>
         </ReactiveFallback>
     </BehaviorTree>
@@ -42,9 +42,7 @@
         </Action>
         <Condition ID="IsCampViolet"/>
         <Action ID="IsNotTimeOut"/>
-        <Condition ID="IsTimeOut"/>
         <Condition ID="IsTirettePresente"/>
-        <Condition ID="IsVoieLibre"/>
         <Action ID="ResterSurPlace"/>
         <SubTree ID="campJaune"/>
         <SubTree ID="campViolet"/>
