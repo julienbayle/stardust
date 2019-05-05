@@ -334,6 +334,11 @@ class TeleopNode {
 				pump_publisher.publish(msg);
 			}
 
+			// Shutdown Raspberry PI
+			if (buttons_long_click_[XBOX_BUTTON_BACK] && buttons_long_click_[XBOX_BUTTON_START]) {
+				system("sudo halt");
+			} 
+
 			// Servos
 			servo1_up_ = buttons_click_[XBOX_BUTTON_CROSS_UP] || buttons_long_click_[XBOX_BUTTON_CROSS_UP];
 			servo1_down_ = buttons_click_[XBOX_BUTTON_CROSS_DOWN] || buttons_long_click_[XBOX_BUTTON_CROSS_DOWN];
