@@ -97,21 +97,43 @@ v_{back}
 \\)
 
 
-## Asservissement robot principal
+## Asservissement
 
-### Un souci de poids
+### Etape 1 : Evaluation de la friction statique
 
-L'utilisation du script *calibrate.py* du package *sd_calibrate* revèle que le robot est trop lourd relativement à la puissance de ses moteurs. En effet, le PWM minimal pour faire bouger le robot est compris entre 50 et 60% de sa puissance.
+Un programme a été réalisé permettant de déterminer le PWM minimum pour faire tourner une roue. Il s'agit de *eval_static_friction*. 
 
-Sur la balance, voici le poids vu pour chaque roue :
- - 2.2 kg à droite
- - 1.9 kg à gauche
- - 2,6 kg à l'arrière
+Exemple d'appel pour la roue droite du robot 2 avec une recherche du PWM minimal dans la plage PWM = 30 ... 70 :
 
-En pratique, les batteries au plomb du robot ont été remplacées par des batteries LIPO et le gain de poids a résolu ce souci.
+```bash
+rosrun sd_calibration eval_static_friction.py /r2/right/encoder/speed /r2/right/pwm 30 70
+```
 
+La valeur obtenue doit être divisé par le PWM max et appliquée dans le réglage de la friction statique du paquet sd_harware_interface. Ici pour la roue droite du robot 2, le fichier r2_hardware_interface.yam / velocity_controllers_static_friction_right
 
-### Réglage PID
+### Etape 2 : Réglage des vitesses et accélérations limites
+
+Le paquet *sd_control* a pour rôle de transformer une commande en vitesse au niveau du robot, en commandes en vitesse pour les roues (vitesses angulaires), en respectant les vitesses et accélérations limites. 
+
+Ouvrir le fichier rX_control.yaml de ce paquet puis :
+ - régler les valeurs physiques du robot
+ - fixer les vitesses et accélérations maxi
+
+Ce réglage pourra être affiné ensuite si l'on découvre lors de l'étape "Réglage PID" que le robot ne peut pas atteindre les consignes.
+
+Puis ouvrir le fichier rX_teleop.yaml du paquet *sd_teleop* et reporter les valeurs choisies.
+
+### Etape 3 : Réglage des encodeurs
+
+Le paquet *sd_harware_interface* a pour mission d'appliquer les vitesses angulaires cibles au niveau des roues. La première étape est d'étalonner les encodeurs et régler les topics.
+
+Pour valider que le réglage est bon, on pousse le robot à la main et on valide que l'odométrie est correctement calculée (position, orientation et vitesse).
+
+```bash
+rostopic echo /r2/mobile_base_controll/odom
+```
+
+### Etape 3 : Réglage PID
 
 Démarrer le robot et vérifier que la commande à distance par télécommande fonctionne.
 Passer le robot en mode "alimentation par batterie" (L'alimentation secteur n'étant pas équivalente, les réglages pourraient être erronés)
@@ -122,28 +144,35 @@ Installation de plot juggler:
 sudo apt-get install ros-melodic-plotjuggler
 ```
 
-Sur un poste distant avec Ubuntu :
-export ROS_MASTER_URI=http://192.168.0.27:11311
+Sur un poste distant avec Ubuntu (dans le dossier scripts du projet):
+
+```bash
+source ./source-pc-slave.ph <nom_du_robot>
 rosrun rqt_reconfigure rqt_reconfigure &
 rosrun plotjuggler PlotJuggler &
+```
 
-Dans PlotJuggler :
-Ouvrir : sd_calibration/config/plotjuggler-pid-tuning.xml
-Ceci permet de voir les valeurs utiles du contrôle commande des moteurs
+Dans PlotJuggler, charger le layout *sd_calibration/config/plotjuggler_pid_tuning_rX.xml* puis passer le buffer size à 20 secondes.
+
+Ainsi configuré, PlotJuggler va permettre de voir les valeurs utiles du contrôle commande des moteurs.
 
 Dans rqt_reconfigure :
-On met toutes les valeurs à 0 (pour désactiver tous les contrôleurs initialement)
-
+On met toutes les valeurs à 0 (pour désactiver tous les contrôleurs initialement) sauf la friction statique calculée précédement.
 
 Commençer le réglage :
  
-1. Placer le gain "Friction statique" à 1 puis le diminuer jusqu'à ce que la roue ne bouge presque plus suite à une sollicitation du robot à la manette. Attention, en fin de réglage la roue doit toujours pouvoir tourner dans les deux sens (même très lentement). Noter cette valeur ou la reporter immédiatement dans le fichier de configuration du hardware interface du robot, en effet, les gains via rqt_reconfigure sont perdus une fois le robot redémarré.
+1. Augmenter le gain "feedfordward" jusqu'à ce que la consigne de vitesse soit grossièrement respectée (à vérifier sur le moniteur graphique plotjuggler). Noter cette valeur ou la reporter immédiatement dans le fichier de configuration du hardware interface du robot, en effet, les gains via rqt_reconfigure sont perdus une fois le robot redémarré.
 
-2. Augmenter le gain "feedfordward" jusqu'à ce que la consigne de vitesse soit grossièrement respectée (à vérifier sur le moniteur graphique plotjuggler). Noter ou enregister le gain obtenu.
+2. Affiner le réglage en sélectionnant des valeurs pour le PID de la roue (à vérifier sur le moniteur graphique plotjuggler). Noter ou enregister les gains obtenus.
 
-3. Affiner le réglage en sélectionnant des valeurs pour le PID de la roue (à vérifier sur le moniteur graphique plotjuggler). Noter ou enregister les gains obtenus.
+3. Dans un terminal connecté sur le robot, lancer l'exécutable pour réaliser des trajectoires de validation de l'asservissement (le premier paramètre est le nom du robot, le second, la valeur limite de la vitesse linéaire en m/s et dernier, la vitesse angulaire en rad/s):
 
-4. Dans un terminal connecté sur le robot, lancer l'exécutable pour réaliser des trajectoires de validation de l'asservissement :
-rosrun sd_calibration move.py et affiner les réglages pour avoir un suivi de consigne qualitatif
+```bash
+rosrun sd_calibration pid_tuning_move.py r2 0.2 3
+```
 
-Il est possible de faire le réglage roue par roue ou toutes les roues à la fois.
+Affiner les réglages pour avoir un suivi de consigne qualitatif. Il est possible de faire le réglage roue par roue ou toutes les roues à la fois.
+
+Exemple de réglage :
+
+<img src="https://github.com/julienbayle/stardust/raw/master/docs/images/pid_tuning.png" width="100%" />

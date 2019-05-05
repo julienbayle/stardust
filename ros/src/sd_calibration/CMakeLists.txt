@@ -13,6 +13,12 @@ catkin_package(
   CATKIN_DEPENDS message_runtime 
 )
 
+install(PROGRAMS
+  scripts/sd_calibrate/eval_static_friction.py
+  scripts/sd_calibrate/pid_tuning_move.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
 install(DIRECTORY
   config
   launch
