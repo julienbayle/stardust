@@ -1,6 +1,6 @@
 # Installation sur Raspberry Pi 3 modèle B ou B+
 
-La distribution Ubuntu 18.04 doit être utilisée car elle permet d'accéder directement aux dépôts ARM de ROS Melodic, compatible sur raspberry pi 3 (Modèles B et B+).
+La distribution Ubuntu 18.04 doit être utilisée car elle permet d'accéder directement aux dépôts ARM de ROS Melodic, compatible sur raspberry pi 3 (Modèles B et B+). Une clé USB ou une sd card de 8 ou 16 Go est suffisant pour cette installation.
 
 > Compter à peu près 2 heures pour réaliser l'installation complète du système
 
@@ -221,13 +221,15 @@ git clone https://github.com/julienbayle/stardust.git
 Puis déployer le code source depuis un poste distant et installer celui-ci pour lancement automatique au démarrage :
 
 ```shell
-deploy-rpi.sh -remote-hostname=stardust_r2 --version=stardust_v1 --robot-name=r1 --build --install-on-startup
+ssh-copy-id <robot_user>@<robot-hostname>
+deploy-rpi.sh -remote-hostname=<robot-hostname> --version=stardust_v1 --robot-name=r1 --build --install-on-startup
 ```
 
 Ou simplement déployer le code sans installation au démarrage :
 
 ```shell
-deploy-rpi.sh -remote-hostname=stardust_r2 --version=stardust_v1 --robot-name=r1 --build
+ssh-copy-id <robot_user>@<robot-hostname>
+deploy-rpi.sh -remote-hostname=<robot-hostname> --version=stardust_v1 --robot-name=r1 --build
 ```
 
 [Détails et explications sur la cross compilation et la commande deploy-rpi.sh](cross_compilation_raspberry.md).
@@ -254,7 +256,7 @@ sudo swapoff /1024m.swap
 
 ### Optionnel - Activation de l'I2C et du SPI
 
-Si le robot utilise des périphériques I2C ou SPI, appliquer cette étape.
+Si le robot utilise des périphériques I2C ou SPI, appliquer cette étape avant de les rebrancher.
 
 Editez le fichier **/boot/firmware/config.txt** et vérifier que les lignes suivantes sont bien présentes (sinon, les ajouter) :
 
@@ -269,6 +271,8 @@ Installez les librairies de developpement:
 sudo apt-get install i2c-tools libi2c-dev
 sudo usermod -a -G i2c <user_name>
 ```
+
+Se déconnecter (exit) puis se reconnecter afin de prendre en compte le nouveau groupe.
 
 Exemple : Si une IMU est connectée au robot via I2C, il est possible de vérifier qu'elle est bien disponible sur le port I2C et que celui-ci marche bien :
 
@@ -292,11 +296,15 @@ On voit ici les 3 puces de l'IMU (gyromètre, acceleromètre et magnétomètre)
 
 ### Optionnel - Support du XV11 LIDAR (UART)
 
+Si le robot utilise un lidar issu du robot Neato XV 11, appliquer cette étape avant de le rebrancher.
+
 La procédure est documentée sur la [page officielle du paquet ROS xv_11_lidar_raspberry](https://github.com/julienbayle/xv_11_lidar_raspberry)
 
 ### Optionnel - Support des pavés LED
 
-Si le robot est connecté via SPI à un ou plusieurs pavés LED, il faut ajouter la librairie nécessaire (pas de paquet rosdep de disponible)
+Si le robot utilise des pavés LED lié au SPI du raspberry, appliquer cette étape avant de les rebrancher.
+
+Ajouter la librairie nécessaire (pas de paquet rosdep de disponible) :
 
 ```bash
 sudo apt install python-pip
@@ -370,3 +378,22 @@ Ajouter le nom de la machine du robot dans le fichier /etc/hosts puis :
 source ~/stardust/scripts/source-pc-slave.sh <robot_hostname>
 rosrun rviz rviz
 ```
+
+## Sauvegarde de la SD Card
+
+Afin d'éviter d'avoir à refaire toute l'installation en cas d'erreur, il est préférable de sauvegarder le media utilisé en fin de procédure. La durée de la sauvegarde dépend de la taille du media (sd card de 64 Go = 1h par exemple). La sauvegarde ne peut être restaurée que sur un media de taille au moins équivalente.
+
+L'utilisation de la compression xz de niveau 9 permet d'avoir une image de seulement 1,3 Go en fin d'installation.
+
+```bash
+diskutil umountDisk /dev/disk2
+sudo dd if=/dev/rdisk2 bs=1m | xz -9 > stardust_r2_sd_card_bs_1m_64go.img.xz
+```
+
+La restauration utilise la même procédure à l'envers :
+
+```bash
+diskutil umountDisk /dev/disk2
+xzcat stardust_r2_sd_card_bs_1m_64go.img.xz | sudo dd bs=1m of=/dev/rdisk2
+```
+
