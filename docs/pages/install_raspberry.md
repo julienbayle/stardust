@@ -321,7 +321,7 @@ sudo  vim /etc/udev/rules.d/90-spi.rules
 
 Contenu à écrire dans le fichier *90-spi.rules* :
 ```
-"SUBSYSTEM=="spidev", GROUP="spi"
+SUBSYSTEM=="spidev", GROUP="spi"
 ```
 
 Puis, redémarrer le système pour prise en compte des modifications
