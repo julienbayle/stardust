@@ -94,10 +94,16 @@ sudo systemctl start NetworkManager
 sudo systemctl enable NetworkManager
 ```
 
-Ajouter votre connection WIFI et modifier le nom de la machine ("stardust_r*X*") :
+Ajouter votre connection WIFI et modifier le nom de la machine ("") :
 
 ```bash
 sudo nmtui
+```
+
+Ajouter le nom de la machine dans le fichier /etc/hosts :
+
+```
+127.0.0.1	stardust_rX
 ```
 
 La suite de l'installation peut être réalisée à distance, via SSH.
