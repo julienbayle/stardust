@@ -13,6 +13,7 @@
   <url type="website">https://github.com/julienbayle/stardust</url>
   <buildtool_depend>catkin</buildtool_depend>
   <depend>xacro</depend>
+  <depend>robot_state_publisher</depend>
   <build_depend>ydlidar</build_depend>
   <exec_depend>ydlidar</exec_depend>
 </package>

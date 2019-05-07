@@ -65,6 +65,7 @@
   <exec_depend>filters</exec_depend>
   <exec_depend>pluginlib</exec_depend>
   <exec_depend>ydlidar</exec_depend>
+  <depend>laser_filters</depend>
   <depend>libi2c-dev</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
