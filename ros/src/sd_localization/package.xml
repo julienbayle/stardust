@@ -54,7 +54,7 @@
   <exec_depend>robot_localization</exec_depend>
   <exec_depend>amcl</exec_depend>
   <exec_depend>pcl</exec_depend>
-  <exec_depend>pcl-conversions<exec_depend>
+  <exec_depend>pcl-conversions</exec_depend>
   <exec_depend>imu_tools</exec_depend>
 
 
