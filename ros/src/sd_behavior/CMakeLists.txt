@@ -48,6 +48,10 @@ add_library(afficherlescore_nodes STATIC src/AfficherLeScore.cpp)
 target_link_libraries(afficherlescore_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
 target_link_libraries(maintree afficherlescore_nodes)
 
+add_library(initialiserrobot_nodes STATIC src/InitialiserRobot.cpp)
+target_link_libraries(initialiserrobot_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
+target_link_libraries(maintree initialiserrobot_nodes)
+
 #############
 ## Install ##
 #############

@@ -1,47 +1,50 @@
 <root main_tree_to_execute="BehaviorTree">
     <!-- ////////// -->
     <BehaviorTree ID="BehaviorTree">
-        <ReactiveSequence>
+        <ReactiveFallback>
             <Condition ID="IsTirettePresente"/>
-            <Action score="0" ID="AfficherLeScore"/>
-            <ReactiveFallback>
-                <SubTree ID="campJaune"/>
-                <SubTree ID="campViolet"/>
-            </ReactiveFallback>
-        </ReactiveSequence>
+            <SequenceStar>
+                <Action ID="InitialiserRobot"/>
+                <ReactiveSequence>
+                    <Action ID="AfficherLeScore" score="0"/>
+                    <ReactiveFallback>
+                        <SubTree ID="campJaune"/>
+                        <SubTree ID="campViolet"/>
+                    </ReactiveFallback>
+                </ReactiveSequence>
+            </SequenceStar>
+        </ReactiveFallback>
     </BehaviorTree>
     <!-- ////////// -->
     <BehaviorTree ID="campJaune">
-        <ReactiveFallback>
-            <ReactiveSequence>
-                <Inverter>
-                    <Condition ID="IsCampViolet"/>
-                </Inverter>
-                <Action ID="ApproachObject" location="1;2;2"/>
-                <Action ID="IsNotTimeOut"/>
-            </ReactiveSequence>
-        </ReactiveFallback>
+        <ReactiveSequence>
+            <Inverter>
+                <Condition ID="IsCampViolet"/>
+            </Inverter>
+            <Condition ID="IsNotTimeOut"/>
+            <Action ID="ApproachObject" location="1;2;2"/>
+        </ReactiveSequence>
     </BehaviorTree>
     <!-- ////////// -->
     <BehaviorTree ID="campViolet">
-        <ReactiveFallback>
-            <ReactiveSequence>
-                <Condition ID="IsCampViolet"/>
-                <Action ID="IsNotTimeOut"/>
-                <Action ID="ApproachObject" location="2;2;1"/>
-            </ReactiveSequence>
-        </ReactiveFallback>
+        <ReactiveSequence>
+            <Condition ID="IsCampViolet"/>
+            <Condition ID="IsNotTimeOut"/>
+            <Action ID="ApproachObject" location="2;2;1"/>
+        </ReactiveSequence>
     </BehaviorTree>
     <!-- ////////// -->
     <TreeNodesModel>
         <Action ID="AfficherLeScore">
-            <input_port name="score" default="0">Le Score du Robot</input_port>
+            <input_port default="0" name="score">Le Score du Robot</input_port>
         </Action>
         <Action ID="ApproachObject">
-            <input_port name="location" default="1;2;2">direction où aller</input_port>
+            <input_port default="1;2;2" name="location">direction où aller</input_port>
         </Action>
+        <Action ID="InitialiserRobot"/>
+        <Condition ID="IsBoutonArretUrgence"/>
         <Condition ID="IsCampViolet"/>
-        <Action ID="IsNotTimeOut"/>
+        <Condition ID="IsNotTimeOut"/>
         <Condition ID="IsTirettePresente"/>
         <Action ID="ResterSurPlace"/>
         <SubTree ID="campJaune"/>

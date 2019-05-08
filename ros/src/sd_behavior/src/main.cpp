@@ -3,6 +3,7 @@
 #include "behaviortree_cpp/bt_factory.h"
 
 #include "ApproachObject.h"
+#include "InitialiserRobot.h"
 #include "IsNotTimeOut.h"
 #include "AfficherLeScore.h"
 #include "robot_sensors_nodes.h"
@@ -24,9 +25,10 @@ int main(int argc, char* argv[])
 
   	BehaviorTreeFactory factory;
 	factory.registerNodeType<RobotNodes::ApproachObject>("ApproachObject");
-	factory.registerNodeType<RobotNodes::IsNotTimeOut>("IsNotTimeOut");
+	factory.registerNodeType<RobotNodes::InitialiserRobot>("InitialiserRobot");
 	factory.registerNodeType<RobotNodes::AfficherLeScore>("AfficherLeScore");
 	factory.registerSimpleCondition("IsTirettePresente", std::bind(RobotSensors::IsTirettePresente));
+	factory.registerSimpleCondition("IsNotTimeOut", std::bind(RobotNodes::IsNotTimeOut));
 	factory.registerSimpleCondition("IsCampViolet", std::bind(RobotSensors::IsCampViolet));
 	
 	//RobotSensors::init(factory, nh);

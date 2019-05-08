@@ -33,9 +33,6 @@ namespace RobotSensors
 {
 	BT::NodeStatus IsTirettePresente();
 	BT::NodeStatus IsCampViolet();
-	
-
-	void rosUpdate(const std_msgs::UInt32 &switches);
 
 	BT::NodeStatus IsPaletDroit();
 	BT::NodeStatus IsPaletCentre();

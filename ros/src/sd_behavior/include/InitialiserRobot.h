@@ -3,10 +3,10 @@
 
 namespace RobotNodes
 {
-class ApproachObject : public BT::SyncActionNode
+class InitialiserRobot : public BT::SyncActionNode
 {
 	public:
-		ApproachObject(const std::string& name, const BT::NodeConfiguration& config);
+		InitialiserRobot(const std::string& name, const BT::NodeConfiguration& config);
 
 		BT::NodeStatus tick() override;
 

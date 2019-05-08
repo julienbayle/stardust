@@ -1,15 +1,6 @@
-#include "behaviortree_cpp/action_node.h"
+#include "behaviortree_cpp/bt_factory.h"
 
 namespace RobotNodes
 {
-class IsNotTimeOut : public BT::SyncActionNode
-{
-	public:
-		IsNotTimeOut(const std::string& name);
-
-		BT::NodeStatus tick() override;
-	private:	
-		 unsigned long debut;
-		 unsigned long duree;
-};
+	BT::NodeStatus IsNotTimeOut();
 };
