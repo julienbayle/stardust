@@ -16,8 +16,15 @@
 		<remap from="scan" to="laser/scan" />
 	</node>
 
+	<node name="xv11lidar" pkg="xv_11_lidar_raspberry" type="xv_11_lidar_raspberry" output="screen" if="$(eval arg('robot_ns') == 'r2' and not arg('sim'))">
+		<param name="port" value="/dev/ttyAMA0"/>
+		<param name="frame_id" value="lidar_link"/>
+		<remap from="scan" to="laser/scan"/>
+	</node>
+
 	<node pkg="laser_filters" type="scan_to_scan_filter_chain" name="$(arg robot_ns)_laser_scan_filter" output="screen">
 		<remap from="scan" to="laser/scan" />
 		<remap from="scan_filtered" to="laser/scan_filtered" />
 	</node>
+
 </launch>
