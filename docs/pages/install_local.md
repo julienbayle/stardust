@@ -92,3 +92,30 @@ ou
 ```bash
 roslaunch sd_main sim.launch
 ```
+## Se connecter au robot
+
+Générer des clés SSH pour le poste de développement (uniquement si pas déjà fait) :
+
+```bash
+ssh-keygen
+```
+
+Déclarer les enregistrements DNS du ou des robot sur le poste de développement (sudo vi /etc/hosts) :
+```bash
+192.168.10.163	stardust_r1
+192.168.10.162	stardust_r2
+```
+
+Copier la clé SSH vers les robots afin de ne pas avoir à taper de code lors de la connexion SSH :
+```bash
+ssh-copy-id ubuntu@stardust_r1
+ssh-copy-id ubuntu@stardust-r2
+```
+
+Déployer le code local sur un robot :
+```shell
+deploy-rpi.sh -remote-hostname=stardust_r1 --version=stardust_v1 --robot-name=r1 --build
+```
+
+[Détails et explications sur la cross compilation et la commande deploy-rpi.sh](cross_compilation_raspberry.md).
+
