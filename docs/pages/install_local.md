@@ -112,9 +112,14 @@ ssh-copy-id ubuntu@stardust_r1
 ssh-copy-id ubuntu@stardust-r2
 ```
 
+Récupérer l'environnement de cross compilation ARM :
+```shell
+./scripts/download-rpi-sysroot.sh -s ubuntu@stardust_r1
+```
+
 Déployer le code local sur un robot :
 ```shell
-deploy-rpi.sh -remote-hostname=stardust_r1 --version=stardust_v1 --robot-name=r1 --build
+./scriptsdeploy-rpi.sh -remote-hostname=stardust_r1 --version=stardust_v1 --robot-name=r1 --build
 ```
 
 [Détails et explications sur la cross compilation et la commande deploy-rpi.sh](cross_compilation_raspberry.md).
