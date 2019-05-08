@@ -15,7 +15,7 @@ using namespace BT;
 // rosrun sd_behavior maintree src/sd_behavior/config/bt_demo.xml
 
 ros::Subscriber test_subscriber_;
-ros::Subscriber subscriber_camp;
+//ros::Subscriber subscriber_camp;
 
 int main(int argc, char* argv[])
 {
@@ -30,8 +30,11 @@ int main(int argc, char* argv[])
 	factory.registerSimpleCondition("IsCampViolet", std::bind(RobotSensors::IsCampViolet));
 	
 	//RobotSensors::init(factory, nh);
-	test_subscriber_ = nh.subscribe("/test_topic", 1, RobotSensors::rosUpdateTirettePresent);
-	subscriber_camp = nh.subscribe("/test_topic2", 1, RobotSensors::rosUpdateCampViolet);
+
+ 
+
+	test_subscriber_ = nh.subscribe("/r1/pilo/switches", 1, RobotSensors::rosUpdateSwitch);
+//	subscriber_camp = nh.subscribe("/test_topic2", 1, RobotSensors::rosUpdateCampViolet);
 
 	//	GripperInterface gripper;
 	//	factory.registerSimpleAction("OpenGripper", std:bind(&GripperInteface::open, &gripper));

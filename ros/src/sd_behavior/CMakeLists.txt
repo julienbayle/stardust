@@ -52,6 +52,22 @@ target_link_libraries(maintree afficherlescore_nodes)
 ## Install ##
 #############
 
+install(TARGETS maintree
+  	ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+	LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+	RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(TARGETS 
+	approachobject_nodes
+  	isnottimeout_nodes
+	robot_sensors_nodes
+	afficherlescore_nodes
+	ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+	LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+	
+)
+
 install(PROGRAMS
   scripts/sd_behavior_base_node.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
