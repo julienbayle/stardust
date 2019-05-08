@@ -1,0 +1,28 @@
+<root main_tree_to_execute="BehaviorTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="BehaviorTree">
+        <Parallel threshold="8">
+            <Condition ID="IsVentouseCentre"/>
+            <Condition ID="IsVentouseGauche"/>
+            <Condition ID="IsPaletDroit"/>
+            <Condition ID="IsCampViolet"/>
+            <Condition ID="IsPaletGauche"/>
+            <Condition ID="IsPaletCentre"/>
+            <Condition ID="IsVentouseDroit"/>
+            <Condition ID="IsTirettePresente"/>
+        </Parallel>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Condition ID="IsCampViolet"/>
+        <Condition ID="IsPaletCentre"/>
+        <Condition ID="IsPaletDroit"/>
+        <Condition ID="IsPaletGauche"/>
+        <Condition ID="IsTirettePresente"/>
+        <Condition ID="IsVentouseCentre"/>
+        <Condition ID="IsVentouseDroit"/>
+        <Condition ID="IsVentouseGauche"/>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>
+
