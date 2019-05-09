@@ -3,12 +3,10 @@
 
 static bool _is_camp_violet = true;
 static unsigned int _ui32_switches = 0;
-static bool _is_tirette = true;
+static bool _is_tirette = false;
 
 BT::NodeStatus RobotSensors::IsTirettePresente()
 {
-
-
     std::cout << "IsTirettePresente : " << _is_tirette << std::endl;
     return _is_tirette ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
 }

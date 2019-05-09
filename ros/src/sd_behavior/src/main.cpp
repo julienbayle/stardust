@@ -28,6 +28,12 @@ int main(int argc, char* argv[])
 	factory.registerNodeType<RobotNodes::InitialiserRobot>("InitialiserRobot");
 	factory.registerNodeType<RobotNodes::AfficherLeScore>("AfficherLeScore");
 	factory.registerSimpleCondition("IsTirettePresente", std::bind(RobotSensors::IsTirettePresente));
+	factory.registerSimpleCondition("IsPaletCentre", std::bind(RobotSensors::IsPaletCentre));
+	factory.registerSimpleCondition("IsPaletGauche", std::bind(RobotSensors::IsPaletGauche));
+	factory.registerSimpleCondition("IsPaletDroit", std::bind(RobotSensors::IsPaletDroit));
+	factory.registerSimpleCondition("IsVentouseGauche", std::bind(RobotSensors::IsVentouseGauche));
+	factory.registerSimpleCondition("IsVentouseDroit", std::bind(RobotSensors::IsVentouseDroit));
+	factory.registerSimpleCondition("IsVentouseCentre", std::bind(RobotSensors::IsVentouseCentre));
 	factory.registerSimpleCondition("IsNotTimeOut", std::bind(RobotNodes::IsNotTimeOut));
 	factory.registerSimpleCondition("IsCampViolet", std::bind(RobotSensors::IsCampViolet));
 	

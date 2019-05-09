@@ -1,7 +1,7 @@
 <root main_tree_to_execute="BehaviorTree">
     <!-- ////////// -->
     <BehaviorTree ID="BehaviorTree">
-        <Parallel threshold="8">
+        <Parallel threshold="4">
             <Condition ID="IsVentouseCentre"/>
             <Condition ID="IsVentouseGauche"/>
             <Condition ID="IsPaletDroit"/>

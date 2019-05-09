@@ -4,7 +4,7 @@
         <ReactiveFallback>
             <Condition ID="IsTirettePresente"/>
             <SequenceStar>
-                <Action ID="InitialiserRobot"/>
+                <Action ID="InitialiserRobot" location="1"/>
                 <ReactiveSequence>
                     <Action ID="AfficherLeScore" score="0"/>
                     <ReactiveFallback>
@@ -41,7 +41,9 @@
         <Action ID="ApproachObject">
             <input_port default="1;2;2" name="location">direction où aller</input_port>
         </Action>
-        <Action ID="InitialiserRobot"/>
+        <Action ID="InitialiserRobot">
+            <input_port default="1" name="location"/>
+        </Action>
         <Condition ID="IsBoutonArretUrgence"/>
         <Condition ID="IsCampViolet"/>
         <Condition ID="IsNotTimeOut"/>
