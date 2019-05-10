@@ -1,0 +1,12 @@
+<launch>
+	<arg name="robot_ns" default=""/>
+
+	<rosparam file="$(find sd_behavior)/config/r1_behavior.yaml" command="load"/>
+
+	<env name="ROSCONSOLE_CONFIG_FILE"
+       value="$(find sd_behavior)/config/rosconsole_debug.conf"/>
+
+	<node pkg="sd_behavior" type="sd_behavior" name="test_behavior_tree" output="screen"
+		args="$(find sd_behavior)/config/tests_bt.xml" />
+
+</launch>

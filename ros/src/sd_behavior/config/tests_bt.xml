@@ -1,0 +1,114 @@
+<root main_tree_to_execute="BehaviorTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="BehaviorTree">
+        <ForceSuccess>
+            <Sequence>
+                <ForceSuccess>
+                    <Sequence>
+                        <Condition ID="ScoreInferieurA" score="2" />
+                        <Action ID="DefinirLeScore" score="5" />
+                        <Action ID="LancerLaMinuterie" seconds="5" />
+                    </Sequence>
+                </ForceSuccess>
+                <ForceSuccess>
+                    <ReactiveSequence>
+                        <Condition ID="MinuterieNonEcoulee" />
+                        <Fallback>
+                            <Sequence>
+                                <Condition ID="ScoreInferieurA" score="100" />
+                                <Action ID="AjouterAuScore" score="10" />
+                            </Sequence>
+                            <Sequence>
+                                <Condition ID="ScoreSuperieurA" score="100" />
+                                <Action ID="Attendre" ms="1000" />
+                                <Action ID="AjouterAuScore" score="1" />
+                            </Sequence>
+                        </Fallback>
+                    </ReactiveSequence>
+                </ForceSuccess>
+                <Action ID="AfficherLeScore" />
+                <SubTree ID="TestSensors"/>
+            </Sequence>
+        </ForceSuccess>
+    </BehaviorTree>
+
+    <!-- ////////// -->
+
+    <BehaviorTree ID="TestSensors">
+        <Sequence>
+            <Inverter>
+                <Condition ID="MinuterieNonEcoulee" />
+            </Inverter>
+            <ForceSuccess>
+                <Condition ID="IsCampViolet"/>
+            </ForceSuccess>
+            <ForceSuccess>
+                <Condition ID="IsArretUrgence"/>
+            </ForceSuccess>
+            <ForceSuccess>
+                <Condition ID="IsTirettePresente"/>
+            </ForceSuccess>
+            <ForceSuccess>
+                <Condition ID="IsPaletCentre"/>
+            </ForceSuccess>
+            <ForceSuccess>
+                <Condition ID="IsPaletDroit"/>
+            </ForceSuccess>
+            <ForceSuccess>
+                <Condition ID="IsPaletGauche"/>
+            </ForceSuccess>
+            <ForceSuccess>
+                <Condition ID="IsVentouseCentre"/>
+            </ForceSuccess>
+            <ForceSuccess>
+                <Condition ID="IsVentouseDroite"/>
+            </ForceSuccess>
+            <ForceSuccess>
+                <Condition ID="IsVentouseGauche"/>
+            </ForceSuccess>
+        </Sequence>
+    </BehaviorTree>
+
+    <!-- ////////// -->
+    
+    <TreeNodesModel>
+
+        <!-- //// SCORE ////// -->
+        <Action ID="AfficherLeScore" />
+        <Action ID="DefinirLeScore">
+            <input_port default="0" name="score">Valeur du score</input_port>
+        </Action>
+        <Action ID="AjouterAuScore">
+            <input_port default="1" name="score">Valeur à ajouter au score</input_port>
+        </Action>
+        <Condition ID="ScoreInferieurA">
+            <input_port default="1" name="score">Score</input_port>
+        </Condition>
+        <Condition ID="ScoreSuperieurA">
+            <input_port default="0" name="score">Score</input_port>
+        </Condition>
+
+        <!-- /////  TIMER ///// -->
+        <Condition ID="MinuterieNonEcoulee" />
+        <Action ID="DefinirTempsMinuterie">
+            <input_port default="1398" name="seconds">Temps de la minuterie en secondes</input_port>
+        </Action>
+        <Action ID="Attendre">
+            <input_port default="1000" name="ms">Temps en millisecondes</input_port>
+        </Action>
+
+        <!-- /////  SENSORS ///// -->
+        <Condition ID="IsCampViolet"/>
+        <Condition ID="IsArretUrgence"/>
+        <Condition ID="IsTirettePresente"/>
+        <Condition ID="IsPaletCentre"/>
+        <Condition ID="IsPaletDroit"/>
+        <Condition ID="IsPaletGauche"/>
+        <Condition ID="IsVentouseCentre"/>
+        <Condition ID="IsVentouseDroite"/>
+        <Condition ID="IsVentouseGauche"/>
+        
+    </TreeNodesModel>
+
+</root>
+

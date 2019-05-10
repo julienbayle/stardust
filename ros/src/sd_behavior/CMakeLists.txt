@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   geometry_msgs
   behaviortree_cpp_v3
+  actionlib
 )
 
 catkin_package(
@@ -23,63 +24,72 @@ catkin_package(
 ###########
 
 include_directories(
-  ${catkin_INCLUDE_DIRS}
   include
-  src
+  ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(maintree src/main.cpp)
-target_link_libraries(maintree ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY} approachobject_nodes afficherlescore_nodes)
-add_dependencies(maintree ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_executable(${PROJECT_NAME} src/main.cpp)
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
+add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-add_library(approachobject_nodes STATIC src/ApproachObject.cpp)
-target_link_libraries(approachobject_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
-target_link_libraries(maintree approachobject_nodes)
+# add_library(display_nodes STATIC src/display_nodes.cpp)
+# target_link_libraries(display_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
+# target_link_libraries(${PROJECT_NAME} display_nodes)
 
-add_library(isnottimeout_nodes STATIC src/IsNotTimeOut.cpp)
-target_link_libraries(isnottimeout_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
-target_link_libraries(maintree isnottimeout_nodes)
+# add_library(gripper_nodes STATIC src/gripper_nodes.cpp)
+# target_link_libraries(gripper_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
+# target_link_libraries(${PROJECT_NAME} gripper_nodes)
 
-add_library(robot_sensors_nodes STATIC src/robot_sensors_nodes.cpp)
-target_link_libraries(robot_sensors_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
-target_link_libraries(maintree robot_sensors_nodes)
+# add_library(move_nodes STATIC src/move_nodes.cpp)
+# target_link_libraries(move_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
+# add_dependencies(move_nodes ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# target_link_libraries(${PROJECT_NAME} move_nodes)
 
-add_library(afficherlescore_nodes STATIC src/AfficherLeScore.cpp)
-target_link_libraries(afficherlescore_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
-target_link_libraries(maintree afficherlescore_nodes)
+add_library(score_nodes STATIC src/score_nodes.cpp)
+target_link_libraries(score_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
+target_link_libraries(${PROJECT_NAME} score_nodes)
 
-add_library(initialiserrobot_nodes STATIC src/InitialiserRobot.cpp)
-target_link_libraries(initialiserrobot_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
-target_link_libraries(maintree initialiserrobot_nodes)
+add_library(sensors_nodes STATIC src/sensors_nodes.cpp)
+target_link_libraries(sensors_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
+target_link_libraries(${PROJECT_NAME} sensors_nodes)
+
+add_library(timer_nodes STATIC src/timer_nodes.cpp)
+target_link_libraries(timer_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
+target_link_libraries(${PROJECT_NAME} timer_nodes)
 
 #############
 ## Install ##
 #############
 
-install(TARGETS maintree
-  	ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+install(
+  TARGETS 
+    ${PROJECT_NAME}
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 	LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 	RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-install(TARGETS 
-	approachobject_nodes
-  	isnottimeout_nodes
-	robot_sensors_nodes
-	afficherlescore_nodes
+install(
+  TARGETS 
+#     display_nodes
+#     gripper_nodes
+#     move_nodes
+    score_nodes
+#     sensors_nodes
+#     timer_nodes
 	ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 	LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-	
 )
 
-install(PROGRAMS
-  scripts/sd_behavior_base_node.py
+install(
+  PROGRAMS
+    scripts/sd_behavior_base_node.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-## Mark other files for installation (e.g. launch and bag files, etc.)
-install(DIRECTORY
-  config
-  launch
+install(
+  DIRECTORY
+    config
+    launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
