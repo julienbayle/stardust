@@ -6,4 +6,5 @@ purple_x: -0.550
 purple_y: 1.275
 purple_yaw: -1.5708 # -pi/2
 
+bt_move_base_topic: /r1/r1_move_base
 bt_cmd_vel_topic: /r1/auto_cmd_vel

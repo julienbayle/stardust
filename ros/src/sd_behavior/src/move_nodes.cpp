@@ -44,15 +44,24 @@ namespace MoveNodes
 
 	GotoNode::GotoNode(
 		const std::string& name, 
-		const BT::NodeConfiguration& config):
-	    	CoroActionNode(name,config),
-	    	ac("move_base", true) { }
+		const BT::NodeConfiguration& config)
+		: CoroActionNode(name,config)
+	{
+		ros::NodeHandle nh;
+		std::string bt_move_base_topic;
+		nh.param("bt_move_base_topic", bt_move_base_topic, std::string("move_base"));
+
+		ROS_DEBUG_STREAM_NAMED("GotoNode",  
+			"Init a goto node with : " << bt_move_base_topic);
+
+		ac = new MoveBaseClient(bt_move_base_topic, true);
+	}
 
 	BT::NodeStatus GotoNode::tick()
 	{
 		halted_.store(false);
 		
-		if (!ac.waitForServer(ros::Duration(1.0)))
+		if (!ac->waitForServer(ros::Duration(1.0)))
 		{
 			ROS_ERROR("Unable to communicate with move base node");
 			return BT::NodeStatus::FAILURE;
@@ -86,13 +95,13 @@ namespace MoveNodes
 			<< "y: " << goal.target_pose.pose.position.y
 			<< "theta: " << theta);
 			
-		ac.sendGoal(goal);
+		ac->sendGoal(goal);
 		
 		actionlib::SimpleClientGoalState ac_state = actionlib::SimpleClientGoalState::ACTIVE;
 		while(ac_state == actionlib::SimpleClientGoalState::ACTIVE && !halted_)
 		{
 			ac_mutex_.lock();
-			ac_state = ac.getState();
+			ac_state = ac->getState();
 			ac_mutex_.unlock();
 			setStatusRunningAndYield();
 		}
@@ -110,7 +119,7 @@ namespace MoveNodes
 	{
 		halted_.store(true);
 		ac_mutex_.lock();
-		ac.cancelGoal();
+		ac->cancelGoal();
 		ac_mutex_.unlock();
 	} 
 }

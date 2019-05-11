@@ -49,7 +49,7 @@ namespace MoveNodes
 			}
 		
 		private:
-			MoveBaseClient ac;
+			MoveBaseClient *ac;
 			std::atomic_bool halted_;
 			std::mutex ac_mutex_;
 	};
