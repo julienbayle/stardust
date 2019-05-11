@@ -40,46 +40,46 @@ BT::NodeStatus SensorsNodes::IsCampViolet()
 
 BT::NodeStatus SensorsNodes::IsArretUrgence()
 {
-	bool bit=(ui32_switches_&(1<<ARRET_URGENCE)>0);
+	bool bit=(ui32_switches_&(1<<ARRET_URGENCE))!=0;
 	ROS_DEBUG_STREAM_NAMED("RobotSensorsCondition", "IsArretUrgence : " << bit);
 	return bit ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
 }
 
 BT::NodeStatus SensorsNodes::IsPaletDroit()
 {
-	bool bit=(ui32_switches_&(1<<PALET_DROIT)>0);
+	bool bit=(ui32_switches_&(1<<PALET_DROIT))==0;
 	ROS_DEBUG_STREAM_NAMED("RobotSensorsCondition", "IsPaletDroit : " << bit);
 	return bit ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
 }
 
 BT::NodeStatus SensorsNodes::IsPaletCentre()
 {
-	bool bit=(ui32_switches_&(1<<PALET_CENTRE)>0);
+	bool bit=(ui32_switches_&(1<<PALET_CENTRE))==0;
 	ROS_DEBUG_STREAM_NAMED("RobotSensorsCondition", "IsPaletCentre : " << bit);
 	return bit ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
 }
 BT::NodeStatus SensorsNodes::IsPaletGauche()
 {
-	bool bit=(ui32_switches_&(1<<PALET_GAUCHE)>0);
+	bool bit=(ui32_switches_&(1<<PALET_GAUCHE))==0;
 	ROS_DEBUG_STREAM_NAMED("RobotSensorsCondition", "IsPaletGauche : " << bit);
 	return bit ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
 }
 
 BT::NodeStatus SensorsNodes::IsVentouseDroite()
 {
-	bool bit=(ui32_switches_&(1<<VENTOUSE_DROITE)>0);
+	bool bit=(ui32_switches_&(1<<VENTOUSE_DROITE))!=0;
 	ROS_DEBUG_STREAM_NAMED("RobotSensorsCondition", "IsVentouseDroite : " << bit);
 	return bit ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
 }
 BT::NodeStatus SensorsNodes::IsVentouseCentre()
 {
-	bool bit=(ui32_switches_&(1<<VENTOUSE_CENTRE)>0);
+	bool bit=(ui32_switches_&(1<<VENTOUSE_CENTRE))!=0;
 	ROS_DEBUG_STREAM_NAMED("RobotSensorsCondition", "IsVentouseCentre : " << bit);
 	return bit ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
 }
 BT::NodeStatus SensorsNodes::IsVentouseGauche()
 {
-	bool bit=(ui32_switches_&(1<<VENTOUSE_GAUCHE)>0);
+	bool bit=(ui32_switches_&(1<<VENTOUSE_GAUCHE))!=0;
 	ROS_DEBUG_STREAM_NAMED("RobotSensorsCondition", "IsVentouseGauche : " << bit);
 	return bit ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
 }
@@ -90,13 +90,15 @@ void SensorsNodes::rosUpdate(const std_msgs::UInt32 &switches)
 	 	"Update sensor values with " 
 		 << std::bitset<10>(switches.data));
 	ui32_switches_.store(switches.data);
-	is_tirette_.store(ui32_switches_&(1<<TIRRETTE_DEMARAGE)>0);
+	is_tirette_.store((ui32_switches_&(1<<TIRRETTE_DEMARAGE))!=0);
 	if(is_tirette_)
 	{
-		if((ui32_switches_&(1<<PALET_GAUCHE)>0))
+		bool is_palet_gauche=(ui32_switches_&(1<<PALET_GAUCHE))==0;
+		bool is_palet_droit=(ui32_switches_&(1<<PALET_DROIT))==0;
+		if(is_palet_gauche)
 			is_camp_violet_.store(true);
 
-		if((ui32_switches_&(1<<PALET_DROIT)>0))
+		if(is_palet_droit)
 			is_camp_violet_.store(false);
 	}
 }
