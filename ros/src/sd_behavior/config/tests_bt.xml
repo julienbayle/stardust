@@ -7,9 +7,17 @@
                     <Sequence>
                         <Condition ID="ScoreInferieurA" score="2" />
                         <Action ID="DefinirLeScore" score="5" />
+                        <Action ID="VitesseConstante" linear_x="0.1" linear_y="0" angular_z="0" />
+                        <Action ID="Attendre" ms="1000" />
+                        <Action ID="VitesseConstante" linear_x="0" linear_y="0" angular_z="1" />
+                        <Action ID="Attendre" ms="1000" />
+                        <Action ID="VitesseConstante" linear_x="0" linear_y="0" angular_z="0" />
                         <Action ID="LancerLaMinuterie" seconds="5" />
+                        <Action ID="Aller" x="0" y="0" theta="0" />
                     </Sequence>
                 </ForceSuccess>
+                <Action ID="Pince" angle_base="100" angle_pince="50" />
+                <Action ID="Pince" angle_base="100" angle_pince="150" />
                 <ForceSuccess>
                     <ReactiveSequence>
                         <Condition ID="MinuterieNonEcoulee" />
@@ -107,6 +115,26 @@
         <Condition ID="IsVentouseCentre"/>
         <Condition ID="IsVentouseDroite"/>
         <Condition ID="IsVentouseGauche"/>
+
+        <!-- /////  MOVE ///// -->
+
+        <Action ID="VitesseConstante">
+            <input_port default="0" name="linear_x">Vitesse dans le sens avant/arriere en m/s</input_port>
+            <input_port default="0" name="linear_y">Vitesse dans le sens droite/gauche en m/s</input_port>
+            <input_port default="0" name="angular_z">Vitesse de rotation en rad/s</input_port>
+        </Action>
+        <Action ID="Aller">
+            <input_port default="0" name="x">Position absolue en X (en metre)</input_port>
+            <input_port default="0" name="y">Position absolue en Y (en metre)</input_port>
+            <input_port default="0" name="theta">Angle du robot (en degree)</input_port>
+        </Action>
+
+        <!-- /////  GRIPPER ///// -->
+
+        <Action ID="Pince">
+            <input_port default="0" name="angle_base">Angle moteur au plus pres de la base</input_port>
+            <input_port default="0" name="angle_pince">Angle moteur au plus pres de la pince</input_port>
+        </Action>
         
     </TreeNodesModel>
 

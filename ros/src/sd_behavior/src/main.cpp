@@ -2,9 +2,8 @@
 #include <ros/ros.h>
 #include "behaviortree_cpp/bt_factory.h"
 
-//#include "sd_behavior/display_nodes.h"
-//#include "sd_behavior/gripper_nodes.h"
-//#include "sd_behavior/move_nodes.h"
+#include "sd_behavior/gripper_nodes.h"
+#include "sd_behavior/move_nodes.h"
 #include "sd_behavior/score_nodes.h"
 #include "sd_behavior/sensors_nodes.h"
 #include "sd_behavior/timer_nodes.h"
@@ -17,12 +16,10 @@ int main(int argc, char* argv[])
 	ros::NodeHandle nh;
 
 	// Init behavior tree
-
 	BehaviorTreeFactory factory;
 
-	//DisplayNodes::registerNodes(factory);
-	//GripperNodes::registerNodes(factory);
-	//MoveNodes::registerNodes(factory);
+	GripperNodes::registerNodes(factory);
+	MoveNodes::registerNodes(factory);
 	ScoreNodes::registerNodes(factory);
 	SensorsNodes::registerNodes(factory);
 	TimerNodes::registerNodes(factory);

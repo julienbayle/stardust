@@ -5,3 +5,5 @@ yellow_yaw: 1.5708 # pi/2
 purple_x: -0.250
 purple_y: 1.275
 purple_yaw: -1.5708 # -pi/2
+
+bt_cmd_vel_topic: /r2/auto_cmd_vel
