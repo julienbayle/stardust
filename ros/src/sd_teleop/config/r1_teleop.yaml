@@ -6,5 +6,5 @@ r1_teleop:
   max_angular_z_velocity: 3.0
   boost_velocity_ratio: 1.0
   joy_topic: joy
-  timer_frequency: 10.0
-  servo_increment: 30 # inc/s
+  timer_frequency: 20.0
+  servo_increment: 3 # 60°/sec at 20Hz

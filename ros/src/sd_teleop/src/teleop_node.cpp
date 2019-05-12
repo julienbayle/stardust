@@ -39,7 +39,7 @@ class TeleopNode {
 		std::string joy_topic_name_;
 		ros::Duration double_click_minimum_interval_;
 		ros::Duration double_click_maximum_interval_;
-		int32_t servo_increment_;
+		unsigned servo_increment_;
 
 		// Actual boost ratio
 		double current_boost_ratio;
@@ -48,9 +48,9 @@ class TeleopNode {
 		double linear_x_, linear_y_, angular_z_;
 		bool pump_on_;
 		bool left_valve_on_, center_valve_on_, right_valve_on_;
-		double servo1_pos_;
+		unsigned servo1_pos_;
 		bool servo1_up_, servo1_down_;
-		double servo2_pos_;
+		unsigned servo2_pos_;
 		bool servo2_up_, servo2_down_;
 
 		// Timer
@@ -357,32 +357,40 @@ class TeleopNode {
 			cmd_vel_teleop_publisher.publish(twist);
 
 			// Servos
+			double last_servo1_pos_ = servo1_pos_;
 			if (servo1_up_)
-				servo1_pos_ += servo_increment_ / timer_frequency_;
+				servo1_pos_ += servo_increment_;
 			else if (servo1_down_)
-				servo1_pos_ -= servo_increment_ / timer_frequency_;
-			if (servo1_pos_ < 20)
-				servo1_pos_ = 20;
-			else if (servo1_pos_ > 170)
-				servo1_pos_ = 170;
+				servo1_pos_ -= servo_increment_;
+			if (servo1_pos_ < 0)
+				servo1_pos_ = 00;
+			else if (servo1_pos_ > 180)
+				servo1_pos_ = 180;
 
-			std_msgs::UInt16 servo1_msg;
-			servo1_msg.data = servo1_pos_;
-			servo1_publisher.publish(servo1_msg);
+			if(last_servo1_pos_ != servo1_pos_)
+			{
+				std_msgs::UInt16 servo1_msg;
+				servo1_msg.data = servo1_pos_;
+				servo1_publisher.publish(servo1_msg);
+			}
 
+			double last_servo2_pos_ = servo2_pos_;
 			if (servo2_up_)
-				servo2_pos_ += servo_increment_ / timer_frequency_;
+				servo2_pos_ += servo_increment_;
 			else if (servo2_down_)
-				servo2_pos_ -= servo_increment_ / timer_frequency_;
-			if (servo2_pos_ < 20)
-				servo2_pos_ = 20;
-			else if (servo2_pos_ > 170)
-				servo2_pos_ = 170;
+				servo2_pos_ -= servo_increment_;
+			if (servo2_pos_ < 0)
+				servo2_pos_ = 0;
+			else if (servo2_pos_ > 180)
+				servo2_pos_ = 180;
 
-			std_msgs::UInt16 servo2_msg;
-			servo2_msg.data = servo2_pos_;
-			servo2_publisher.publish(servo2_msg);
-
+			if(last_servo2_pos_ != servo2_pos_)
+			{
+				std_msgs::UInt16 servo2_msg;
+				servo2_msg.data = servo2_pos_;
+				servo2_publisher.publish(servo2_msg);
+			}
+			
 			// Trigger timer
 			timer_.expires_from_now(timer_rate_);
 			timer_.async_wait(boost::bind(&TeleopNode::timerCallback, this, _1));
