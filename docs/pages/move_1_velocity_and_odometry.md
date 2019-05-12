@@ -145,6 +145,12 @@ Pour valider que le réglage est bon, on pousse le robot à la main et on valide
 rostopic echo /r2/mobile_base_controll/odom
 ```
 
+OU
+
+```bash
+rosrun tf tf_echo r2/odom r2/base_link
+```
+
 ### Etape 3 : Réglage PID
 
 Démarrer le robot et vérifier que la commande à distance par télécommande fonctionne.
