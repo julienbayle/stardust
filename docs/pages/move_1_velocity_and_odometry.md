@@ -1,4 +1,16 @@
-# Contrôle commande des robots
+# Déplacement - Article 1 - Pilotage en vitesse et odométrie
+
+Ce premier article sur le déplacement du robot traite des éléments de bas niveau nécessaires aux couche supérieures gérant le déplacement du robot.
+
+Il s'agit ici de permettre au robot d'éxécuter une commande en vitesse, exprimées dans le repère du robot (base_link) et de retourner l'odométrie du robot dans ce même référentiel.
+
+Le paquet **sd_control** a pour rôle de transformer une commande de vitesse souhaitée, en commande réalisable (prise en compte des limites des actions) dans le référentiel du robot (base_link). Puis, de transformer cette commande dans le référentiel des actioneurs (exemple left_wheel_to_base). Enfin, ce paquet également pour rôle de récupérer la réalité du mouvement du robot pour exprimer le déplacement réel (odométrie) et le publier.
+
+Le paquet **sd_hardware_interface** a pour objectif de faire appliquer aux actionneurs les commandes exprimées dans leur repêre (contrôle commande de bas niveau) et de publier les mouvements réel des actionneurs.
+
+Cet article évoque le réglage des paramètres de ces deux paquets afin d'avoir les ingrédients de base du déplacement du robot.
+
+## Modélisation d'un robot holonome
 
 La modelisation du robot omnidirectionnel à trois roues est inspirée par l'article de Mariane Dourado Correia [Modeling of a Three Wheeled Omnidirectional Robot Including Friction Models](https://github.com/julienbayle/stardust/raw/master/docs/pdf/omnidirectionnal_model.pdf)
 
