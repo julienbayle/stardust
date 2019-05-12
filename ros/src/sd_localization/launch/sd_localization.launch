@@ -4,11 +4,13 @@
 
 	<rosparam file="$(find sd_localization)/config/$(arg robot_ns)_localization.yaml" command="load"/>
 	
-	<node pkg="imu_filter_madgwick" type="imu_filter_node" name="$(arg robot_ns)_imu_filter_madgwick"/>
+	<node name="$(arg robot_ns)_map_server" pkg="map_server" type="map_server" args="$(find sd_navigation)/config/sd_map.yaml"/>
 
-	<node pkg="robot_localization" type="ukf_localization_node" name="$(arg robot_ns)_localization" clear_params="true">
-		<remap from="cmd_vel" to="mobile_base_controller/cmd_vel"/>
-	</node>
+	<node pkg="imu_filter_madgwick" type="imu_filter_node" name="$(arg robot_ns)_imu_filter_madgwick" if="$(eval arg('robot_ns') == 'r1')"/>
+
+	<node pkg="robot_localization" type="ukf_localization_node" name="$(arg robot_ns)_localization" clear_params="true" output="screen" />
+
+	<!--node pkg="robot_localization" type="ukf_localization_node" name="$(arg robot_ns)_localization_map" clear_params="true" output="screen" /-->
 	
 	<node pkg="amcl" type="amcl" name="$(arg robot_ns)_amcl" output="screen">
 		<remap from="map" to="map"/>

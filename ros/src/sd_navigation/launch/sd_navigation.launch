@@ -2,8 +2,6 @@
 	<arg name="robot_ns" default=""/>
 
 	<rosparam file="$(find sd_navigation)/config/$(arg robot_ns)_navigation.yaml" command="load"/>
-
-	<node name="$(arg robot_ns)_map_server" pkg="map_server" type="map_server" args="$(find sd_navigation)/config/sd_map.yaml"/>
 	
 	<node name="$(arg robot_ns)_move_base" pkg="move_base" type="move_base" respawn="false" output="screen">
 		<rosparam file="$(find sd_navigation)/config/$(arg robot_ns)_move_base.yaml" command="load"/>
