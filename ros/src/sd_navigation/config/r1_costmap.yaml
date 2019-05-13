@@ -7,6 +7,7 @@ local_costmap:
   static_map: false
   rolling_window: true
   width: 2.0
+  height: 2.0
   origin_x: -1.0
   origin_y: 0.0
   resolution: 0.01 # meters/cell
