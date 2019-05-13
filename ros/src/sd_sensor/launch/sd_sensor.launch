@@ -18,7 +18,7 @@
 
 	<node name="xv11lidar" pkg="xv_11_lidar_raspberry" type="xv_11_lidar_raspberry" output="screen" if="$(eval arg('robot_ns') == 'r2' and not arg('sim'))">
 		<param name="port" value="/dev/ttyAMA0"/>
-		<param name="frame_id" value="lidar_link"/>
+		<param name="frame_id" value="r2/lidar_link"/>
 		<remap from="scan" to="laser/scan"/>
 	</node>
 
