@@ -5,6 +5,7 @@
 	
 	<node name="$(arg robot_ns)_move_base" pkg="move_base" type="move_base" respawn="false" output="screen">
 		<rosparam file="$(find sd_navigation)/config/$(arg robot_ns)_move_base.yaml" command="load"/>
+        <rosparam file="$(find sd_navigation)/config/$(arg robot_ns)_costmap.yaml" command="load"/>
 		<rosparam file="$(find sd_navigation)/config/$(arg robot_ns)_costmap_common_params.yaml" command="load" ns="global_costmap"/>
 	    <rosparam file="$(find sd_navigation)/config/$(arg robot_ns)_costmap_common_params.yaml" command="load" ns="local_costmap"/>
 	    

@@ -1,7 +1,46 @@
-obstacle_range: 2.5
-raytrace_range: 3.0
+# Costmap layers (one plugin per layer)
+plugins:
+  - {name: static_map_layer,       type: "costmap_2d::StaticLayer"}
+  - {name: obstacles_layer,        type: "costmap_2d::ObstacleLayer"}
+  - {name: inflation_layer,        type: "costmap_2d::InflationLayer"}
+
+# Use a static map that doesn't change 
+static_map_layer:
+  map_topic: map
+  first_map_only: true
+
+# Obstacle layer 
+obstacles_layer:
+  observation_sources: lidar
+  lidar: {
+    sensor_frame: r2/lidar_link,
+    data_type: LaserScan,
+    topic: /r2/laser/scan_filtered,
+    clearing: true,
+    marking: true
+  }
+  # All obstacle in that range will be marked as obstacle (marking)
+  obstacle_range: 1.0
+
+  # All free space in that range will be marked as free (clearing)
+  raytrace_range: 3.0
+
+# Inflation layer
+# Each non free node is inflated in space
+inflation_layer:
+  inflation_radius: 0.1
+
+# Robot foot print
 footprint: [[-0.075, 0.130], [0.075, 0.130], [0.075, -0.130], [-0.075, -0.130]]
-#robot_radius: ir_of_robot
-inflation_radius: 0.005
-cost_scaling_factor: 10.0
+
+# Robot base frame
+robot_base_frame: r2/base_link
+
+# The frequency in Hz for the map to be updated.
+update_frequency: 5.0
+
+# The frequency in Hz for the map to be publish display information
+publish_frequency: 2.0
+
+# Specifies the delay in transform (tf) data that is tolerable in seconds
 transform_tolerance: 0.3

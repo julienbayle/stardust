@@ -1,58 +1,121 @@
-global_costmap:
-  global_frame: map
-  robot_base_frame: r2/base_link
-  update_frequency: 5.0
-  publish_frequency: 2.0
-  static_map: true
 
-local_costmap:
-  global_frame: r2/odom
-  robot_base_frame: r2/base_link
-  update_frequency: 5.0
-  publish_frequency: 2.0
-  static_map: false
-  rolling_window: true
-  width: 2.0
-  height: 3.0
-  origin_x: -2.0
-  origin_y: 0.0
-  resolution: 0.01
-  transform_tolerance: 0.2
+# These behaviors will be run when move_base fails to find a valid plan
+recovery_behaviors: [
+  # Revert to the static map outside of a given radius away from 
+  # the robot (conservative_reset_dist : 3 meters by default)
+  { name: conservative_reset, type: clear_costmap_recovery/ClearCostmapRecovery }, 
+  # This package provides a recovery behavior for the navigation stack that attempts
+  # to clear space by performing a 360 degree rotation of the robot.
+  { name: rotate_recovery, type: rotate_recovery/RotateRecovery }]
 
-  observation_sources: lidar sonar_left sonar_right
+# The rate in Hz at which to run the control loop and send velocity commands to the base
+controller_frequency: 10.0
 
-  lidar: {
-    sensor_frame: r2/lidar_link,
-    data_type: LaserScan,
-    topic: /r2/laser/scan_filtered,
-    clearing: true,
-    marking: true
-  }
+# How long the planner / controller will wait in seconds in an attempt to find a 
+# valid plan before space-clearing operations are performed
+planner_patience: 2.0
+controller_patience: 4.0
 
-  sonar_left: { 
-    sensor_frame: r2/sonar_left_link,
-    data_type: PointCloud,
-    topic: /r2/sonar/left_point_cloud,
-    clearing: true,
-    marking: true
-  }
+# How long in seconds to allow for oscillation before executing recovery behaviors
+oscillation_timeout: 10
 
-  sonar_right: { 
-    sensor_frame: r2/sonar_right_link,
-    data_type: PointCloud,
-    topic: /r2/sonar/right_point_cloud,
-    clearing: true,
-    marking: true
-  }
+# How far in meters the robot must move to be considered not to be oscillating. 
+# Moving this far resets the timer counting up to the ~oscillation_timeout
+oscillation_distance: 0.5
+
+# How many times to allow for planning retries before executing recovery behaviors
+max_planning_retries: 1
+
+base_global_planner: "global_planner/GlobalPlanner"
+
+GlobalPlanner:
+  # True : Unknown space is used as free space
+  allow_unknown: true
   
+  # The planner will attempt to create a plan that is as close 
+  # to the specified goal as possible but no further than that
+  default_tolerance: 0.01
+
+  # Dijkstra (More complex than A* but gives better path)
+  # This algorithm works on the "node" level 
+  use_dijkstra: true
+
+  # Use the quadratic approximation of the potential
+  # and then optimize path using a gradient descent method
+  # This part does subnode path optimization 
+  use_quadratic: true
+  use_grid_path: false
+
+  # Specifies whether or not to visualize the potential 
+  # area computed via a PointCloud2
+  visualize_potential: true
+  publish_potential: true
+
+  # Orientation mode = 2 = Interpolate
+  # Robot is holonomous. Goal orientation is reached as
+  # a linea blend from start pose to last pose 
+  orientation_mode: 2
+  orientation_window_size: 1
+
+base_local_planner: "base_local_planner/TrajectoryPlannerROS"
+
 TrajectoryPlannerROS:
-  max_vel_x: 0.45
-  min_vel_x: 0.1
-  max_vel_theta: 1.0
-  min_in_place_vel_theta: 0.4
-
-  acc_lim_theta: 3.2
-  acc_lim_x: 2.5
-  acc_lim_y: 2.5
-
+  # Robot Configuration Parameters (same values as in sd_control)
   holonomic_robot: false
+  
+  acc_lim_x: 0.5
+  acc_lim_y: 0.5
+  acc_lim_theta: 2
+  max_vel_x: 0.2
+  max_vel_theta: 1
+
+  # The minimum velocities are useful to guarantee that
+  #  velocity commands sent to a mobile base are high enough 
+  # to allow the base to overcome friction
+  min_vel_x: 0.05
+  min_vel_theta: 0.05
+  min_in_place_vel_theta: 0.2
+
+  # Velocity used when the robot attempt to escape (closed path)
+  # Must be negative
+  escape_vel: -0.1
+
+  # Goal Tolerance Parameters
+  yaw_goal_tolerance: 0.09  # 5°
+  xy_goal_tolerance: 0.05   # m
+
+  # When robot has reached xy goal, then ignore it for 
+  # the last rotation part of the trajectory
+  # Speed up the displacement
+  latch_xy_goal_tolerance: true
+
+  # The weighting for how much the controller should stay 
+  # close to the path it was given (0 - 5)
+  pdist_scale: 0.6
+  
+  #The weighting for how much the controller should 
+  # attempt to reach its local goal (0 - 5)
+  gdist_scale: 0.8
+
+  # The weighting for how much the controller should attempt to avoid obstacles
+  occdist_scale: 0.01
+
+  # How far to look ahead in meters when scoring different in-place-rotation trajectories
+  heading_lookahead: 0.325
+
+  # Whether to score based on the robot's heading to the
+  # path or its distance from the path
+  heading_scoring: false
+
+  # How far to look ahead in time in seconds along the 
+  # simulated trajectory when using heading scoring
+  heading_scoring_timestep: 0.8
+
+  # Whether or not to publish the cost grid that the planner will 
+  # use when planning. When true, a sensor_msgs/PointCloud2 will 
+  # be available on the ~<name>/cost_cloud topic
+  publish_cost_grid_pc: false
+  
+  # The frame to set for the cost_cloud. 
+  # Should be set to the same frame as the local costmap's global frame
+  global_frame_id: 'r2/odom'
