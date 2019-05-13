@@ -33,7 +33,6 @@
 #include <sensor_msgs/PointCloud.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <nav_msgs/OccupancyGrid.h>
-//for point_cloud::fromROSMsg
 
 #include <pcl_conversions/pcl_conversions.h>
 #include <sensor_msgs/point_cloud_conversion.h>
@@ -54,7 +53,7 @@
 
 #include <dynamic_reconfigure/server.h>
 #include <sd_localization/SnapMapConfig.h>
-#include <sd_localization/SnapMapDebug.h>
+#include <sd_localization/SnapMapMonitor.h>
 
 namespace sd_localization {
 class SnapMap {
@@ -73,7 +72,7 @@ private:
     ros::Duration update_age_threshold_;
     double pose_covariance_trans_;
 
-    bool debug_;
+    bool monitoring_;
 
     std::string odom_frame_;
     std::string laser_frame_;
@@ -106,7 +105,7 @@ private:
     ros::Publisher publisher_initial_pose_;
     ros::Publisher publisher_scan_points_;
     ros::Publisher publisher_scan_points_transformed_;
-    ros::Publisher publisher_debug_;
+    ros::Publisher publisher_monitoring_;
 
     ros::Subscriber subscriber_map_;
     ros::Subscriber subscriber_laser_scan_;
@@ -131,7 +130,7 @@ public:
         update_age_threshold_(0),
         pose_covariance_trans_(1.5),
 
-        debug_(false),
+        monitoring_(true),
 
         odom_frame_(),
         laser_frame_(),
@@ -160,7 +159,7 @@ public:
         publisher_initial_pose_(nh_.advertise<geometry_msgs::PoseWithCovarianceStamped>("initialpose", 1)),
         publisher_scan_points_(nh_priv_.advertise<sensor_msgs::PointCloud2> ("scan_points", 1)),
         publisher_scan_points_transformed_(nh_priv_.advertise<sensor_msgs::PointCloud2> ("scan_points_transformed", 1)),
-        publisher_debug_(nh_priv_.advertise<sd_localization::SnapMapDebug> ("debug", 1)),
+        publisher_monitoring_(nh_priv_.advertise<sd_localization::SnapMapMonitor> ("acml_monitoring", 1)),
 
         subscriber_map_(nh_.subscribe("map", 1, &SnapMap::mapCallback, this)),
         subscriber_laser_scan_(nh_.subscribe("laser_scan", 1, &SnapMap::scanCallback, this)),
@@ -192,7 +191,7 @@ public:
         update_age_threshold_ = ros::Duration(config.update_age_threshold);
         pose_covariance_trans_ = config.pose_covariance_trans;
 
-        debug_ = config.debug;
+        monitoring_ = config.publish_monitoring;
     }
 
     inline void matrixAsTransfrom (const Eigen::Matrix4f &out_mat, tf::Transform& bt)
@@ -245,7 +244,6 @@ public:
         for (int y = 0; y < height; y++)
             for (int x = 0; x < width; x++)
             {
-                //@TODO
                 if (msg.data[x + y * width] == 100)
                 {
                     point_xyz.x = (.5f + x) * resolution + posx;
@@ -333,7 +331,7 @@ public:
         {
             cloudInMap.points[k].z = 0;
         }
-  
+
         tf::StampedTransform oldPose;
         tf_listener_.lookupTransform(map_frame_, base_frame_, cloud.header.stamp , oldPose);
 
@@ -430,7 +428,7 @@ public:
             sent = true;
         }
 
-        if (debug_) {
+        if (monitoring_) {
             publisher_scan_points_.publish(cloud2);
 
             sensor_msgs::PointCloud2 cloud2_transformed;
@@ -438,20 +436,20 @@ public:
             publisher_scan_points_transformed_.publish(cloud2_transformed);
 
             // Publish debug info
-            sd_localization::SnapMapDebug debug;
-            debug.inlier_percentage = inlier_perc;
-            debug.inlier_percentage_threshold = icp_inlier_threshold_;
-            debug.scan_age = scan_age.toSec();
-            debug.scan_age_threshold = age_threshold_.toSec();
-            debug.distance = dist;
-            debug.angle = angleDist;
-            debug.rotation_axis.x = rotAxis.x();
-            debug.rotation_axis.y = rotAxis.y();
-            debug.rotation_axis.z = rotAxis.z();
-            debug.regression_converged = reg.hasConverged();
-            debug.fitness_score = reg.getFitnessScore();
-            debug.sent = sent;
-            publisher_debug_.publish(debug);
+            sd_localization::SnapMapMonitor monitor;
+            monitor.inlier_percentage = inlier_perc;
+            monitor.inlier_percentage_threshold = icp_inlier_threshold_;
+            monitor.scan_age = scan_age.toSec();
+            monitor.scan_age_threshold = age_threshold_.toSec();
+            monitor.distance = dist;
+            monitor.angle = angleDist;
+            monitor.rotation_axis.x = rotAxis.x();
+            monitor.rotation_axis.y = rotAxis.y();
+            monitor.rotation_axis.z = rotAxis.z();
+            monitor.regression_converged = reg.hasConverged();
+            monitor.fitness_score = reg.getFitnessScore();
+            monitor.sent = sent;
+            publisher_monitoring_.publish(monitor);
         }
     }
 };
