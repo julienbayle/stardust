@@ -224,14 +224,14 @@ r1_localization_map:
                   0.0 ,0.0, 0.0]
 
   # Use this filter to publish map TF     
-  publish_tf: true
+  publish_tf: false
   publish_acceleration: false
   print_diagnostics: false
   
   # Do not use control to derive acceleration as
   # an IMU is configured an it overides the value
   use_control: false
-  
+ 
   # True : AMCL position computation time
   smooth_lagged_data: true
 
@@ -347,7 +347,7 @@ r1_amcl:
   global_frame_id: map
 
   # TF is broadcasted by the UKF filter
-  tf_broadcast: false
+  tf_broadcast: true
 
 r1_snap_map:
   active: false
