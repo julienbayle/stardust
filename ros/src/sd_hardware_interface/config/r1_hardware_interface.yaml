@@ -1,7 +1,7 @@
 control_loop:
   loop_hz: 50 # in Hz
   cycle_time_error_threshold: 0.1 # in seconds (Means an 10% error threshold for 100Hz)
-  print_state: true   # true to see controller state in console (every second)
+  print_state: false   # true to see controller state in console (every second)
   publish_state: true # publish regulator state to topics
 
 hardware_interface:
