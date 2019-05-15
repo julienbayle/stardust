@@ -339,6 +339,11 @@ class TeleopNode {
 				system("sudo halt");
 			} 
 
+			// Shutdown all ROS nodes
+			if (buttons_long_click_[XBOX_BUTTON_BACK] && buttons_long_click_[XBOX_BUTTON_B]) {
+				system("~/stardust/scripts/stop.sh &");
+			} 
+			
 			// Servos
 			servo1_up_ = buttons_click_[XBOX_BUTTON_CROSS_UP] || buttons_long_click_[XBOX_BUTTON_CROSS_UP];
 			servo1_down_ = buttons_click_[XBOX_BUTTON_CROSS_DOWN] || buttons_long_click_[XBOX_BUTTON_CROSS_DOWN];
