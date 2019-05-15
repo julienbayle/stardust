@@ -6,7 +6,7 @@ plugins:
 
 # Use a static map that doesn't change 
 static_map_layer:
-  map_topic: map
+  map_topic: map_static_obstacle
   first_map_only: true
 
 # Obstacle layer 
@@ -28,7 +28,7 @@ obstacles_layer:
 # Inflation layer
 # Each non free node is inflated in space
 inflation_layer:
-  inflation_radius: 0.1
+  inflation_radius: 0.10
 
 # Robot foot print
 footprint: [[-0.075, 0.130], [0.075, 0.130], [0.075, -0.130], [-0.075, -0.130]]
@@ -40,7 +40,7 @@ robot_base_frame: r2/base_link
 update_frequency: 5.0
 
 # The frequency in Hz for the map to be publish display information
-publish_frequency: 2.0
+publish_frequency: 1.0
 
 # Specifies the delay in transform (tf) data that is tolerable in seconds
-transform_tolerance: 0.3
+transform_tolerance: 0.5

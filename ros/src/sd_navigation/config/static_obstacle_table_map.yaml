@@ -1,4 +1,4 @@
-image: sd_map.png
+image: static_obstacle_table_map.png
 resolution: 0.01
 origin: [-1.04, -1.54, 0.0]
 occupied_thresh: 0.65
