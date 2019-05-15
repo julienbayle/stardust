@@ -1,5 +1,12 @@
 <launch>
 	<arg name="robot_ns" default=""/>
+	<arg name="location" default="table"/>
+
+	<node name="$(arg robot_ns)_obstacle_map_server" pkg="map_server" type="map_server" args="$(find sd_navigation)/config/static_obstacle_$( arg location)_map.yaml" >
+		<remap from="map" to="map_static_obstacle"/>
+		<remap from="map_metadata" to="map_static_obstacle_metadata"/>
+		<remap from="static_map" to="map_static_obstacle_service"/> 
+	</node>
 
 	<node name="$(arg robot_ns)_move_base" pkg="move_base" type="move_base" respawn="false" output="screen">
 		<rosparam file="$(find sd_navigation)/config/$(arg robot_ns)_move_base.yaml" command="load"/>
@@ -8,6 +15,6 @@
 	    <rosparam file="$(find sd_navigation)/config/$(arg robot_ns)_costmap_common_params.yaml" command="load" ns="local_costmap"/>
 	    
 	    <remap from="cmd_vel" to="auto_cmd_vel"/>
-		<remap from="odom" to="odometry/filtered"/>
+		<remap from="odom" to="odom"/>
 	</node>
 </launch>

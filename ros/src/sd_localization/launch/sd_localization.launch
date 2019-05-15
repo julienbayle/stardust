@@ -1,10 +1,11 @@
 <launch>
 	<arg name="robot_ns" default=""/>
 	<arg name="ground_truth" default="false"/>
+	<arg name="location" default="table"/>
 
 	<rosparam file="$(find sd_localization)/config/$(arg robot_ns)_localization.yaml" command="load"/>
 	
-	<node name="$(arg robot_ns)_map_server" pkg="map_server" type="map_server" args="$(find sd_localization)/config/sd_map.yaml"/>
+	<node name="$(arg robot_ns)_map_server" pkg="map_server" type="map_server" args="$(find sd_localization)/config/amcl_$(arg location)_map.yaml"/>
 
 	<node pkg="imu_filter_madgwick" type="imu_filter_node" name="$(arg robot_ns)_imu_filter_madgwick" if="$(eval arg('robot_ns') == 'r1')"/>
 

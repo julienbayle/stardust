@@ -9,7 +9,7 @@ recovery_behaviors: [
   { name: rotate_recovery, type: rotate_recovery/RotateRecovery }]
 
 # The rate in Hz at which to run the control loop and send velocity commands to the base
-controller_frequency: 10.0
+controller_frequency: 5.0
 
 # How long the planner / controller will wait in seconds in an attempt to find a 
 # valid plan before space-clearing operations are performed
@@ -17,14 +17,14 @@ planner_patience: 2.0
 controller_patience: 4.0
 
 # How long in seconds to allow for oscillation before executing recovery behaviors
-oscillation_timeout: 10
+oscillation_timeout: 5
 
 # How far in meters the robot must move to be considered not to be oscillating. 
 # Moving this far resets the timer counting up to the ~oscillation_timeout
-oscillation_distance: 0.5
+oscillation_distance: 0.10
 
 # How many times to allow for planning retries before executing recovery behaviors
-max_planning_retries: 1
+max_planning_retries: 2
 
 base_global_planner: "global_planner/GlobalPlanner"
 
@@ -43,18 +43,19 @@ GlobalPlanner:
   # Use the quadratic approximation of the potential
   # and then optimize path using a gradient descent method
   # This part does subnode path optimization 
-  use_quadratic: true
+  use_quadratic: false
   use_grid_path: false
 
   # Specifies whether or not to visualize the potential 
   # area computed via a PointCloud2
-  visualize_potential: true
-  publish_potential: true
+  visualize_potential: false
+  publish_potential: false
 
-  # Orientation mode = 2 = Interpolate
-  # Robot is holonomous. Goal orientation is reached as
-  # a linea blend from start pose to last pose 
-  orientation_mode: 2
+  # Orientation mode = 0 = None
+  # Robot is non holonomous. Final goal orientation is reached 
+  # with an in-place rotation at the end
+  # During the execution, orientation is not controlled 
+  orientation_mode: 0
   orientation_window_size: 1
 
 base_local_planner: "base_local_planner/TrajectoryPlannerROS"
@@ -89,23 +90,28 @@ TrajectoryPlannerROS:
   # Speed up the displacement
   latch_xy_goal_tolerance: true
 
+  # Set that gdist_scale and pdist_scale parameters 
+  # assume that goal_distance and path_distance are expressed 
+  # in meters
+  meter_scoring: true
+
   # The weighting for how much the controller should stay 
-  # close to the path it was given (0 - 5)
-  pdist_scale: 0.6
+  # close to the path it was given (0 - 5) 
+  pdist_scale: 0.2
   
-  #The weighting for how much the controller should 
+  # The weighting for how much the controller should 
   # attempt to reach its local goal (0 - 5)
-  gdist_scale: 0.8
+  gdist_scale: 0.2
 
   # The weighting for how much the controller should attempt to avoid obstacles
-  occdist_scale: 0.01
+  occdist_scale: 0.05
 
   # How far to look ahead in meters when scoring different in-place-rotation trajectories
-  heading_lookahead: 0.325
+  heading_lookahead: 1.0
 
   # Whether to score based on the robot's heading to the
   # path or its distance from the path
-  heading_scoring: false
+  heading_scoring: true
 
   # How far to look ahead in time in seconds along the 
   # simulated trajectory when using heading scoring

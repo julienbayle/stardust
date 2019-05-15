@@ -6,7 +6,7 @@ plugins:
 
 # Use a static map that doesn't change 
 static_map_layer:
-  map_topic: map
+  map_topic: map_static_obstacle
   first_map_only: true
 
 # Obstacle layer 
@@ -32,8 +32,6 @@ inflation_layer:
 
 # Robot foot print
 footprint: [[-0.165, -0.035], [-0.165, 0.035], [0.038, 0.165], [0.118, 0.118], [0.118, -0.118], [0.038, -0.165]]
-
-
 
 # Robot base frame
 robot_base_frame: r1/base_link

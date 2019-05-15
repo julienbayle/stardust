@@ -76,7 +76,7 @@ r2_localization_odom:
                   0.0 ,0.0, 0.0]
 
   # Use this filter to publish odom TF     
-  publish_tf: true
+  publish_tf: false
   publish_acceleration: false
   print_diagnostics: false
   
@@ -183,14 +183,14 @@ r2_localization_map:
   use_control: false
   
   # True : AMCL position computation time
-  #smooth_lagged_data: true
+  smooth_lagged_data: true
 
   # If smooth_lagged_data is set to true, this parameter 
   # specifies the number of seconds for which the filter 
   # will retain its state and measurement history. This value 
   # should be at least as large as the time delta between y
   # our lagged measurements and the current time.
-  #history_length: 2
+  history_length: 2
 
   #                          X,     Y,    Z,   roll, pitch, yaw,  X˙,    Y˙,    Z˙,  roll˙, pitch˙,yaw˙,X¨,   Y¨,   Z¨. 
   process_noise_covariance: [0.01,  0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
@@ -232,26 +232,30 @@ r2_amcl:
   min_particles: 100
 
   # Maximum allowed number of particles (default : 5000)
-  max_particles: 2500
+  max_particles: 1000
 
   # Translational movement required before performing 
   # a filter update (in meter)
-  update_min_d: 0.05
+  update_min_d: 0.01
 
   # Rotational movement required before performing 
   # a filter update (radian)
-  update_min_a: 0.1
+  update_min_a: 0.01
 
   # Number of filter updates required before resampling
-  resample_interval: 10
+  resample_interval: 2
 
   # Time with which to post-date the transform that is 
   # published, to indicate that this transform is valid into the future
-  transform_tolerance: 0.2
+  transform_tolerance: 0.5
 
-  # Disable the "add random poses" mecanism
-  recovery_alpha_slow: 0.0
-  recovery_alpha_fast: 0.0
+  # Exponential decay rate for the slow average weight filter, used in 
+  # deciding when to recover by adding random poses
+  recovery_alpha_slow: 0.005
+
+  # Exponential decay rate for the fast average weight filter, used in 
+  # deciding when to recover by adding random poses.
+  recovery_alpha_fast: 0.2
 
   # Limit the GUI refresh rate at 2Hz
   gui_publish_rate: 2

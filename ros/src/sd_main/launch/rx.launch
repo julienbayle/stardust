@@ -4,6 +4,7 @@
 	<arg name="robot_ns" default=""/>
 	<arg name="ground_truth" default="false"/>
 	<arg name="joy_type" default=""/>
+	<arg name="location" default=""/>
 
 	<group ns="$(arg robot_ns)">
 		<!-- Description  -->
@@ -42,11 +43,13 @@
 		<include file="$(find sd_localization)/launch/sd_localization.launch">
 			<arg name="robot_ns" value="$(arg robot_ns)"/>
 			<arg name="ground_truth" value="$(arg ground_truth)"/>
+			<arg name="location" value="$(arg location)"/>
 		</include>
 		
 		<!-- Navigation -->
 		<include file="$(find sd_navigation)/launch/sd_navigation.launch">
 			<arg name="robot_ns" value="$(arg robot_ns)"/>
+			<arg name="location" value="$(arg location)"/>
 		</include>
 
 		<!-- Show in Rviz   -->
