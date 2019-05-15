@@ -40,4 +40,4 @@ else
 fi
 
 echo "Starting ROS on $IP for robot $ID"
-roslaunch --pid=/tmp/ros.pid sd_main $ID.launch & 
+roslaunch --pid=/tmp/ros.pid sd_main $ID.launch 2>&1 & 
