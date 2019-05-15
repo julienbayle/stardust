@@ -16,8 +16,8 @@ namespace GripperNodes
 			: SyncActionNode(name, config)
     { 
         ros::NodeHandle nh;
-        angle_base_pub_ = nh.advertise<std_msgs::UInt16>("servo/F", 1);
-        angle_pince_pub_ = nh.advertise<std_msgs::UInt16>("servo/E", 1);
+        angle_base_pub_ = nh.advertise<std_msgs::UInt16>("/r1/servo/E", 1);
+        angle_pince_pub_ = nh.advertise<std_msgs::UInt16>("/r1/servo/F", 1);
     }
 
 	BT::NodeStatus ArmNode::tick()
@@ -37,11 +37,18 @@ namespace GripperNodes
         angle_base_msg.data = angle_base;
         angle_base_pub_.publish(angle_base_msg);
 
+        ROS_DEBUG_STREAM_NAMED("ArmNode", "Publish pince F - " << angle_base_msg.data);
+
         std_msgs::UInt16 angle_pince_msg;
         angle_pince_msg.data = angle_pince;
+
         angle_pince_pub_.publish(angle_pince_msg);
 
-	    return BT::NodeStatus::SUCCESS;
+        ROS_DEBUG_STREAM_NAMED("ArmNode", "Publish base E  - " << angle_pince_msg.data);
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(angle_pince*rotationDelayPerDegree));
+
+	return BT::NodeStatus::SUCCESS;
 	}
 
     GripperNode::GripperNode(
@@ -51,10 +58,10 @@ namespace GripperNodes
     { 
         ros::NodeHandle nh;
 
-        activation_right_valve_pub_ = nh.advertise<std_msgs::Int16>("pwm/vanne1", 1);
-        activation_middle_valve_pub_ = nh.advertise<std_msgs::Int16>("pwm/vanne3", 1);
-	activation_left_valve_pub_ = nh.advertise<std_msgs::Int16>("pwm/vanne2", 1);
-        activation_pump_pub_ = nh.advertise<std_msgs::Int16>("pwm/pompe", 1);
+        activation_right_valve_pub_ = nh.advertise<std_msgs::Int16>("/r1/pwm/vanne1", 1);
+        activation_middle_valve_pub_ = nh.advertise<std_msgs::Int16>("/r1/pwm/vanne3", 1);
+	activation_left_valve_pub_ = nh.advertise<std_msgs::Int16>("/r1/pwm/vanne2", 1);
+        activation_pump_pub_ = nh.advertise<std_msgs::Int16>("/r1/pwm/pompe", 1);
     }
 
 	BT::NodeStatus GripperNode::tick()
@@ -87,9 +94,9 @@ namespace GripperNodes
 	{
                 std_msgs::Int16 msg;
                 msg.data = 0;
-                activation_pump_pub_.publish(msg);
+//                activation_pump_pub_.publish(msg);
 
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  //              std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
                 activation_left_valve_pub_.publish(msg);
 	}
@@ -108,9 +115,9 @@ namespace GripperNodes
         {
                 std_msgs::Int16 msg;
                 msg.data = 0;
-                activation_pump_pub_.publish(msg);
+      //          activation_pump_pub_.publish(msg);
 
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    //            std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
                 activation_right_valve_pub_.publish(msg);
         }
@@ -129,9 +136,9 @@ namespace GripperNodes
         {
                 std_msgs::Int16 msg;
                 msg.data = 0;
-                activation_pump_pub_.publish(msg);
+        //        activation_pump_pub_.publish(msg);
 
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+          //      std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
                 activation_middle_valve_pub_.publish(msg);
         }

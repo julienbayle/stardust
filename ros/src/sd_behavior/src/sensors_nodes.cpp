@@ -4,7 +4,8 @@
 
 std::atomic<bool> 		is_tirette_;
 std::atomic<bool>		is_camp_violet_;
-std::atomic<unsigned>  	ui32_switches_;
+std::atomic<bool>		is_robot_en_mouvement_;
+std::atomic<unsigned>  		ui32_switches_;
 ros::Subscriber 		sensors_sub_;
 
 void SensorsNodes::registerNodes(BT::BehaviorTreeFactory& factory)
@@ -12,6 +13,7 @@ void SensorsNodes::registerNodes(BT::BehaviorTreeFactory& factory)
 	factory.registerSimpleCondition("IsTirettePresente", std::bind(SensorsNodes::IsTirettePresente));
 	factory.registerSimpleCondition("IsCampViolet", std::bind(SensorsNodes::IsCampViolet));
 	factory.registerSimpleCondition("IsArretUrgence", std::bind(SensorsNodes::IsArretUrgence));
+	factory.registerSimpleCondition("IsRobotEnMouvement", std::bind(SensorsNodes::IsRobotEnMouvement));
 	factory.registerSimpleCondition("IsPaletDroit", std::bind(SensorsNodes::IsPaletDroit));
 	factory.registerSimpleCondition("IsPaletCentre", std::bind(SensorsNodes::IsPaletCentre));
 	factory.registerSimpleCondition("IsPaletGauche", std::bind(SensorsNodes::IsPaletGauche));
@@ -36,6 +38,12 @@ BT::NodeStatus SensorsNodes::IsCampViolet()
 {
 	ROS_DEBUG_STREAM_NAMED("RobotSensorsCondition", "IsCampViolet : " << is_camp_violet_);
 	return is_camp_violet_ ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
+}
+
+BT::NodeStatus SensorsNodes::IsRobotEnMouvement()
+{
+	ROS_DEBUG_STREAM_NAMED("RobotSensorsCondition", "IsRobotEnMouvement : " << is_robot_en_mouvement_);
+	return BT::NodeStatus::FAILURE;
 }
 
 BT::NodeStatus SensorsNodes::IsArretUrgence()
@@ -67,18 +75,21 @@ BT::NodeStatus SensorsNodes::IsPaletGauche()
 
 BT::NodeStatus SensorsNodes::IsVentouseDroite()
 {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	bool bit=(ui32_switches_&(1<<VENTOUSE_DROITE))!=0;
 	ROS_DEBUG_STREAM_NAMED("RobotSensorsCondition", "IsVentouseDroite : " << bit);
 	return bit ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
 }
 BT::NodeStatus SensorsNodes::IsVentouseCentre()
 {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	bool bit=(ui32_switches_&(1<<VENTOUSE_CENTRE))!=0;
 	ROS_DEBUG_STREAM_NAMED("RobotSensorsCondition", "IsVentouseCentre : " << bit);
 	return bit ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
 }
 BT::NodeStatus SensorsNodes::IsVentouseGauche()
 {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	bool bit=(ui32_switches_&(1<<VENTOUSE_GAUCHE))!=0;
 	ROS_DEBUG_STREAM_NAMED("RobotSensorsCondition", "IsVentouseGauche : " << bit);
 	return bit ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;

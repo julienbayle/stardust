@@ -46,6 +46,6 @@ namespace GripperNodes
 		private:
 			ros::Publisher angle_base_pub_;
         		ros::Publisher angle_pince_pub_;
-        	
+			const int rotationDelayPerDegree = 30;       	
 	};
 }

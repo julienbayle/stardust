@@ -34,6 +34,7 @@ namespace SensorsNodes
 	BT::NodeStatus IsArretUrgence();
 	BT::NodeStatus IsTirettePresente();
 	BT::NodeStatus IsCampViolet();
+	BT::NodeStatus IsRobotEnMouvement();
 
 	BT::NodeStatus IsPaletDroit();
 	BT::NodeStatus IsPaletCentre();

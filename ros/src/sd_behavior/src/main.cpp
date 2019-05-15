@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
 	// Run behavior tree
 	BT::NodeStatus status = NodeStatus::RUNNING;
 
-	ros::Rate rate(50);
+	ros::Rate rate(10);
 	while(ros::ok() && status != NodeStatus::FAILURE) {
 		ros::spinOnce();
 		status = tree.root_node->executeTick();
