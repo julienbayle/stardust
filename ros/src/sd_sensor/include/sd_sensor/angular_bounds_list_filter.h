@@ -86,28 +86,32 @@ namespace sd_sensor
         filtered_scan = input_scan; //copy entire message
         XmlRpc::XmlRpcValue& angles = use_angles2_ ? angles2_ : angles_;
 
-        unsigned int current_list_index = 0;
-        XmlRpc::XmlRpcValue current_list_value = angles[current_list_index];
-        double current_angle = input_scan.angle_min;
         unsigned int count = 0;
-        //loop through the scan and remove ranges at angles between lower_angle_ and upper_angle_
-        for(unsigned int i = 0; i < input_scan.ranges.size(); ++i) {
-          // Switch to next range
-          if (current_angle > ((double)current_list_value[1]) && current_list_index < angles.size() - 1) {
-            current_list_index++;
-            current_list_value = angles[current_list_index];
-          }
-
-          // Remove scans
-          if (current_angle < ((double)current_list_value[0]) || current_angle > ((double)current_list_value[1])) {
-            filtered_scan.ranges[i] = input_scan.range_max + 1.0;
-            if(i < filtered_scan.intensities.size()){
-              filtered_scan.intensities[i] = 0.0;
+        if( angles.size() > 0) {
+          unsigned int current_list_index = 0;
+          XmlRpc::XmlRpcValue current_list_value = angles[current_list_index];
+          double current_angle = input_scan.angle_min;
+          
+          //loop through the scan and remove ranges at angles between lower_angle_ and upper_angle_
+          for(unsigned int i = 0; i < input_scan.ranges.size(); ++i) {
+            // Switch to next range
+            if (current_angle > ((double)current_list_value[1]) && current_list_index < angles.size() - 1) {
+              current_list_index++;
+              current_list_value = angles[current_list_index];
             }
-            count++;
+
+            // Remove scans
+            if (current_angle < ((double)current_list_value[0]) || current_angle > ((double)current_list_value[1])) {
+              filtered_scan.ranges[i] = input_scan.range_max + 1.0;
+              if(i < filtered_scan.intensities.size()){
+                filtered_scan.intensities[i] = 0.0;
+              }
+              count++;
+            }
+            current_angle += input_scan.angle_increment;
           }
-          current_angle += input_scan.angle_increment;
         }
+  
 
         ROS_DEBUG("Filtered out %d points from the laser scan.", (int)count);
 
