@@ -163,7 +163,7 @@
     <joint name="lidar_to_body" type="fixed">
         <parent link="body_link"/>
         <child link="lidar_link"/>
-        <origin xyz="${lidar_x} ${lidar_y} ${lidar_z}" rpy="${pi} 0 0"/>
+        <origin xyz="${lidar_x} ${lidar_y} ${lidar_z}" rpy="${pi} 0 ${pi}"/>
     </joint>
 
     <xacro:macro name="sonar_macro" params="name y">
