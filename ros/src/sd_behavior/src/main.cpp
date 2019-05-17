@@ -1,12 +1,16 @@
 #include <string>
 #include <ros/ros.h>
 #include "behaviortree_cpp/bt_factory.h"
+#include "behaviortree_cpp/loggers/bt_file_logger.h"
+#include "behaviortree_cpp/loggers/bt_zmq_publisher.h"
 
 #include "sd_behavior/gripper_nodes.h"
 #include "sd_behavior/move_nodes.h"
 #include "sd_behavior/score_nodes.h"
 #include "sd_behavior/sensors_nodes.h"
 #include "sd_behavior/timer_nodes.h"
+
+
 
 using namespace BT;
 
@@ -33,6 +37,12 @@ int main(int argc, char* argv[])
 
 	std::string fn = argv[1];
 	auto tree = factory.createTreeFromFile(fn);
+
+    // Real time monitoring with Groot
+    BT::PublisherZMQ publisher_zmq(tree);
+
+	// This logger saves state changes on file
+    BT::FileLogger logger_file(tree, "bt_trace.fbl", 20);
 
 	// Run behavior tree
 	BT::NodeStatus status = NodeStatus::RUNNING;
