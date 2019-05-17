@@ -4,8 +4,11 @@
 
 namespace GripperNodes
 {
-   void registerNodes(BT::BehaviorTreeFactory& factory);
+   	void registerNodes(BT::BehaviorTreeFactory& factory, ros::NodeHandle& nh);
 
+	// Async spinner node handle
+	static ros::NodeHandle* nh_;
+	
     class GripperNode : public BT::SyncActionNode
 	{
 		public:

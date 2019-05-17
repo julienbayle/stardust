@@ -14,14 +14,21 @@ int main(int argc, char* argv[])
 {
 	ros::init(argc, argv, "robot_behavior");
 	ros::NodeHandle nh;
+  	ros::CallbackQueue queue;
+  	nh.setCallbackQueue(&queue);
+
+  	// Run the ROS loop in a separate thread as external calls such
+  	// as service callbacks to load controllers can block the (main) control loop
+  	ros::AsyncSpinner spinner(1, &queue);
+  	spinner.start();
 
 	// Init behavior tree
 	BehaviorTreeFactory factory;
 
-	GripperNodes::registerNodes(factory);
-	MoveNodes::registerNodes(factory);
-	ScoreNodes::registerNodes(factory);
-	SensorsNodes::registerNodes(factory);
+	GripperNodes::registerNodes(factory, nh);
+	MoveNodes::registerNodes(factory, nh);
+	ScoreNodes::registerNodes(factory, nh);
+	SensorsNodes::registerNodes(factory, nh);
 	TimerNodes::registerNodes(factory);
 
 	std::string fn = argv[1];
@@ -30,15 +37,16 @@ int main(int argc, char* argv[])
 	// Run behavior tree
 	BT::NodeStatus status = NodeStatus::RUNNING;
 
-	ros::Rate rate(10);
 	while(ros::ok() && status != NodeStatus::FAILURE) {
-		ros::spinOnce();
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		status = tree.root_node->executeTick();
-		rate.sleep();
 	}
 
 	// Wait for ROS threads to terminate
 	ros::waitForShutdown();
+
+	// Release AsyncSpinner object
+  	spinner.stop();
 
 	return 0;
 }

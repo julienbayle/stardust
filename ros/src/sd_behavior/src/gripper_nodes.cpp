@@ -4,10 +4,11 @@
 
 namespace GripperNodes
 {
-	void registerNodes(BT::BehaviorTreeFactory& factory) 
+	void registerNodes(BT::BehaviorTreeFactory& factory, ros::NodeHandle& nh) 
 	{
 		factory.registerNodeType<GripperNodes::ArmNode>("Bras");
 		factory.registerNodeType<GripperNodes::GripperNode>("Pince");
+        nh_ = &nh;
 	}
 
     ArmNode::ArmNode(
@@ -15,9 +16,8 @@ namespace GripperNodes
         const BT::NodeConfiguration& config) 
 			: SyncActionNode(name, config)
     { 
-        ros::NodeHandle nh;
-        angle_base_pub_ = nh.advertise<std_msgs::UInt16>("/r1/servo/E", 1);
-        angle_pince_pub_ = nh.advertise<std_msgs::UInt16>("/r1/servo/F", 1);
+        angle_base_pub_ = nh_->advertise<std_msgs::UInt16>("/r1/servo/F", 1);
+        angle_pince_pub_ = nh_->advertise<std_msgs::UInt16>("/r1/servo/E", 1);
     }
 
 	BT::NodeStatus ArmNode::tick()
@@ -56,12 +56,10 @@ namespace GripperNodes
         const BT::NodeConfiguration& config) 
 			: SyncActionNode(name, config)
     { 
-        ros::NodeHandle nh;
-
-        activation_right_valve_pub_ = nh.advertise<std_msgs::Int16>("/r1/pwm/vanne1", 1);
-        activation_middle_valve_pub_ = nh.advertise<std_msgs::Int16>("/r1/pwm/vanne3", 1);
-	activation_left_valve_pub_ = nh.advertise<std_msgs::Int16>("/r1/pwm/vanne2", 1);
-        activation_pump_pub_ = nh.advertise<std_msgs::Int16>("/r1/pwm/pompe", 1);
+        activation_right_valve_pub_ = nh_->advertise<std_msgs::Int16>("/r1/pwm/vanne1", 1);
+        activation_middle_valve_pub_ = nh_->advertise<std_msgs::Int16>("/r1/pwm/vanne3", 1);
+	    activation_left_valve_pub_ = nh_->advertise<std_msgs::Int16>("/r1/pwm/vanne2", 1);
+        activation_pump_pub_ = nh_->advertise<std_msgs::Int16>("/r1/pwm/pompe", 1);
     }
 
 	BT::NodeStatus GripperNode::tick()

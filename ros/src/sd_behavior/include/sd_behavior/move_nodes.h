@@ -8,9 +8,32 @@ typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseCl
 
 namespace MoveNodes
 {
-	void registerNodes(BT::BehaviorTreeFactory& factory);
+	void registerNodes(BT::BehaviorTreeFactory& factory, ros::NodeHandle& nh);
+
+	// Async spinner node handle
+	static ros::NodeHandle* nh_;
 	
-	class ConstantVelocityNode : public BT::SyncActionNode
+	class SetPositionNode : public BT::SyncActionNode
+	{
+		public:
+			SetPositionNode(const std::string& name, const BT::NodeConfiguration& config);
+
+			BT::NodeStatus tick() override;
+
+		    static BT::PortsList providedPorts()
+		    {
+			    return { 
+			    	BT::InputPort<double>("x"), 
+					BT::InputPort<double>("y"),
+					BT::InputPort<double>("z")
+				};
+			}
+		
+		private:
+			ros::Publisher initialpose_pub;
+	};
+    
+    class ConstantVelocityNode : public BT::SyncActionNode
 	{
 		public:
 			ConstantVelocityNode(const std::string& name, const BT::NodeConfiguration& config);
@@ -53,4 +76,8 @@ namespace MoveNodes
 			std::atomic_bool halted_;
 			std::mutex ac_mutex_;
 	};
+
+    BT::NodeStatus IsStopped();
+
+    BT::NodeStatus IsStopped();
 }

@@ -1,5 +1,4 @@
 #include "sd_behavior/sensors_nodes.h"
-#include <ros/ros.h>
 #include <bitset>
 
 std::atomic<bool> 		is_tirette_;
@@ -8,7 +7,7 @@ std::atomic<bool>		is_robot_en_mouvement_;
 std::atomic<unsigned>  		ui32_switches_;
 ros::Subscriber 		sensors_sub_;
 
-void SensorsNodes::registerNodes(BT::BehaviorTreeFactory& factory)
+void SensorsNodes::registerNodes(BT::BehaviorTreeFactory& factory, ros::NodeHandle& nh)
 {
 	factory.registerSimpleCondition("IsTirettePresente", std::bind(SensorsNodes::IsTirettePresente));
 	factory.registerSimpleCondition("IsCampViolet", std::bind(SensorsNodes::IsCampViolet));
@@ -21,7 +20,6 @@ void SensorsNodes::registerNodes(BT::BehaviorTreeFactory& factory)
 	factory.registerSimpleCondition("IsVentouseCentre", std::bind(SensorsNodes::IsVentouseCentre));
 	factory.registerSimpleCondition("IsVentouseGauche", std::bind(SensorsNodes::IsVentouseGauche));
 
-	ros::NodeHandle nh;
 	sensors_sub_ = nh.subscribe("/r1/pilo/switches", 1, SensorsNodes::rosUpdate);
 	is_tirette_.store(false);
 	is_camp_violet_.store(true);
@@ -75,21 +73,18 @@ BT::NodeStatus SensorsNodes::IsPaletGauche()
 
 BT::NodeStatus SensorsNodes::IsVentouseDroite()
 {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	bool bit=(ui32_switches_&(1<<VENTOUSE_DROITE))!=0;
 	ROS_DEBUG_STREAM_NAMED("RobotSensorsCondition", "IsVentouseDroite : " << bit);
 	return bit ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
 }
 BT::NodeStatus SensorsNodes::IsVentouseCentre()
 {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	bool bit=(ui32_switches_&(1<<VENTOUSE_CENTRE))!=0;
 	ROS_DEBUG_STREAM_NAMED("RobotSensorsCondition", "IsVentouseCentre : " << bit);
 	return bit ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
 }
 BT::NodeStatus SensorsNodes::IsVentouseGauche()
 {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	bool bit=(ui32_switches_&(1<<VENTOUSE_GAUCHE))!=0;
 	ROS_DEBUG_STREAM_NAMED("RobotSensorsCondition", "IsVentouseGauche : " << bit);
 	return bit ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;

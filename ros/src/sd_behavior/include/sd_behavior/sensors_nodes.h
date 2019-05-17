@@ -1,5 +1,6 @@
 #include "behaviortree_cpp/bt_factory.h"
 #include <std_msgs/UInt32.h>
+#include <ros/ros.h>
 
 /*
 #### ros topic "/r1/pilo/switches" : Uint32
@@ -29,7 +30,7 @@ bit 10 : fils noir_vert			:PiloP_COM3.Pin.IO5 	: palet droite present
 
 namespace SensorsNodes
 {
-	void registerNodes(BT::BehaviorTreeFactory& factory);
+	void registerNodes(BT::BehaviorTreeFactory& factory, ros::NodeHandle& nh);
 	
 	BT::NodeStatus IsArretUrgence();
 	BT::NodeStatus IsTirettePresente();

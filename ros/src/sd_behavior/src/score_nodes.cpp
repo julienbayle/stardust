@@ -11,9 +11,9 @@ namespace ScoreNodes
     return { BT::InputPort<std::string>("score") };
   }
 
-  void registerNodes(BT::BehaviorTreeFactory& factory)
-	{
-		factory.registerNodeType<DisplayScoreNode>("AfficherLeScore");
+  void registerNodes(BT::BehaviorTreeFactory& factory, ros::NodeHandle& nh) 
+	{    
+    factory.registerNodeType<DisplayScoreNode>("AfficherLeScore");
     
     factory.registerSimpleAction(
       "DefinirLeScore", 
@@ -37,6 +37,8 @@ namespace ScoreNodes
 
     // Initial score
     score_.store(0);
+
+    nh_ = &nh;
 	}
 
   DisplayScoreNode::DisplayScoreNode(
@@ -46,7 +48,7 @@ namespace ScoreNodes
           last_score_(-1)
   { 
     ros::NodeHandle nh;
-		score_pub_ = nh.advertise<std_msgs::String>("/r1/lcd/line1", 1);
+		score_pub_ = nh_->advertise<std_msgs::String>("/r1/lcd/line1", 1);
   }
 
   BT::NodeStatus DisplayScoreNode::tick() 
