@@ -1,0 +1,61 @@
+<root main_tree_to_execute="BehaviorTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="BehaviorTree">
+        <SequenceStar>
+            <SubTree ID="initRobot"/>
+        </SequenceStar>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="initRobot">
+        <Sequence>
+             <Condition ID="ScoreInferieurA" score="5" />
+            <Action ID="DefinirLeScore" score="10" />
+        </Sequence>
+    </BehaviorTree>
+     <!-- ////////// -->
+    <TreeNodesModel>
+
+        <!-- //// SCORE ////// -->
+        <Action ID="AfficherLeScore" />
+        <Action ID="DefinirLeScore">
+            <input_port default="0" name="score">Valeur du score</input_port>
+        </Action>
+        <Action ID="AjouterAuScore">
+            <input_port default="1" name="score">Valeur à ajouter au score</input_port>
+        </Action>
+        <Condition ID="ScoreInferieurA">
+            <input_port default="1" name="score">Score</input_port>
+        </Condition>
+        <Condition ID="ScoreSuperieurA">
+            <input_port default="0" name="score">Score</input_port>
+        </Condition>
+
+        <!-- /////  TIMER ///// -->
+        <Condition ID="MinuterieNonEcoulee" />
+        <Action ID="DefinirTempsMinuterie">
+            <input_port default="1398" name="seconds">Temps de la minuterie en secondes</input_port>
+        </Action>
+        <Action ID="Attendre">
+            <input_port default="1000" name="ms">Temps en millisecondes</input_port>
+        </Action>
+
+        <!-- /////  SENSORS ///// -->
+        <Condition ID="IsCampViolet"/>
+        <Condition ID="IsTirettePresente"/>
+  
+        <!-- /////  MOVE ///// -->
+        <Action ID="VitesseConstante">
+            <input_port default="0" name="linear_x">Vitesse dans le sens avant/arriere en m/s</input_port>
+            <input_port default="0" name="linear_y">Vitesse dans le sens droite/gauche en m/s</input_port>
+            <input_port default="0" name="angular_z">Vitesse de rotation en rad/s</input_port>
+        </Action>
+        <Action ID="Aller">
+            <input_port default="0" name="x">Position absolue en X (en metre)</input_port>
+            <input_port default="0" name="y">Position absolue en Y (en metre)</input_port>
+            <input_port default="0" name="theta">Angle du robot (en degree)</input_port>
+        </Action>
+        
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>
+
