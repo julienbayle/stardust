@@ -17,14 +17,14 @@ planner_patience: 2.0
 controller_patience: 4.0
 
 # How long in seconds to allow for oscillation before executing recovery behaviors
-oscillation_timeout: 10
+oscillation_timeout: 5
 
 # How far in meters the robot must move to be considered not to be oscillating. 
 # Moving this far resets the timer counting up to the ~oscillation_timeout
-oscillation_distance: 0.5
+oscillation_distance: 0.1
 
 # How many times to allow for planning retries before executing recovery behaviors
-max_planning_retries: 1
+max_planning_retries: 2
 
 base_global_planner: "global_planner/GlobalPlanner"
 
@@ -48,8 +48,8 @@ GlobalPlanner:
 
   # Specifies whether or not to visualize the potential 
   # area computed via a PointCloud2
-  visualize_potential: true
-  publish_potential: true
+  visualize_potential: false
+  publish_potential: false
 
   # Orientation mode = 2 = Interpolate
   # Robot is holonomous. Goal orientation is reached as
@@ -67,46 +67,70 @@ TrajectoryPlannerROS:
   acc_lim_y: 2.0
   acc_lim_theta: 9.0
   max_vel_x: 1.0
-  y_vels: [-1.0, -0.1, 0.1, 1.0] # [-max_vel_y -min_vel_y min_vel_y max_vel_y]
+  min_vel_theta: -6.0
   max_vel_theta: 6.0
+  y_vels: [-1.0, -0.1, 0.1, 1.0] # [-max_vel_y -min_vel_y min_vel_y max_vel_y]
 
   # The minimum velocities are useful to guarantee that
   #  velocity commands sent to a mobile base are high enough 
   # to allow the base to overcome friction
   min_vel_x: 0.1
-  min_vel_theta: 0.1
-  min_in_place_vel_theta: 0.4
+  min_vel_theta: 0.0
+  min_in_place_vel_theta: 0.2
+
+  # The amount of time to forward-simulate trajectories in seconds
+  sim_time: 2.0
+
+  # The step size, in meters, to take between points on a given trajectory 
+  sim_granularity: 0.05
+
+  # The step size, in radians, to take between angular samples 
+  # on a given trajectory. - New in navigation 1.3.1 
+  angular_sim_granularity: 0.05
+
+  # The number of samples to use when exploring the x velocity space 
+  # Default : 3
+  vx_samples: 3
+
+  # The number of samples to use when exploring the theta velocity space
+  # Default : 20 
+  vtheta_samples: 10
 
   # Velocity used when the robot attempt to escape (closed path)
   # Must be negative
-  escape_vel: -0.2
+  escape_vel: -0.1
 
   # Goal Tolerance Parameters
-  yaw_goal_tolerance: 0.09  # 5°
-  xy_goal_tolerance: 0.10   # m
+  yaw_goal_tolerance: 0.18  # 5°
+  xy_goal_tolerance: 0.1   # m
 
   # When robot has reached xy goal, then ignore it for 
   # the last rotation part of the trajectory
   # Speed up the displacement
   latch_xy_goal_tolerance: true
 
+  # Set that gdist_scale and pdist_scale parameters 
+  # assume that goal_distance and path_distance are expressed 
+  # in meters
+  meter_scoring: true
+
   # The weighting for how much the controller should stay 
   # close to the path it was given (0 - 5)
-  pdist_scale: 0.6
+  pdist_scale: 4.5
   
-  #The weighting for how much the controller should 
+  # The weighting for how much the controller should 
   # attempt to reach its local goal (0 - 5)
-  gdist_scale: 0.8
+  gdist_scale: 0.2
 
   # The weighting for how much the controller should attempt to avoid obstacles
-  occdist_scale: 0.01
+  occdist_scale: 2.0
 
   # How far to look ahead in meters when scoring different in-place-rotation trajectories
-  heading_lookahead: 0.325
+  heading_lookahead: 1.0
 
   # Whether to score based on the robot's heading to the
   # path or its distance from the path
-  heading_scoring: false
+  heading_scoring: true
 
   # How far to look ahead in time in seconds along the 
   # simulated trajectory when using heading scoring
