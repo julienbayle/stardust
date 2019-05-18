@@ -262,7 +262,6 @@ void HWInterface::write(ros::Duration &elapsed_time)
 
     double cmd_effort = joint_effort_command_[joint_id];
     double cmd_speed = 0.0;
-    bool security = false;
 
     if (velocity_controller_enabled_) {
       cmd_effort = joint_velocity_controllers_[joint_id]->velocityToEffort(
@@ -275,14 +274,13 @@ void HWInterface::write(ros::Duration &elapsed_time)
    
     // Safety
     if(!joint_encoders_[joint_id]->isAlive()) {
-        ROS_ERROR_STREAM_THROTTLE(1, "Encoder do not emit data. By security, actuator control commannd is set to velocicity = 0 (stay on place)");
+        ROS_ERROR_STREAM_THROTTLE(1, "Encoder do not emit data. By security, actuator mode is set a null effort");
         cmd_effort = 0.0;
         cmd_speed = 0.0;
-	      security = true;
     }
 
     // Effort mode
-    if (!security && cmd_speed > -0.01 && cmd_speed < 0.01) {
+    if (cmd_speed > -0.01 && cmd_speed < 0.01) {
       // Send effort command to hardware
       std_msgs::Int16 effort;
       effort.data = cmd_effort;  
