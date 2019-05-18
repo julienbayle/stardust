@@ -6,6 +6,9 @@
 	<arg name="joy_type" default=""/>
 	<arg name="location" default=""/>
 
+	<env name="ROSCONSOLE_CONFIG_FILE"
+       value="$(find sd_main)/config/$(arg robot_ns)_log_level.conf"/>
+	 
 	<group ns="$(arg robot_ns)">
 		<!-- Description  -->
 		<include file="$(find sd_description)/launch/sd_description.launch">
