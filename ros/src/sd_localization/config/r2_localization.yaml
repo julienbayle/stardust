@@ -1,3 +1,32 @@
+r2_imu_filter_madgwick:
+  # Gain of the filter. 
+  # Higher values lead to faster convergence but more noise. 
+  # Lower values lead to slower convergence but smoother signal. 
+  # Range: 0.0 to 1.0
+  gain: 0.1     
+
+  # Gyro drift gain (approx. rad/s). 
+  # Range: -1.0 to 1.0              
+  zeta: 0.0
+
+  # Standard deviation of the orientation estimate. 
+  # Range: 0.0 to 1.0
+  orientation_stddev: 0.0
+
+  # Orientation (enu = East / North UP) 
+  # in respect with REP-145
+  world_frame: "enu"            
+  
+  use_mag: false                # Only use angular speeds
+
+  # Do not publish TF
+  publish_tf: false
+  fixed_frame: "r2/odom"
+
+  # 0.0 means compute dt dynamically from message headers. 
+  constant_dt: 0.0
+
+
 r2_localization_odom:
   # The real-valued frequency, in Hz, 
   # at which the filter produces a state estimate
@@ -69,6 +98,15 @@ r2_localization_odom:
   odom0_queue_size: 5 # Odom is 50Hz, filter is 10Hz
   odom0_nodelay: true
   
+  imu0: imu/data
+  imu0_config: [false, false, false,
+                false, false, false,
+                false, false, false,
+                false, false, true,
+                true, true, false]
+  imu0_queue_size: 5 # Imu is 50Hz, filter is 10Hz
+  imu0_nodelay: true
+
   initial_state: [0.0, 0.0, 0.0,
                   0.0, 0.0, 0.0,
                   0.0, 0.0, 0.0,

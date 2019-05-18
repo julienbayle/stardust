@@ -15,8 +15,8 @@
     <xacro:property name="free_wheel_x" value="${wheel_x + body_length/2}" />
     
     <xacro:property name="imu_size" value="0.050"/>
-    <xacro:property name="imu_x" value="0.0" />
-    <xacro:property name="imu_y" value="0.0" />
+    <xacro:property name="imu_x" value="${wheel_x}" />
+    <xacro:property name="imu_y" value="${body_width / 2}" />
     <xacro:property name="imu_z" value="0.170" />
     
     <xacro:property name="lidar_height" value="0.037"/>
@@ -144,7 +144,7 @@
     <joint name="imu_to_body" type="fixed">
         <parent link="body_link"/>
         <child link="imu_link"/>
-        <origin xyz="${imu_x} ${imu_y} ${imu_z}" rpy="0 0 0"/>
+        <origin xyz="${imu_x} ${imu_y} ${imu_z}" rpy="0 ${pi} 0"/>
     </joint>
     
     <link name="lidar_link">

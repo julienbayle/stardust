@@ -7,7 +7,7 @@
 	
 	<node name="$(arg robot_ns)_map_server" pkg="map_server" type="map_server" args="$(find sd_localization)/config/amcl_$(arg location)_map.yaml"/>
 
-	<node pkg="imu_filter_madgwick" type="imu_filter_node" name="$(arg robot_ns)_imu_filter_madgwick" if="$(eval arg('robot_ns') == 'r1')"/>
+	<node pkg="imu_filter_madgwick" type="imu_filter_node" name="$(arg robot_ns)_imu_filter_madgwick" />
 
 	<node pkg="robot_localization" type="ukf_localization_node" name="$(arg robot_ns)_localization_odom" clear_params="true" output="screen">
 	</node>

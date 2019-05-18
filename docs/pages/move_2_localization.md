@@ -18,6 +18,15 @@ Le paquet **sd_sensors** publie les données brutes de la centrale inertielle (i
 
 Pour valider le bon fonctionnement de ce paquet, il faut afficher les données du topic imu/data et valider que les données sont correctes.
 
+Pour bien calculer les biais de la centrale inertielle, un service a été mis au point. Pour l'appeler il se connecter au Pi et entrer :
+
+```bash
+source install/setup.bash
+rosservice call /r2/mpu6050/get_bias
+```
+
+Puis reporter les données dans la configuration de l'IMU du paquet **sd_sensors** 
+
 Le second noeud fusionne les données IMU avec celle de l'odométrie afin de publier une odométrie filtrée (odom/filtered) et la transformation TF odom->base_link. Il s'agit en pratique d'un filtre *Unscented Kalman Filter* proposé dans le paquet [robot_localization]("http://docs.ros.org/melodic/api/robot_localization/html/index.html). La [documentation](http://docs.ros.org/melodic/api/robot_localization/html/state_estimation_nodes.html) précise comment régler les différents paramètres. 
 
 Pour valider le bon fonctionnement de ce filtre, on balade le robot à la télécommande et on valide que le topic odom/filtered contient des données de qualité. Une autre technique est de visualiser le robot dans RVIZ dans la base rX/odom et valider que les déplacements sont logiques, surtout les rotations.
