@@ -54,6 +54,7 @@
             <Inverter>
                 <Condition ID="IsRobotEnMouvement"/>
             </Inverter>
+            <Condition ID="IsTirettePresente"/>
             <ReactiveFallback>
                 <ReactiveSequence>
                     <Action angle_base="170" angle_pince="80" ID="Bras"/>
