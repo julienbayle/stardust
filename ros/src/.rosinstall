@@ -3,7 +3,7 @@
     uri: https://github.com/yann-bourrigault/ydlidar.git
 - git:
     local-name: drivers/rosserial
-    uri: https://github.com/yann-bourrigault/rosserial.git
+    uri: https://github.com/julienbayle/rosserial.git
 - git:
     local-name: drivers/neatolidar
     uri: https://github.com/julienbayle/xv_11_lidar_raspberry.git
