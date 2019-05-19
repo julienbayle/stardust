@@ -103,7 +103,7 @@ namespace MoveNodes
 		ROS_DEBUG_STREAM_NAMED("GotoNode",  
 			"Init a goto node with : " << bt_move_base_topic);
 
-		ac = new MoveBaseClient(bt_move_base_topic, true);
+		ac = new MoveBaseClient(*nh_, bt_move_base_topic, true);
 	}
 
 	BT::NodeStatus GotoNode::tick()
@@ -128,6 +128,12 @@ namespace MoveNodes
 		if( !getInput("theta", theta) )
 			throw BT::RuntimeError("theta is missing");
 
+		ROS_DEBUG_STREAM_NAMED("GotoNode", 
+			"Aller en : " 
+			<< "x: " << goal.target_pose.pose.position.x
+			<< "y: " << goal.target_pose.pose.position.y
+			<< "theta: " << theta);
+
 		// generate quaternion
         tf::Quaternion quaternion;
 		geometry_msgs::Quaternion qMsg;
@@ -135,22 +141,22 @@ namespace MoveNodes
         tf::quaternionTFToMsg(quaternion, qMsg);
 
        	goal.target_pose.pose.orientation = qMsg;
-	  	
-
-		goal.target_pose.header.frame_id = "map_link";
-		ROS_DEBUG_STREAM_NAMED("GotoNode", 
-			"Aller en : " 
-			<< "x: " << goal.target_pose.pose.position.x
-			<< "y: " << goal.target_pose.pose.position.y
-			<< "theta: " << theta);
+		goal.target_pose.header.frame_id = "map";
 			
 		ac->sendGoal(goal);
 		
-		actionlib::SimpleClientGoalState ac_state = actionlib::SimpleClientGoalState::ACTIVE;
-		while(ac_state == actionlib::SimpleClientGoalState::ACTIVE && !halted_)
+		actionlib::SimpleClientGoalState ac_state = actionlib::SimpleClientGoalState::PENDING;
+		while(!ac_state.isDone() && !halted_)
 		{
 			ac_mutex_.lock();
 			ac_state = ac->getState();
+
+			ROS_DEBUG_STREAM_NAMED("GotoNode", 
+				"Aller en : " 
+				<< "x: " << goal.target_pose.pose.position.x
+				<< "y: " << goal.target_pose.pose.position.y
+				<< "theta: " << theta
+				<< "statut: " << ac_state.toString());
 			ac_mutex_.unlock();
 			setStatusRunningAndYield();
 		}

@@ -25,7 +25,7 @@ namespace MoveNodes
 			    return { 
 			    	BT::InputPort<double>("x"), 
 					BT::InputPort<double>("y"),
-					BT::InputPort<double>("z")
+					BT::InputPort<double>("theta")
 				};
 			}
 		
@@ -70,7 +70,7 @@ namespace MoveNodes
 					BT::InputPort<double>("theta")
 				};
 			}
-		
+
 		private:
 			MoveBaseClient *ac;
 			std::atomic_bool halted_;
