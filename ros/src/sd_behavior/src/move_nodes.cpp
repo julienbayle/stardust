@@ -140,11 +140,13 @@ namespace MoveNodes
         quaternion = tf::createQuaternionFromYaw(theta * (M_PI/180));
         tf::quaternionTFToMsg(quaternion, qMsg);
 
-       	goal.target_pose.pose.orientation = qMsg;
+	goal.target_pose.pose.orientation = qMsg;
 		goal.target_pose.header.frame_id = "map";
-			
-		ac->sendGoal(goal);
-		
+
+        // Cancel all goals
+		ac->cancelAllGoals();
+        ac->sendGoal(goal);
+
 		actionlib::SimpleClientGoalState ac_state = actionlib::SimpleClientGoalState::PENDING;
 		while(!ac_state.isDone() && !halted_)
 		{
@@ -161,13 +163,10 @@ namespace MoveNodes
 			setStatusRunningAndYield();
 		}
 
-		if(halted_)
-			return BT::NodeStatus::FAILURE;
-		
-  		if(ac_state == actionlib::SimpleClientGoalState::SUCCEEDED)
-  			return BT::NodeStatus::SUCCESS;
-  		else
-  			return BT::NodeStatus::FAILURE;
+		if(ac_state == actionlib::SimpleClientGoalState::SUCCEEDED)
+			return BT::NodeStatus::SUCCESS;
+
+        return BT::NodeStatus::FAILURE;
 	}
 
 	void GotoNode::halt()
