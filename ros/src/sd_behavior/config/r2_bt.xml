@@ -1,60 +1,162 @@
 <root main_tree_to_execute="BehaviorTree">
     <!-- ////////// -->
-    <BehaviorTree ID="BehaviorTree">
-        <SequenceStar>
-            <SubTree ID="initRobot"/>
-        </SequenceStar>
+    <BehaviorTree ID="Afficher le score">
+        <ReactiveSequence>
+            <Condition ID="MinuterieNonEcoulee"/>
+            <Action ID="AfficherLeScore"/>
+            <Action ID="Attendre" ms="5000"/>
+        </ReactiveSequence>
     </BehaviorTree>
     <!-- ////////// -->
-    <BehaviorTree ID="initRobot">
+    <BehaviorTree ID="BehaviorTree">
+        <ForceSuccess>
+            <Sequence>
+                <Condition ID="RobotPret"/>
+                <SubTree ID="Initialisation"/>
+                <SubTree ID="Afficher le score"/>
+                <SubTree ID="Minuterie"/>
+                <SubTree ID="Trier les palets"/>
+                <SubTree ID="Yeux"/>
+            </Sequence>
+        </ForceSuccess>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="Initialisation">
         <Sequence>
-             <Condition ID="ScoreInferieurA" score="5" />
-            <Action ID="DefinirLeScore" score="10" />
+            <Condition ID="IsTirettePresente"/>
+            <Action ID="DefinirLeScore" score="0"/>
+            <Fallback>
+                <Sequence>
+                    <Condition ID="IsCampViolet"/>
+                    <Action ID="DefinirPosition" theta="0" x="0" y="0"/>
+                    <SetBlackboard value="palet_jaune_1" output_key="1"/>
+                    <SetBlackboard value="palet_jaune_2" output_key="1"/>
+                    <SetBlackboard value="palet_violet_1" output_key="0"/>
+                    <SetBlackboard value="palet_violet_2" output_key="0"/>
+                </Sequence>
+                <Sequence>
+                    <Action ID="DefinirPosition" theta="0" x="1" y="0"/>
+                    <SetBlackboard value="palet_jaune_1" output_key="0"/>
+                    <SetBlackboard value="palet_jaune_2" output_key="0"/>
+                    <SetBlackboard value="palet_violet_1" output_key="1"/>
+                    <SetBlackboard value="palet_violet_2" output_key="1"/>
+                </Sequence>
+            </Fallback>
         </Sequence>
     </BehaviorTree>
-     <!-- ////////// -->
+    <!-- ////////// -->
+    <BehaviorTree ID="Minuterie">
+        <ForceSuccess>
+            <Sequence>
+                <Inverter>
+                    <Condition ID="IsTirettePresente"/>
+                </Inverter>
+                <Inverter>
+                    <Condition ID="MinuterieDemarree"/>
+                </Inverter>
+                <Action ID="DefinirTempsMinuterie" seconds="88"/>
+            </Sequence>
+        </ForceSuccess>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="Trier les palets">
+        <Fallback>
+            <BlackboardCheckString value_A="{palet_jaune_1}" return_on_mismatch="FAILURE" value_B="1">
+                <Sequence>
+                    <Action ID="Aller" theta="0" x="1" y="0"/>
+                    <Action ID="Aller" theta="0" x="0" y="0"/>
+                    <Action ID="AjouterAuScore" score="6"/>
+                    <SetBlackboard value="palet_jaune_1" output_key="0"/>
+                </Sequence>
+            </BlackboardCheckString>
+            <BlackboardCheckString value_A="{palet_jaune_2}" return_on_mismatch="FAILURE" value_B="1">
+                <Sequence>
+                    <Action ID="Aller" theta="0" x="2" y="0"/>
+                    <Action ID="Aller" theta="0" x="0" y="0"/>
+                    <Action ID="AjouterAuScore" score="6"/>
+                    <SetBlackboard value="palet_jaune_2" output_key="0"/>
+                </Sequence>
+            </BlackboardCheckString>
+        </Fallback>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="Yeux">
+        <ForceSuccess>
+            <Fallback>
+                <ReactiveSequence>
+                    <Condition ID="IsTirettePresente"/>
+                    <Fallback>
+                        <ReactiveSequence>
+                            <Condition ID="IsCampViolet"/>
+                            <Action ID="AfficheYeux" message="violet" is_default="0"/>
+                        </ReactiveSequence>
+                        <Action ID="AfficheYeux" message="jaune" is_default="0"/>
+                    </Fallback>
+                </ReactiveSequence>
+                <ReactiveSequence>
+                    <Condition ID="MinuterieDemarree"/>
+                    <Condition ID="MinuterieNonEcoulee"/>
+                    <Fallback>
+                        <Sequence>
+                            <Condition ID="ScoreInferieurA" score="1"/>
+                            <Action ID="AfficheYeux" message="perdu.gif" is_default="1"/>
+                        </Sequence>
+                        <Action ID="AfficheYeux" message="adam.gif" is_default="1"/>
+                    </Fallback>
+                </ReactiveSequence>
+            </Fallback>
+        </ForceSuccess>
+    </BehaviorTree>
+    <!-- ////////// -->
     <TreeNodesModel>
-
-        <!-- //// SCORE ////// -->
-        <Action ID="AfficherLeScore" />
-        <Action ID="DefinirLeScore">
-            <input_port default="0" name="score">Valeur du score</input_port>
+        <Action ID="AfficheYeux">
+            <input_port name="is_default" default="0"/>
+            <input_port name="message"/>
         </Action>
+        <SubTree ID="Afficher le score"/>
+        <Action ID="AfficherLeScore"/>
         <Action ID="AjouterAuScore">
-            <input_port default="1" name="score">Valeur à ajouter au score</input_port>
-        </Action>
-        <Condition ID="ScoreInferieurA">
-            <input_port default="1" name="score">Score</input_port>
-        </Condition>
-        <Condition ID="ScoreSuperieurA">
-            <input_port default="0" name="score">Score</input_port>
-        </Condition>
-
-        <!-- /////  TIMER ///// -->
-        <Condition ID="MinuterieNonEcoulee" />
-        <Action ID="DefinirTempsMinuterie">
-            <input_port default="1398" name="seconds">Temps de la minuterie en secondes</input_port>
-        </Action>
-        <Action ID="Attendre">
-            <input_port default="1000" name="ms">Temps en millisecondes</input_port>
-        </Action>
-
-        <!-- /////  SENSORS ///// -->
-        <Condition ID="IsCampViolet"/>
-        <Condition ID="IsTirettePresente"/>
-  
-        <!-- /////  MOVE ///// -->
-        <Action ID="VitesseConstante">
-            <input_port default="0" name="linear_x">Vitesse dans le sens avant/arriere en m/s</input_port>
-            <input_port default="0" name="linear_y">Vitesse dans le sens droite/gauche en m/s</input_port>
-            <input_port default="0" name="angular_z">Vitesse de rotation en rad/s</input_port>
+            <input_port name="score" default="1">Valeur à ajouter au score</input_port>
         </Action>
         <Action ID="Aller">
-            <input_port default="0" name="x">Position absolue en X (en metre)</input_port>
-            <input_port default="0" name="y">Position absolue en Y (en metre)</input_port>
-            <input_port default="0" name="theta">Angle du robot (en degree)</input_port>
+            <input_port name="theta" default="0">Angle du robot (en degree)</input_port>
+            <input_port name="x" default="0">Position absolue en X (en metre)</input_port>
+            <input_port name="y" default="0">Position absolue en Y (en metre)</input_port>
         </Action>
-        
+        <Action ID="Attendre">
+            <input_port name="ms" default="1000">Temps en millisecondes</input_port>
+        </Action>
+        <Action ID="DefinirLeScore">
+            <input_port name="score" default="0">Valeur du score</input_port>
+        </Action>
+        <Action ID="DefinirPosition">
+            <input_port name="theta" default="0">Angle initial (theta)</input_port>
+            <input_port name="x" default="0">Position initiale x</input_port>
+            <input_port name="y" default="0">Position initiale y</input_port>
+        </Action>
+        <Action ID="DefinirTempsMinuterie">
+            <input_port name="seconds" default="1398">Temps de la minuterie en secondes</input_port>
+        </Action>
+        <SubTree ID="Initialisation"/>
+        <Condition ID="IsCampViolet"/>
+        <Condition ID="IsTirettePresente"/>
+        <SubTree ID="Minuterie"/>
+        <Condition ID="MinuterieDemarree"/>
+        <Condition ID="MinuterieNonEcoulee"/>
+        <Condition ID="RobotPret"/>
+        <Condition ID="ScoreInferieurA">
+            <input_port name="score" default="1">Score</input_port>
+        </Condition>
+        <Condition ID="ScoreSuperieurA">
+            <input_port name="score" default="0">Score</input_port>
+        </Condition>
+        <SubTree ID="Trier les palets"/>
+        <Action ID="VitesseConstante">
+            <input_port name="angular_z" default="0">Vitesse de rotation en rad/s</input_port>
+            <input_port name="linear_x" default="0">Vitesse dans le sens avant/arriere en m/s</input_port>
+            <input_port name="linear_y" default="0">Vitesse dans le sens droite/gauche en m/s</input_port>
+        </Action>
+        <SubTree ID="Yeux"/>
     </TreeNodesModel>
     <!-- ////////// -->
 </root>

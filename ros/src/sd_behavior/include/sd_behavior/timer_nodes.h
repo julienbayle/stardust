@@ -54,9 +54,9 @@ namespace TimerNodes
 
 	BT::NodeStatus StartTimer(BT::TreeNode& self);
 
-    BT::NodeStatus StopTimer();
+  BT::NodeStatus StopTimer(BT::TreeNode& self);
 
-    BT::NodeStatus IsStarted();
+  BT::NodeStatus IsStarted();
 
 	BT::NodeStatus IsNotTimeOut();
 };

@@ -10,6 +10,4 @@ namespace StatusNodes
      * Robot is ready when odom and map tf are availables
      */
     BT::NodeStatus IsReady();
-
-    tf::TransformListener listener_;
 };

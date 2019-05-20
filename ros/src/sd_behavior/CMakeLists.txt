@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   behaviortree_cpp_v3
   actionlib
+  tf
 )
 
 catkin_package(

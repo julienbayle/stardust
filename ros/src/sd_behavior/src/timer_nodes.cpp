@@ -14,6 +14,11 @@ namespace TimerNodes
 		return { BT::InputPort<std::string>("seconds") };
 	}
 
+	static BT::PortsList emptyPorts()
+	{
+		return {  };
+	}
+
 	void registerNodes(BT::BehaviorTreeFactory& factory)
 	{
 		factory.registerNodeType<WaitNode>("Attendre");
@@ -28,12 +33,12 @@ namespace TimerNodes
 
 		factory.registerSimpleAction(
 			"LancerLaMinuterie", 
-			StartTimer, 
+			TimerNodes::StartTimer, 
 			timerPorts());
 
         factory.registerSimpleAction(
 			"ArreterLaMinuterie", 
-			StopTimer);
+			TimerNodes::StopTimer);
 
 		timer_started_.store(false);
 		timer_duration_ = std::chrono::seconds(88);
@@ -139,7 +144,7 @@ namespace TimerNodes
 		return BT::NodeStatus::SUCCESS;
 	}
 
-    BT::NodeStatus StopTimer()
+    BT::NodeStatus StopTimer(BT::TreeNode& self)
 	{
 		timer_started_.store(false);
 		ROS_DEBUG_STREAM_NAMED("GlobalTimer", "Arrêt de la minuterie");
