@@ -40,7 +40,7 @@ Ce fût un vrai plus pour nous. Peu d’équipes en disposait en pratique et nou
 
 ## Travailler régulièrement et commencer tôt
 
-Participer à la coupe Eurobot est un travail d'équipe. Pour se classer dans le haut du tableau, il faut compter entre 1000 à 5000 heures de travail de préparation.
+Participer à la coupe Eurobot est un travail d'équipe. Pour se classer dans le haut du tableau, il faut compter entre 1000 et 5000 heures de travail de préparation.
 
 A titre l'illustration 1000 heures, 6 personnes, 8 mois, c'est une moyenne de 5 heures par semaine et par personne. 
 
@@ -103,7 +103,7 @@ Il est possible de faire des petits modules intelligents soit même en employant
 
 L'avantage d'un bus est qu'il est possible de relier presque tous les éléments en série, ce qui simplifie le câblage dans le robot.
 
-Le choix du protocole est difficile. L'essentiel s'est ensuite de s'y tenir.
+Le choix du protocole est difficile. L'essentiel, c'est ensuite de s'y tenir.
 
 ## Bonne pratique observée chez les autres : Des éléments non remis en cause
 
