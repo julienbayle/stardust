@@ -67,7 +67,8 @@ namespace MoveNodes
 			    return { 
 			    	BT::InputPort<double>("x"), 
 					BT::InputPort<double>("y"),
-					BT::InputPort<double>("theta")
+					BT::InputPort<double>("theta"),
+					BT::InputPort<double>("comment")
 				};
 			}
 
@@ -77,7 +78,4 @@ namespace MoveNodes
 			std::mutex ac_mutex_;
 	};
 
-    BT::NodeStatus IsStopped();
-
-    BT::NodeStatus IsStopped();
 }
