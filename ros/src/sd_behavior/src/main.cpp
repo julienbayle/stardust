@@ -5,10 +5,12 @@
 #include "behaviortree_cpp/loggers/bt_zmq_publisher.h"
 
 #include "sd_behavior/eye_nodes.h"
+#include "sd_behavior/laser_nodes.h"
 #include "sd_behavior/gripper_nodes.h"
 #include "sd_behavior/move_nodes.h"
 #include "sd_behavior/score_nodes.h"
 #include "sd_behavior/sensors_nodes.h"
+#include "sd_behavior/status_nodes.h"
 #include "sd_behavior/timer_nodes.h"
 
 
@@ -32,9 +34,11 @@ int main(int argc, char* argv[])
 
 	EyeNodes::registerNodes(factory, nh);
 	GripperNodes::registerNodes(factory, nh);
+	LaserNodes::registerNodes(factory, nh);
 	MoveNodes::registerNodes(factory, nh);
 	ScoreNodes::registerNodes(factory, nh);
 	SensorsNodes::registerNodes(factory, nh);
+	StatusNodes::registerNodes(factory, nh);
 	TimerNodes::registerNodes(factory);
 
 	std::string fn = argv[1];

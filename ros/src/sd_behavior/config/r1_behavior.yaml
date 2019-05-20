@@ -6,6 +6,10 @@ purple_x: -0.550
 purple_y: 1.275
 purple_yaw: -1.5708 # -pi/2
 
+base_link_frame_id: r1/base_link
+odom_frame_id: r1/odom
+map_frame_id: map
+
 bt_initialpose_topic: /r1/initialpose
 bt_move_base_topic: /r1/move_base
 bt_cmd_vel_topic: /r1/auto_cmd_vel
