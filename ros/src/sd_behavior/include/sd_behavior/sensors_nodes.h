@@ -1,6 +1,9 @@
 #include "behaviortree_cpp/bt_factory.h"
 #include <std_msgs/UInt32.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <geometry_msgs/Twist.h>
 #include <ros/ros.h>
+
 
 /*
 #### ros topic "/r1/pilo/switches" : Uint32
@@ -19,9 +22,9 @@ bit 9  : fils noir_bleu			:PiloP_COM3.Pin.IO1 	: palet centre present
 bit 10 : fils noir_vert			:PiloP_COM3.Pin.IO5 	: palet droite present
 */
 
-#define VENTOUSE_GAUCHE 0
+#define VENTOUSE_GAUCHE 2
 #define VENTOUSE_CENTRE 1
-#define VENTOUSE_DROITE 2
+#define VENTOUSE_DROITE 0
 #define ARRET_URGENCE 6
 #define TIRRETTE_DEMARAGE 7
 #define PALET_GAUCHE 8
@@ -30,6 +33,7 @@ bit 10 : fils noir_vert			:PiloP_COM3.Pin.IO5 	: palet droite present
 
 namespace SensorsNodes
 {
+	
 	void registerNodes(BT::BehaviorTreeFactory& factory, ros::NodeHandle& nh);
 	
 	BT::NodeStatus IsArretUrgence();
@@ -46,4 +50,7 @@ namespace SensorsNodes
 	BT::NodeStatus IsVentouseGauche();
 
 	void rosUpdate(const std_msgs::UInt32 &switches);
+	void rosUpdateMovement(const geometry_msgs::Twist &speed);
+	void rosUpdatePosition(const geometry_msgs::PoseWithCovarianceStamped &position);
+
 }

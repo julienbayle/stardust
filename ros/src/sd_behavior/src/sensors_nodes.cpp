@@ -5,7 +5,10 @@ std::atomic<bool> 		is_tirette_;
 std::atomic<bool>		is_camp_violet_;
 std::atomic<bool>		is_robot_en_mouvement_;
 std::atomic<unsigned>  		ui32_switches_;
+geometry_msgs::PoseWithCovarianceStamped		position_robot_;
 ros::Subscriber 		sensors_sub_;
+ros::Subscriber 		position_sub_;
+ros::Subscriber 		speed_sub_;
 
 void SensorsNodes::registerNodes(BT::BehaviorTreeFactory& factory, ros::NodeHandle& nh)
 {
@@ -21,8 +24,12 @@ void SensorsNodes::registerNodes(BT::BehaviorTreeFactory& factory, ros::NodeHand
 	factory.registerSimpleCondition("IsVentouseGauche", std::bind(SensorsNodes::IsVentouseGauche));
 
 	sensors_sub_ = nh.subscribe("/r1/pilo/switches", 1, SensorsNodes::rosUpdate);
+	sensors_sub_ = nh.subscribe("/r1/amcl_pose", 1, SensorsNodes::rosUpdatePosition);
+	speed_sub_ = nh.subscribe("/r1/auto_cmd_vel", 1, SensorsNodes::rosUpdateMovement);
+
 	is_tirette_.store(false);
 	is_camp_violet_.store(true);
+	is_robot_en_mouvement_.store(false);
 	ui32_switches_.store(0);
 }
 
@@ -41,7 +48,7 @@ BT::NodeStatus SensorsNodes::IsCampViolet()
 BT::NodeStatus SensorsNodes::IsRobotEnMouvement()
 {
 	ROS_DEBUG_STREAM_NAMED("RobotSensorsCondition", "IsRobotEnMouvement : " << is_robot_en_mouvement_);
-	return BT::NodeStatus::FAILURE;
+	return is_robot_en_mouvement_ ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
 }
 
 BT::NodeStatus SensorsNodes::IsArretUrgence()
@@ -88,6 +95,23 @@ BT::NodeStatus SensorsNodes::IsVentouseGauche()
 	bool bit=(ui32_switches_&(1<<VENTOUSE_GAUCHE))!=0;
 	ROS_DEBUG_STREAM_NAMED("RobotSensorsCondition", "IsVentouseGauche : " << bit);
 	return bit ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
+}
+
+void SensorsNodes::rosUpdateMovement(const geometry_msgs::Twist &speed)
+{
+        ROS_DEBUG_STREAM_NAMED("RobotSensorsCondition",
+                "Update sensor values with "
+                 << speed);
+		is_robot_en_mouvement_ = false;
+}
+
+void SensorsNodes::rosUpdatePosition(const geometry_msgs::PoseWithCovarianceStamped &position)
+{
+        ROS_DEBUG_STREAM_NAMED("RobotSensorsCondition",
+                "Update sensor values with "
+                 << position.pose.pose.position.x << "," << position.pose.pose.position.y);
+				 
+				 position_robot_ = position;
 }
 
 void SensorsNodes::rosUpdate(const std_msgs::UInt32 &switches)

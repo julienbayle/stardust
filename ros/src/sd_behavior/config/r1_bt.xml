@@ -19,6 +19,99 @@
         </ReactiveFallback>
     </BehaviorTree>
     <!-- ////////// -->
+    <BehaviorTree ID="TesterToutesLesVentouses">
+        <Fallback>
+            <SubTree ID="VentouseD"/>
+            <SubTree ID="VentouseCD"/>
+            <SubTree ID="VentouseDG"/>
+            <SubTree ID="VentouseC"/>
+            <SubTree ID="VentouseCDG"/>
+            <SubTree ID="VentouseG"/>
+            <SubTree ID="VentouseCG"/>
+        </Fallback>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="VentouseC">
+        <Sequence>
+            <Condition ID="IsVentouseCentre"/>
+            <Inverter>
+                <Condition ID="IsVentouseDroite"/>
+            </Inverter>
+            <Inverter>
+                <Condition ID="IsVentouseGauche"/>
+            </Inverter>
+            <Action right_valve="false" middle_valve="true" ID="Pince" left_valve="false"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="VentouseCD">
+        <Sequence>
+            <Condition ID="IsVentouseCentre"/>
+            <Condition ID="IsVentouseDroite"/>
+            <Inverter>
+                <Condition ID="IsVentouseGauche"/>
+            </Inverter>
+            <Action right_valve="true" middle_valve="true" ID="Pince" left_valve="false"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="VentouseCDG">
+        <Sequence>
+            <Condition ID="IsVentouseCentre"/>
+            <Condition ID="IsVentouseDroite"/>
+            <Condition ID="IsVentouseGauche"/>
+            <Action right_valve="true" middle_valve="true" ID="Pince" left_valve="true"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="VentouseCG">
+        <Sequence>
+            <Condition ID="IsVentouseCentre"/>
+            <Inverter>
+                <Condition ID="IsVentouseDroite"/>
+            </Inverter>
+            <Condition ID="IsVentouseGauche"/>
+            <Action right_valve="false" middle_valve="true" ID="Pince" left_valve="true"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="VentouseDG">
+        <Sequence>
+            <Inverter>
+                <Condition ID="IsVentouseCentre"/>
+            </Inverter>
+            <Condition ID="IsVentouseDroite"/>
+            <Condition ID="IsVentouseGauche"/>
+            <Action right_valve="true" middle_valve="false" ID="Pince" left_valve="true"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="VentouseG">
+        <Sequence>
+            <Inverter>
+                <Condition ID="IsVentouseCentre"/>
+            </Inverter>
+            <Inverter>
+                <Condition ID="IsVentouseDroite"/>
+            </Inverter>
+            <Condition ID="IsVentouseGauche"/>
+            <Action right_valve="false" middle_valve="false" ID="Pince" left_valve="true"/>
+        </Sequence>
+    </BehaviorTree>
+	    <!-- ////////// -->
+    <BehaviorTree ID="VentouseD">
+        <Sequence>
+	            <Inverter>
+                <Condition ID="IsVentouseCentre"/>
+            </Inverter>
+            <Condition ID="IsVentouseDroite"/>
+            <Inverter>
+                <Condition ID="IsVentouseGauche"/>
+            </Inverter>
+            <Action right_valve="true" middle_valve="false" ID="Pince" left_valve="false"/>
+			        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
     <BehaviorTree ID="campJaune">
         <ReactiveSequence>
             <Inverter>
@@ -26,9 +119,9 @@
             </Inverter>
             <Condition ID="MinuterieNonEcoulee"/>
             <SequenceStar>
-                <Action y="2" ID="Aller" x="1" theta="0"/>
-                <Action y="0" ID="Aller" x="0" theta="0"/>
-                <Action y="0" ID="Aller" x="0" theta="0"/>
+                <Action theta="0" y="2" x="1" ID="Aller"/>
+                <Action theta="0" y="0" x="0" ID="Aller"/>
+                <Action theta="0" y="0" x="0" ID="Aller"/>
             </SequenceStar>
         </ReactiveSequence>
     </BehaviorTree>
@@ -37,15 +130,15 @@
         <ReactiveSequence>
             <Condition ID="IsCampViolet"/>
             <Condition ID="MinuterieNonEcoulee"/>
-            <Action y="2" ID="Aller" x="2" theta="0"/>
+            <Action theta="0" y="2" x="2" ID="Aller"/>
         </ReactiveSequence>
     </BehaviorTree>
     <!-- ////////// -->
     <BehaviorTree ID="initRobot">
         <Sequence>
             <Action ID="InitialiserPosition"/>
-            <Action score="50" ID="DefinirLeScore"/>
-            <Action seconds="1398" ID="LancerLaMinuterie"/>
+            <Action ID="DefinirLeScore" score="50"/>
+            <Action ID="LancerLaMinuterie" seconds="1398"/>
         </Sequence>
     </BehaviorTree>
     <!-- ////////// -->
@@ -54,24 +147,18 @@
             <Inverter>
                 <Condition ID="IsRobotEnMouvement"/>
             </Inverter>
-            <Condition ID="IsTirettePresente"/>
-            <ReactiveFallback>
-                <ReactiveSequence>
-                    <Action angle_base="170" angle_pince="80" ID="Bras"/>
+            <Fallback>
+                <SequenceStar>
+                    <Action angle_base="170" angle_pince="80" ID="Bras"/>	
                     <Action angle_base="180" angle_pince="51" ID="Bras"/>
                     <Action angle_base="156" angle_pince="27" ID="Bras"/>
-                    <Sequence>
-                        <RetryUntilSuccesful num_attempts="10">
-                            <Condition ID="IsVentouseDroite"/>
-                        </RetryUntilSuccesful>
-                        <Action left_valve="true" right_valve="true" ID="Pince" middle_valve="true"/>
-                    </Sequence>
+                    <SubTree ID="TesterToutesLesVentouses"/>
                     <Action angle_base="170" angle_pince="110" ID="Bras"/>
                     <Action angle_base="90" angle_pince="110" ID="Bras"/>
-                </ReactiveSequence>
+                </SequenceStar>
                 <Action angle_base="170" angle_pince="110" ID="Bras"/>
                 <Action angle_base="90" angle_pince="110" ID="Bras"/>
-            </ReactiveFallback>
+            </Fallback>
         </ReactiveSequence>
     </BehaviorTree>
     <!-- ////////// -->
@@ -80,21 +167,10 @@
             <Inverter>
                 <Condition ID="IsRobotEnMouvement"/>
             </Inverter>
-            <Condition y="10" ID="checkPosition" x="10"/>
+            <Condition y="10" x="10" ID="checkPosition"/>
             <ReactiveFallback>
-                <Inverter>
-                    <Condition ID="IsCampViolet"/>
-                </Inverter>
                 <Action angle_base="0" angle_pince="0" ID="Bras"/>
-                <Condition ID="IsVentouseGauche"/>
-                <Action left_valve="true" right_valve="false" ID="Pince" middle_valve="false"/>
-                <Action angle_base="0" angle_pince="0" ID="Bras"/>
-            </ReactiveFallback>
-            <ReactiveFallback>
-                <Condition ID="IsCampViolet"/>
-                <Action angle_base="0" angle_pince="0" ID="Bras"/>
-                <Condition ID="IsVentouseDroite"/>
-                <Action left_valve="true" right_valve="false" ID="Pince" middle_valve="false"/>
+                <SubTree ID="TesterToutesLesVentouses"/>
                 <Action angle_base="0" angle_pince="0" ID="Bras"/>
             </ReactiveFallback>
         </ReactiveSequence>
@@ -111,8 +187,7 @@
                 <Action angle_base="35" angle_pince="170" ID="Bras"/>
                 <Action angle_base="38" angle_pince="180" ID="Bras"/>
                 <Action angle_base="32" angle_pince="180" ID="Bras"/>
-                <Condition ID="IsVentouseCentre"/>
-                <Action left_valve="false" right_valve="false" ID="Pince" middle_valve="true"/>
+                <SubTree ID="TesterToutesLesVentouses"/>
                 <Action angle_base="40" angle_pince="140" ID="Bras"/>
                 <Action angle_base="40" angle_pince="90" ID="Bras"/>
                 <Action angle_base="70" angle_pince="110" ID="Bras"/>
@@ -125,21 +200,18 @@
             <Inverter>
                 <Condition ID="IsRobotEnMouvement"/>
             </Inverter>
-            <Condition y="10" ID="checkPosition" x="10"/>
             <ReactiveFallback>
                 <Inverter>
                     <Condition ID="IsCampViolet"/>
                 </Inverter>
                 <Action angle_base="0" angle_pince="0" ID="Bras"/>
-                <Condition ID="IsVentouseGauche"/>
-                <Action left_valve="true" right_valve="false" ID="Pince" middle_valve="false"/>
+                <SubTree ID="VentouseG"/>
                 <Action angle_base="0" angle_pince="0" ID="Bras"/>
             </ReactiveFallback>
             <ReactiveFallback>
                 <Condition ID="IsCampViolet"/>
                 <Action angle_base="0" angle_pince="0" ID="Bras"/>
-                <Condition ID="IsVentouseDroite"/>
-                <Action left_valve="true" right_valve="false" ID="Pince" middle_valve="false"/>
+                <SubTree ID="VentouseD"/>
                 <Action angle_base="0" angle_pince="0" ID="Bras"/>
             </ReactiveFallback>
         </ReactiveSequence>
@@ -148,25 +220,25 @@
     <TreeNodesModel>
         <Action ID="AfficherLeScore"/>
         <Action ID="AjouterAuScore">
-            <input_port default="1" name="score">Valeur à ajouter au score</input_port>
+            <input_port name="score" default="1">Valeur à ajouter au score</input_port>
         </Action>
         <Action ID="Aller">
-            <input_port default="0" name="theta">Angle du robot (en degree)</input_port>
-            <input_port default="0" name="x">Position absolue en X (en metre)</input_port>
-            <input_port default="0" name="y">Position absolue en Y (en metre)</input_port>
+            <input_port name="theta" default="0">Angle du robot (en degree)</input_port>
+            <input_port name="x" default="0">Position absolue en X (en metre)</input_port>
+            <input_port name="y" default="0">Position absolue en Y (en metre)</input_port>
         </Action>
         <Action ID="Attendre">
-            <input_port default="1000" name="ms">Temps en millisecondes</input_port>
+            <input_port name="ms" default="1000">Temps en millisecondes</input_port>
         </Action>
         <Action ID="Bras">
-            <input_port default="0" name="angle_base">Angle moteur au plus pres de la base</input_port>
-            <input_port default="0" name="angle_pince">Angle moteur au plus pres de la pince</input_port>
+            <input_port name="angle_base" default="0">Angle moteur au plus pres de la base</input_port>
+            <input_port name="angle_pince" default="0">Angle moteur au plus pres de la pince</input_port>
         </Action>
         <Action ID="DefinirLeScore">
-            <input_port default="0" name="score">Valeur du score</input_port>
+            <input_port name="score" default="0">Valeur du score</input_port>
         </Action>
         <Action ID="DefinirTempsMinuterie">
-            <input_port default="1398" name="seconds">Temps de la minuterie en secondes</input_port>
+            <input_port name="seconds" default="1398">Temps de la minuterie en secondes</input_port>
         </Action>
         <Action ID="InitialiserPosition"/>
         <Condition ID="IsArretUrgence"/>
@@ -184,21 +256,29 @@
         </Action>
         <Condition ID="MinuterieNonEcoulee"/>
         <Action ID="Pince">
-            <input_port default="false" name="left_valve"/>
-            <input_port default="false" name="middle_valve"/>
-            <input_port default="false" name="right_valve"/>
+            <input_port name="left_valve" default="false"/>
+            <input_port name="middle_valve" default="false"/>
+            <input_port name="right_valve" default="false"/>
         </Action>
         <Condition ID="ScoreInferieurA">
-            <input_port default="1" name="score">Score</input_port>
+            <input_port name="score" default="1">Score</input_port>
         </Condition>
         <Condition ID="ScoreSuperieurA">
-            <input_port default="0" name="score">Score</input_port>
+            <input_port name="score" default="0">Score</input_port>
         </Condition>
         <SubTree ID="TestSensors"/>
+        <SubTree ID="TesterToutesLesVentouses"/>
+        <SubTree ID="VentouseC"/>
+        <SubTree ID="VentouseCD"/>
+        <SubTree ID="VentouseCDG"/>
+        <SubTree ID="VentouseCG"/>
+        <SubTree ID="VentouseD"/>
+        <SubTree ID="VentouseDG"/>
+        <SubTree ID="VentouseG"/>
         <Action ID="VitesseConstante">
-            <input_port default="0" name="angular_z">Vitesse de rotation en rad/s</input_port>
-            <input_port default="0" name="linear_x">Vitesse dans le sens avant/arriere en m/s</input_port>
-            <input_port default="0" name="linear_y">Vitesse dans le sens droite/gauche en m/s</input_port>
+            <input_port name="angular_z" default="0">Vitesse de rotation en rad/s</input_port>
+            <input_port name="linear_x" default="0">Vitesse dans le sens avant/arriere en m/s</input_port>
+            <input_port name="linear_y" default="0">Vitesse dans le sens droite/gauche en m/s</input_port>
         </Action>
         <SubTree ID="campJaune"/>
         <SubTree ID="campViolet"/>

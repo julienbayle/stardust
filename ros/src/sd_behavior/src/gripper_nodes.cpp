@@ -4,6 +4,7 @@
 
 namespace GripperNodes
 {
+	
 	void registerNodes(BT::BehaviorTreeFactory& factory, ros::NodeHandle& nh) 
 	{
 		factory.registerNodeType<GripperNodes::ArmNode>("Bras");
@@ -14,10 +15,12 @@ namespace GripperNodes
     ArmNode::ArmNode(
         const std::string& name, 
         const BT::NodeConfiguration& config) 
-			: SyncActionNode(name, config)
+			: CoroActionNode(name, config)
     { 
-        angle_base_pub_ = nh_->advertise<std_msgs::UInt16>("/r1/servo/F", 1);
-        angle_pince_pub_ = nh_->advertise<std_msgs::UInt16>("/r1/servo/E", 1);
+        angle_base_pub_ = nh_->advertise<std_msgs::UInt16>("/r1/servo/E", 1);
+        angle_pince_pub_ = nh_->advertise<std_msgs::UInt16>("/r1/servo/F", 1);
+		duration_ = std::chrono::milliseconds(0);
+		halted_.store(false);
     }
 
 	BT::NodeStatus ArmNode::tick()
@@ -46,24 +49,56 @@ namespace GripperNodes
 
         ROS_DEBUG_STREAM_NAMED("ArmNode", "Publish base E  - " << angle_pince_msg.data);
 
-	std::this_thread::sleep_for(std::chrono::milliseconds(angle_pince*rotationDelayPerDegree));
+		duration_ = std::chrono::milliseconds(angle_pince*ROTATION_DELAY_BY_DEGREE);
+		start_ = std::chrono::high_resolution_clock::now();	
+		t_chrono elapsed_time = std::chrono::milliseconds(0);
+		
+			while (elapsed_time < duration_ && !halted_)
+			{	
+				elapsed_time = std::chrono::high_resolution_clock::now() - start_;
+				ROS_DEBUG_STREAM_NAMED("GripperNode",
+					"Attente en cours depuis " 
+					<< std::fixed << std::setprecision(0) 
+					<< 1000 * elapsed_time.count() << " ms");
+				setStatusRunningAndYield();
+			}
+			
+			if(! halted_)
+			{
+				ROS_DEBUG_STREAM_NAMED("GripperNode","Fin de l'attente");
+			}
 
 	return BT::NodeStatus::SUCCESS;
+	}
+	
+	void ArmNode::halt() 
+	{
+		t_chrono elapsed_time = std::chrono::high_resolution_clock::now() - start_;
+        ROS_DEBUG_STREAM_NAMED("ArmNode",
+			"Arret de l'attente avant la fin, il restait " 
+			<< std::fixed << std::setprecision(0) 
+			<< 1000 * (duration_.count() - elapsed_time.count()) 
+			<< " ms");
+		halted_.store(true);
 	}
 
     GripperNode::GripperNode(
         const std::string& name, 
         const BT::NodeConfiguration& config) 
-			: SyncActionNode(name, config)
+			: CoroActionNode(name, config)
     { 
         activation_right_valve_pub_ = nh_->advertise<std_msgs::Int16>("/r1/pwm/vanne1", 1);
         activation_middle_valve_pub_ = nh_->advertise<std_msgs::Int16>("/r1/pwm/vanne3", 1);
 	    activation_left_valve_pub_ = nh_->advertise<std_msgs::Int16>("/r1/pwm/vanne2", 1);
         activation_pump_pub_ = nh_->advertise<std_msgs::Int16>("/r1/pwm/pompe", 1);
+		duration_ = std::chrono::milliseconds(10);
+		halted_.store(false);
     }
 
 	BT::NodeStatus GripperNode::tick()
 	{
+		
+		
 	bool left_valve, middle_valve, right_valve;
 	    if( !getInput("left_valve", left_valve) )
 	        throw BT::RuntimeError("left_valve is missing");
@@ -80,22 +115,35 @@ namespace GripperNodes
 
 	if(left_valve)
 	{
-                std_msgs::Int16 msg;
-                msg.data = 4096;
-                activation_pump_pub_.publish(msg);
+		std_msgs::Int16 msg;
+		msg.data = 4096;
+		activation_pump_pub_.publish(msg);
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-				
-                activation_left_valve_pub_.publish(msg);
+		start_ = std::chrono::high_resolution_clock::now();	
+		t_chrono elapsed_time = std::chrono::milliseconds(0);
+		
+		while (elapsed_time < duration_ && !halted_)
+		{	
+			elapsed_time = std::chrono::high_resolution_clock::now() - start_;
+			ROS_DEBUG_STREAM_NAMED("GripperNode",
+				"Attente en cours depuis " 
+				<< std::fixed << std::setprecision(0) 
+				<< 1000 * elapsed_time.count() << " ms");
+			setStatusRunningAndYield();
+		}
+		
+		 activation_left_valve_pub_.publish(msg);
+		
+		if(! halted_)
+		{
+			ROS_DEBUG_STREAM_NAMED("GripperNode","Fin de l'attente");
+		}
+
 	}
 	else
 	{
                 std_msgs::Int16 msg;
                 msg.data = 0;
-//                activation_pump_pub_.publish(msg);
-
-  //              std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
                 activation_left_valve_pub_.publish(msg);
 	}
 
@@ -105,18 +153,31 @@ namespace GripperNodes
                 msg.data = 4096;
                 activation_pump_pub_.publish(msg);
 
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		start_ = std::chrono::high_resolution_clock::now();	
+		t_chrono elapsed_time = std::chrono::milliseconds(0);
+		
+			while (elapsed_time < duration_ && !halted_)
+			{	
+				elapsed_time = std::chrono::high_resolution_clock::now() - start_;
+				ROS_DEBUG_STREAM_NAMED("GripperNode",
+					"Attente en cours depuis " 
+					<< std::fixed << std::setprecision(0) 
+					<< 1000 * elapsed_time.count() << " ms");
+				setStatusRunningAndYield();
+			}
+			
+					activation_right_valve_pub_.publish(msg);
+			
+			if(! halted_)
+			{
+				ROS_DEBUG_STREAM_NAMED("GripperNode","Fin de l'attente");
+			}
 
-                activation_right_valve_pub_.publish(msg);
         }
         else
         {
                 std_msgs::Int16 msg;
                 msg.data = 0;
-      //          activation_pump_pub_.publish(msg);
-
-    //            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
                 activation_right_valve_pub_.publish(msg);
         }
 
@@ -126,21 +187,46 @@ namespace GripperNodes
                 msg.data = 4096;
                 activation_pump_pub_.publish(msg);
 
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
+		start_ = std::chrono::high_resolution_clock::now();	
+		t_chrono elapsed_time = std::chrono::milliseconds(0);
+		
+			while (elapsed_time < duration_ && !halted_)
+			{	
+				elapsed_time = std::chrono::high_resolution_clock::now() - start_;
+				ROS_DEBUG_STREAM_NAMED("GripperNode",
+					"Attente en cours depuis " 
+					<< std::fixed << std::setprecision(0) 
+					<< 1000 * elapsed_time.count() << " ms");
+				setStatusRunningAndYield();
+			}
+			
                 activation_middle_valve_pub_.publish(msg);
+			
+			if(! halted_)
+			{
+				ROS_DEBUG_STREAM_NAMED("GripperNode","Fin de l'attente");
+			}
+
         }
         else
         {
                 std_msgs::Int16 msg;
                 msg.data = 0;
-        //        activation_pump_pub_.publish(msg);
-
-          //      std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
                 activation_middle_valve_pub_.publish(msg);
         }
 
 	    return BT::NodeStatus::SUCCESS;
+	}
+	
+		
+	void GripperNode::halt() 
+	{
+		t_chrono elapsed_time = std::chrono::high_resolution_clock::now() - start_;
+        ROS_DEBUG_STREAM_NAMED("GripperNode",
+			"Arret de l'attente avant la fin, il restait " 
+			<< std::fixed << std::setprecision(0) 
+			<< 1000 * (duration_.count() - elapsed_time.count()) 
+			<< " ms");
+		halted_.store(true);
 	}
 }
