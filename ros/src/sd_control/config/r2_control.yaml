@@ -9,7 +9,7 @@ mobile_base_controller:
   right_wheel : 'right_wheel_to_base'
   publish_rate: 25.0               # default: 50
   publish_cmd: true
-  enable_odom_tf: true            # TF is publihed by the ukf filter
+  enable_odom_tf: false            # TF is publihed by the ukf filter
   open_loop: false
   
   pose_covariance_diagonal : [0.001, 0.001, 1000000.0, 1000000.0, 1000000.0, 1000.0]

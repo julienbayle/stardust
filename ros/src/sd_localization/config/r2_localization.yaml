@@ -114,7 +114,7 @@ r2_localization_odom:
                   0.0 ,0.0, 0.0]
 
   # Use this filter to publish odom TF     
-  publish_tf: false
+  publish_tf: true
   publish_acceleration: false
   print_diagnostics: false
   
@@ -201,9 +201,18 @@ r2_localization_map:
                  false, false, false]
   # AMCL should be the only source for pose, 
   # so odom is used as "differential" (only for speed)
-  # odom0_differetial: true
+  odom0_differetial: true
   odom0_queue_size: 5 # Odom is 50Hz, filter is 10Hz
   odom0_nodelay: true
+  
+  imu0: imu/data
+  imu0_config: [false, false, false,
+                false, false, false,
+                false, false, false,
+                false, false, true,
+                true, true, false]
+  imu0_queue_size: 5 # Imu is 50Hz, filter is 10Hz
+  imu0_nodelay: true  
   
   initial_state: [0.0, 0.0, 0.0,
                   0.0, 0.0, 0.0,
