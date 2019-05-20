@@ -1,4 +1,3 @@
-// Exemple de base de behaviorTree.cpp pour test
 #include "sd_behavior/timer_nodes.h"
 #include <iomanip>
 #include <ros/ros.h>
@@ -23,13 +22,21 @@ namespace TimerNodes
 			"MinuterieNonEcoulee", 
 			std::bind(TimerNodes::IsNotTimeOut));
 
+        factory.registerSimpleCondition(
+			"MinuterieDemarree", 
+			std::bind(TimerNodes::IsStarted));
+
 		factory.registerSimpleAction(
 			"LancerLaMinuterie", 
 			StartTimer, 
 			timerPorts());
 
+        factory.registerSimpleAction(
+			"ArreterLaMinuterie", 
+			StopTimer);
+
 		timer_started_.store(false);
-		timer_duration_ = std::chrono::seconds(1398);
+		timer_duration_ = std::chrono::seconds(88);
 	}
 
 	WaitNode::WaitNode(
@@ -96,6 +103,7 @@ namespace TimerNodes
 		if(remaining_time < std::chrono::milliseconds(0))
 		{
 			ROS_DEBUG_STREAM_NAMED("GlobalTimer", "Minuterie terminee");
+
 			return BT::NodeStatus::FAILURE;
 		}
 		else
@@ -106,6 +114,11 @@ namespace TimerNodes
 				<< remaining_time.count() << " sec. )");
 			return BT::NodeStatus::SUCCESS;
 		}		
+	}
+
+    BT::NodeStatus IsStarted()
+	{
+		return timer_started_ ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
 	}
 
 	BT::NodeStatus StartTimer(BT::TreeNode& self)
@@ -122,6 +135,14 @@ namespace TimerNodes
 			<< std::fixed << std::setprecision(0) 
 			<< timer_duration_.count() 
 			<< " seconde(s)");
+			
+		return BT::NodeStatus::SUCCESS;
+	}
+
+    BT::NodeStatus StopTimer()
+	{
+		timer_started_.store(false);
+		ROS_DEBUG_STREAM_NAMED("GlobalTimer", "Arrêt de la minuterie");
 			
 		return BT::NodeStatus::SUCCESS;
 	}

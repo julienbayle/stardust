@@ -4,6 +4,29 @@
 typedef std::chrono::time_point<std::chrono::high_resolution_clock> t_clock;
 typedef std::chrono::duration<double> t_chrono;
 
+/**
+  * ------------
+  * GLOBAL TIMER
+  * ------------
+  * 
+  * Non démarrée <--
+  *      |         |
+  *  *StartTimer*  |
+  *      |         |
+  *      v         |
+  *  En cours      |
+  *      |         |
+  *      -----*StopTimer* 
+  *      |
+  *      v
+  *   Terminé (temps dépassé)
+  * 
+  *
+  *   				IsStarted	IsNotTimeOut
+  * Non démarrée	0			1
+  * En cours		1			1
+  * Terminé			1			0
+  */
 namespace TimerNodes
 {
 	void registerNodes(BT::BehaviorTreeFactory& factory);
@@ -30,6 +53,10 @@ namespace TimerNodes
 	};
 
 	BT::NodeStatus StartTimer(BT::TreeNode& self);
+
+    BT::NodeStatus StopTimer();
+
+    BT::NodeStatus IsStarted();
 
 	BT::NodeStatus IsNotTimeOut();
 };
