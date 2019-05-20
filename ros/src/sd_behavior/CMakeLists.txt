@@ -6,6 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   sensor_msgs
+  sd_led_matrix
   geometry_msgs
   behaviortree_cpp_v3
   actionlib
@@ -53,6 +54,11 @@ add_library(timer_nodes STATIC src/timer_nodes.cpp)
 target_link_libraries(timer_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
 target_link_libraries(${PROJECT_NAME} timer_nodes)
 
+add_library(eye_nodes STATIC src/eye_nodes.cpp)
+target_link_libraries(eye_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
+target_link_libraries(${PROJECT_NAME} eye_nodes)
+
+
 #############
 ## Install ##
 #############
@@ -67,12 +73,12 @@ install(
 
 install(
   TARGETS 
-#     display_nodes
-#     gripper_nodes
-#     move_nodes
+    eye_nodes
+    gripper_nodes
+    move_nodes
     score_nodes
-#     sensors_nodes
-#     timer_nodes
+    sensors_nodes
+    timer_nodes
 	ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 	LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )

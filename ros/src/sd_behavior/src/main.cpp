@@ -4,6 +4,7 @@
 #include "behaviortree_cpp/loggers/bt_file_logger.h"
 #include "behaviortree_cpp/loggers/bt_zmq_publisher.h"
 
+#include "sd_behavior/eye_nodes.h"
 #include "sd_behavior/gripper_nodes.h"
 #include "sd_behavior/move_nodes.h"
 #include "sd_behavior/score_nodes.h"
@@ -29,6 +30,7 @@ int main(int argc, char* argv[])
 	// Init behavior tree
 	BehaviorTreeFactory factory;
 
+	EyeNodes::registerNodes(factory, nh);
 	GripperNodes::registerNodes(factory, nh);
 	MoveNodes::registerNodes(factory, nh);
 	ScoreNodes::registerNodes(factory, nh);
