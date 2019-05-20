@@ -187,7 +187,7 @@ r1_localization_map:
   world_frame: map
 
   transform_time_offset: 0.05 # 50ms
-  transform_timeout: 0
+  transform_timeout: 0.1
   
   pose0: amcl_pose
   pose0_config: [true, true, false,
@@ -282,26 +282,30 @@ r1_amcl:
   min_particles: 100
 
   # Maximum allowed number of particles (default : 5000)
-  max_particles: 2500
+  max_particles: 1000
 
   # Translational movement required before performing 
   # a filter update (in meter)
-  update_min_d: 0.1
+  update_min_d: 0.01
 
   # Rotational movement required before performing 
   # a filter update (radian)
-  update_min_a: 0.25 # 20°
+  update_min_a: 0.01
 
   # Number of filter updates required before resampling
   resample_interval: 2
 
   # Time with which to post-date the transform that is 
   # published, to indicate that this transform is valid into the future
-  transform_tolerance: 0.2
+  transform_tolerance: 0.5
 
-  # Disable the "add random poses" mecanism
-  recovery_alpha_slow: 0.0
-  recovery_alpha_fast: 0.0
+  # Exponential decay rate for the slow average weight filter, used in 
+  # deciding when to recover by adding random poses
+  recovery_alpha_slow: 0.005
+
+  # Exponential decay rate for the fast average weight filter, used in 
+  # deciding when to recover by adding random poses.
+  recovery_alpha_fast: 0.2
 
   # Limit the GUI refresh rate at 2Hz
   gui_publish_rate: 2

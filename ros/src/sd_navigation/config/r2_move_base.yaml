@@ -100,7 +100,7 @@ TrajectoryPlannerROS:
   escape_vel: -0.1
 
   # Goal Tolerance Parameters
-  yaw_goal_tolerance: 0.0.9  # 5°
+  yaw_goal_tolerance: 0.9  # 5°
   xy_goal_tolerance: 0.05   # m
 
   # When robot has reached xy goal, then ignore it for 
