@@ -107,6 +107,8 @@ Pour commencer, rien de tel ques les tutoriaux débutant et intermédiaire (si p
 
 [Cours progressif en vidéo](https://www.youtube.com/watch?v=0BxVPCInS3M)
 
+[Debugger un programme ROS, les outils](https://bluesat.com.au/a-dummys-guide-to-debugging-ros-systems/)
+
 ROS, c'est ensuite de nombreux modules. Pour comprendre tout le fonctionnement du robot, il faut apprendre le fonctionnement de chaque module utilisé. C'est un périple. Alors, on y va petit à petit ou alors, on se concentre sur ce qui nous est utile au vu de la contribution que l'on souhaite faire.
 
 Au coeur des déplacements du robot, le module de navigation :
@@ -135,6 +137,9 @@ Le robot se déplace, c'est pourquoi il y a plein de modules dédiés au contrô
 Exemples de projet complets avec ROS pour inspiration :
 
 [Linorobot](https://github.com/linorobot/linorobot)
+
+
+
 
 ## GAZEBO
 
