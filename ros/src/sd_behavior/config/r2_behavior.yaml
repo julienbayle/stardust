@@ -10,6 +10,14 @@ base_link_frame_id: r2/base_link
 odom_frame_id: r2/odom
 map_frame_id: map
 
+bt_modules:
+  - EyeNodes
+  - LaserNodes
+  - MoveNodes
+  - ScoreNodes
+  - StatusNodes
+  - TimerNodes
+
 bt_initialpose_topic: /r2/initialpose
 bt_move_base_topic: /r2/move_base
 bt_cmd_vel_topic: /r2/auto_cmd_vel

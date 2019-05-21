@@ -10,6 +10,14 @@ base_link_frame_id: r1/base_link
 odom_frame_id: r1/odom
 map_frame_id: map
 
+bt_modules:
+  - GripperNode
+  - MoveNodes
+  - ScoreNodes
+  - SensorsNodes
+  - StatusNodes
+  - TimerNodes
+
 bt_initialpose_topic: /r1/initialpose
 bt_move_base_topic: /r1/move_base
 bt_cmd_vel_topic: /r1/auto_cmd_vel
