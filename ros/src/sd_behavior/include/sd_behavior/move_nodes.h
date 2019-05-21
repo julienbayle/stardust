@@ -68,6 +68,9 @@ namespace MoveNodes
 			    	BT::InputPort<double>("x"), 
 					BT::InputPort<double>("y"),
 					BT::InputPort<double>("theta"),
+					BT::InputPort<double>("x_mul"),
+                    BT::InputPort<double>("y_mul"),
+                    BT::InputPort<double>("theta_mul"),
 					BT::InputPort<double>("comment")
 				};
 			}
@@ -76,6 +79,22 @@ namespace MoveNodes
 			MoveBaseClient *ac;
 			std::atomic_bool halted_;
 			std::mutex ac_mutex_;
+	};
+
+	class StopNode : public BT::SyncActionNode
+	{
+		public:
+			StopNode(const std::string& name, const BT::NodeConfiguration& config);
+
+			BT::NodeStatus tick() override;
+
+			static BT::PortsList providedPorts()
+		    {
+			    return {};
+			}
+
+		private:
+			MoveBaseClient *ac;
 	};
 
 }
