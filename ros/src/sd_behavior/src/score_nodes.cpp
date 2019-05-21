@@ -11,6 +11,11 @@ namespace ScoreNodes
     return { BT::InputPort<std::string>("score") };
   }
 
+  static BT::PortsList outputScorePorts()
+  {
+    return { BT::OutputPort<std::string>("score") };
+  }
+
   void registerNodes(BT::BehaviorTreeFactory& factory, ros::NodeHandle& nh) 
 	{    
     factory.registerNodeType<DisplayScoreNode>("AfficherLeScore");
@@ -19,6 +24,11 @@ namespace ScoreNodes
       "DefinirLeScore", 
       SetScore,
       scorePorts());
+
+    factory.registerSimpleAction(
+      "RecupererLeScore", 
+      ExportScore,
+      outputScorePorts());
 
     factory.registerSimpleAction(
       "AjouterAuScore", 
@@ -80,6 +90,17 @@ namespace ScoreNodes
     ROS_DEBUG_STREAM_NAMED("ScoreNodes", "Set score : " << msg.value());
 
     score_.store(msg.value());
+    return BT::NodeStatus::SUCCESS;
+  }
+
+  BT::NodeStatus ExportScore(BT::TreeNode& self)
+  {
+    std::stringstream ss;
+    std::cout.precision(3);
+    ss << score_ << " pts";
+    self.setOutput("score", ss.str());
+    ROS_DEBUG_STREAM_NAMED("ScoreNodes", "Recuperer le score");
+
     return BT::NodeStatus::SUCCESS;
   }
   

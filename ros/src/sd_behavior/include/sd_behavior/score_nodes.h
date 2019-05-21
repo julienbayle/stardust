@@ -27,6 +27,8 @@ namespace ScoreNodes
   };
 
   BT::NodeStatus SetScore(BT::TreeNode& self);
+
+  BT::NodeStatus ExportScore(BT::TreeNode& self);
   
   BT::NodeStatus AddScore(BT::TreeNode& self);
 
