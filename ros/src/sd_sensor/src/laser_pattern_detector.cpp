@@ -35,7 +35,7 @@ namespace sd_sensor {
 
     ros::Publisher laser_pattern_detector_pub_;
 
-    ros::Publisher laser_pattern_120_pub_;
+    ros::Publisher laser_pattern_60_pub_;
 
   public:
 
@@ -44,7 +44,7 @@ namespace sd_sensor {
         last_processed_scan_(ros::Time::now()),
         laser_scan_sub_(nh.subscribe("scan", 1, &LaserPatternDetector::laserScanCallback, this)),
         laser_pattern_detector_pub_(nh.advertise<sd_sensor_msgs::LaserPatternDetector>("laser_pattern_detector", 1)),
-        laser_pattern_120_pub_(nh.advertise<std_msgs::String>("laser_pattern_120", 1))
+        laser_pattern_60_pub_(nh.advertise<std_msgs::String>("laser_pattern_60", 1))
     {
       nh_priv_.param<float>("detector_frequency", detector_frequency_, 5.0);
       
@@ -82,8 +82,8 @@ namespace sd_sensor {
       }
 
       std_msgs::String pattern_msg;
-      pattern_msg.data = pattern120(scan, 0.15);
-      laser_pattern_120_pub_.publish(pattern_msg);
+      pattern_msg.data = pattern60(scan, 0.3);
+      laser_pattern_60_pub_.publish(pattern_msg);
 
       sd_sensor_msgs::LaserPatternDetector msg;
       msg.isTirette   = detect(scan, isTirette_pattern_,   isTirette_threshold_);
@@ -96,9 +96,9 @@ namespace sd_sensor {
       last_processed_scan_ = scan_time;
     }
 
-    std::string pattern120(const sensor_msgs::LaserScan::ConstPtr& scan, float threshold)
+    std::string pattern60(const sensor_msgs::LaserScan::ConstPtr& scan, float threshold)
     {
-      int increments = scan->ranges.size() / 120;
+      int increments = scan->ranges.size() / 60;
 
       std::string mesure = ""; 
       float sum = 0;
@@ -113,7 +113,7 @@ namespace sd_sensor {
         
         if((i+1) % increments == 0)
         {
-          mesure += good_increments != increments ? "X" : (sum > threshold * increments ? "1" : "0");
+          mesure += good_increments != increments ? std::to_string(good_increments) : (sum > threshold * increments ? "H" : "L");
           sum = good_increments = 0;
         }        
       }
@@ -123,7 +123,7 @@ namespace sd_sensor {
 
     bool detect(const sensor_msgs::LaserScan::ConstPtr& scan, std::string& pattern, float threshold)
     {
-      int increments = scan->ranges.size() / pattern.size();
+      int increments = 6; //scan->ranges.size() / 60;
       float sum = 0;
       int good_increments = 0;
       for(unsigned int i = 0; i < scan->ranges.size(); i++)
@@ -135,13 +135,16 @@ namespace sd_sensor {
         }
         if((i+1) % increments == 0)
         {
-          if (sum > threshold * increments && good_increments == increments && pattern[i]  == '0')
+          char p = pattern[(i+1)/increments];
+          float limit = threshold * good_increments;
+
+          if (sum > limit && good_increments > 0 && p == '0')
             return false;
         
-          if (sum < threshold * increments && good_increments == increments && pattern[i] == '1')
+          if (sum < limit && good_increments > 0 && p == '1')
             return false;
 
-          if (good_increments == increments && pattern[i] == 'X')
+          if (good_increments > 0 && p == 'X')
             return false;
 
           sum = good_increments = 0;
