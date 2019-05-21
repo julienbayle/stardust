@@ -20,21 +20,29 @@ namespace EyeNodes
 
 	BT::NodeStatus EyeNode::tick()
 	{
-	    bool is_default;
-		if( !getInput("is_default", is_default) )
-	        throw BT::RuntimeError("is_default is missing");
-
-		std::string message;
+	    std::string message;
 	    if( !getInput("message", message) )
 	        throw BT::RuntimeError("message is missing");
 
-		sd_led_matrix::Eye msg;
-		msg.text = message;
+	    bool is_default = false;
+		getInput("defaut", is_default);
 		
+		int repeat = 1;
+		getInput("repetition", repeat);
+
+		int fps = 4;
+		getInput("fps", fps);
+
+
+		sd_led_matrix::Eye msg;
+		msg.text = message.c_str();
+		msg.repeat = repeat;
+		msg.fps = fps;
+
 		if (is_default)
-			eye_pub.publish(msg);
-		else
 			default_eye_pub.publish(msg);
+		else
+			eye_pub.publish(msg);
 			
 		return BT::NodeStatus::SUCCESS;
 	}

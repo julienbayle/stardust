@@ -18,8 +18,10 @@ namespace EyeNodes
 		    static BT::PortsList providedPorts()
 		    {
 			    return { 
-			    	BT::InputPort<double>("text"), 
-					BT::InputPort<bool>("is_default"),
+			    	BT::InputPort<std::string>("message"), 
+					BT::InputPort<bool>("defaut"),
+					BT::InputPort<int>("repetition"),
+					BT::InputPort<int>("fps"),
 				};
 			}
 		

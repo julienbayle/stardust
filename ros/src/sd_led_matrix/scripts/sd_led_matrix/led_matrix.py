@@ -28,7 +28,7 @@ class RobotEye:
         rospy.init_node("led_matrix")
         self.default_text = ""
         self.default_image = Image.open(os.path.join(img_path, "adam.gif"))
-        self.default_fps = 6
+        self.default_fps = 2
         self.repeat = 0
         self.img_path = img_path
         ns = rospy.get_namespace()
@@ -63,7 +63,7 @@ class RobotEye:
             self.default_text = ""
 
         self.default_fps = msg.fps or 24
-        rospy.loginfo("Default Eye message received %s, %s, %d", self.default_text, self.default_image, self.default_fps)
+        rospy.logdebug("Default Eye message received %s, %d", self.default_text, self.default_fps)
 
     def execute_msg_cb(self, msg):
         # If text message is the name of an existing GIF then
@@ -76,7 +76,7 @@ class RobotEye:
 
         self.repeat = msg.repeat or 1
         self.fps = msg.fps or 10
-        rospy.loginfo("Eye message received %s, %d, %d", self.text, self.repeat, self.fps)
+        rospy.logdebug("Eye message received %s, %d, %d", self.text, self.repeat, self.fps)
 
     def spin(self):
     
