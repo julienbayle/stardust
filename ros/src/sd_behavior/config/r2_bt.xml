@@ -1,161 +1,198 @@
 <root main_tree_to_execute="BehaviorTree">
     <!-- ////////// -->
-    <BehaviorTree ID="Afficher le score">
-        <ReactiveSequence>
-            <Condition ID="MinuterieNonEcoulee"/>
-            <Action ID="AfficherLeScore"/>
-            <Action ID="Attendre" ms="5000"/>
-        </ReactiveSequence>
+    <BehaviorTree ID="BehaviorTree">
+        <Parallel threshold="5">
+            <Condition ID="RobotPret"/>
+            <SubTree ID="Tirette"/>
+            <SubTree ID="Minuterie"/>
+            <SubTree ID="Yeux"/>
+            <SubTree ID="Trier les palets"/>
+        </Parallel>
     </BehaviorTree>
     <!-- ////////// -->
-    <BehaviorTree ID="BehaviorTree">
+    <BehaviorTree ID="Tirette">
         <ForceSuccess>
             <Sequence>
-                <Condition ID="RobotPret"/>
-                <SubTree ID="Initialisation"/>
-                <SubTree ID="Afficher le score"/>
-                <SubTree ID="Minuterie"/>
-                <SubTree ID="Trier les palets"/>
-                <SubTree ID="Yeux"/>
+                <Condition ID="TiretteLaserPresente"/>
+                <Action ID="Arreter le robot" />
+                <Action ID="DefinirLeScore" score="0"/>
+                <Action ID="ArreterLaMinuterie"/>
+                <SetBlackboard value="1" output_key="palet_vert"/>
+                <SetBlackboard value="1" output_key="palets_rouge"/>
+                <SetBlackboard value="1" output_key="palet_pente"/>
+                <Fallback>
+                    <Sequence>
+                        <Condition ID="LaVoieEstLibre-Gauche"/>
+                        <Action ID="DefinirPosition" theta="0" x="0.05" y="-1.18"/>
+                        <SetBlackboard value="violet" output_key="{camp}"/>
+                        <SetBlackboard value="-1.0" output_key="{sym_y}"/>
+                        <SetBlackboard value="-1.0" output_key="{sym_theta}"/>
+                    </Sequence>
+                    <Sequence>
+                        <Action ID="DefinirPosition" theta="0" x="0.05" y="1.18"/>
+                        <SetBlackboard value="jaune" output_key="{camp}"/>
+                        <SetBlackboard value="1.0" output_key="{sym_y}"/>
+                        <SetBlackboard value="1.0" output_key="{sym_theta}"/>
+                    </Sequence>
+                </Fallback>
             </Sequence>
         </ForceSuccess>
-    </BehaviorTree>
-    <!-- ////////// -->
-    <BehaviorTree ID="Initialisation">
-        <Sequence>
-            <Condition ID="IsTirettePresente"/>
-            <Action ID="DefinirLeScore" score="0"/>
-            <Fallback>
-                <Sequence>
-                    <Condition ID="IsCampViolet"/>
-                    <Action ID="DefinirPosition" theta="0" x="0" y="0"/>
-                    <SetBlackboard value="palet_jaune_1" output_key="1"/>
-                    <SetBlackboard value="palet_jaune_2" output_key="1"/>
-                    <SetBlackboard value="palet_violet_1" output_key="0"/>
-                    <SetBlackboard value="palet_violet_2" output_key="0"/>
-                </Sequence>
-                <Sequence>
-                    <Action ID="DefinirPosition" theta="0" x="1" y="0"/>
-                    <SetBlackboard value="palet_jaune_1" output_key="0"/>
-                    <SetBlackboard value="palet_jaune_2" output_key="0"/>
-                    <SetBlackboard value="palet_violet_1" output_key="1"/>
-                    <SetBlackboard value="palet_violet_2" output_key="1"/>
-                </Sequence>
-            </Fallback>
-        </Sequence>
     </BehaviorTree>
     <!-- ////////// -->
     <BehaviorTree ID="Minuterie">
         <ForceSuccess>
-            <Sequence>
-                <Inverter>
-                    <Condition ID="IsTirettePresente"/>
-                </Inverter>
-                <Inverter>
-                    <Condition ID="MinuterieDemarree"/>
-                </Inverter>
-                <Action ID="DefinirTempsMinuterie" seconds="88"/>
-            </Sequence>
-        </ForceSuccess>
-    </BehaviorTree>
-    <!-- ////////// -->
-    <BehaviorTree ID="Trier les palets">
-        <Fallback>
-            <BlackboardCheckString value_A="{palet_jaune_1}" return_on_mismatch="FAILURE" value_B="1">
-                <Sequence>
-                    <Action ID="Aller" theta="0" x="1" y="0"/>
-                    <Action ID="Aller" theta="0" x="0" y="0"/>
-                    <Action ID="AjouterAuScore" score="6"/>
-                    <SetBlackboard value="palet_jaune_1" output_key="0"/>
-                </Sequence>
-            </BlackboardCheckString>
-            <BlackboardCheckString value_A="{palet_jaune_2}" return_on_mismatch="FAILURE" value_B="1">
-                <Sequence>
-                    <Action ID="Aller" theta="0" x="2" y="0"/>
-                    <Action ID="Aller" theta="0" x="0" y="0"/>
-                    <Action ID="AjouterAuScore" score="6"/>
-                    <SetBlackboard value="palet_jaune_2" output_key="0"/>
-                </Sequence>
-            </BlackboardCheckString>
-        </Fallback>
-    </BehaviorTree>
-    <!-- ////////// -->
-    <BehaviorTree ID="Yeux">
-        <ForceSuccess>
             <Fallback>
-                <ReactiveSequence>
-                    <Condition ID="IsTirettePresente"/>
-                    <Fallback>
-                        <ReactiveSequence>
-                            <Condition ID="IsCampViolet"/>
-                            <Action ID="AfficheYeux" message="violet" is_default="0"/>
-                        </ReactiveSequence>
-                        <Action ID="AfficheYeux" message="jaune" is_default="0"/>
-                    </Fallback>
-                </ReactiveSequence>
-                <ReactiveSequence>
-                    <Condition ID="MinuterieDemarree"/>
-                    <Condition ID="MinuterieNonEcoulee"/>
-                    <Fallback>
-                        <Sequence>
-                            <Condition ID="ScoreInferieurA" score="1"/>
-                            <Action ID="AfficheYeux" message="perdu.gif" is_default="1"/>
-                        </Sequence>
-                        <Action ID="AfficheYeux" message="adam.gif" is_default="1"/>
-                    </Fallback>
-                </ReactiveSequence>
+                <Sequence>
+                    <Inverter>
+                        <Condition ID="TiretteLaserPresente"/>
+                    </Inverter>
+                    <Inverter>
+                        <Condition ID="MinuterieDemarree"/>
+                    </Inverter>
+                    <Action seconds="88" ID="LancerLaMinuterie"/>
+                </Sequence>
+                 <Sequence>
+                    <Inverter>
+                        <Condition ID="MinuterieNonEcoulee"/>
+                    </Inverter>
+                    <Action ID="Arreter le robot"/>
+                </Sequence>
             </Fallback>
         </ForceSuccess>
     </BehaviorTree>
     <!-- ////////// -->
+    <BehaviorTree ID="Trier les palets">
+        <ForceSuccess>
+            <Fallback>
+                <BlackboardCheckString return_on_mismatch="FAILURE" value_A="{palet_vert}" value_B="1">
+                    <Sequence>
+                        <Action ID="Aller" theta="90"  x="0.30" y="1.15" y_mul="{sym_y}" theta_mul="{theta_mul}" comment="contourner les palets par l'extérieur"/>
+                        <Action ID="Aller" theta="180" x="0.30" y="1.05" y_mul="{sym_y}" theta_mul="{theta_mul}" comment="se placer face aux palets"/>
+                        <Action ID="Aller" theta="180" x="0.05" y="1.05" y_mul="{sym_y}" theta_mul="{theta_mul}" comment="capturer le palet vert"/>
+                        <Action ID="Aller" theta="270" x="0.05" y="1.05" y_mul="{sym_y}" theta_mul="{theta_mul}" comment="tourner en directin de la zone de tri"/>
+                        <Action ID="Aller" theta="270" x="0.05" y="1.25" y_mul="{sym_y}" theta_mul="{theta_mul}" comment="avancer dans la zone de tri"/>
+                        <Action ID="Aller" theta="180" x="0.05" y="1.25" y_mul="{sym_y}" theta_mul="{theta_mul}" comment="se tourner en direction de la case verte"/>
+                        <Action ID="Aller" theta="180" x="-0.25" y="1.25" y_mul="{sym_y}" theta_mul="{theta_mul}" comment="déposer le palet dans la case verte"/>
+                        <Action ID="Aller" theta="180" x="0.1" y="1.25" y_mul="{sym_y}" theta_mul="{theta_mul}" comment="reculer pour libérer le palet"/>
+                        <Action ID="AjouterAuScore" score="6"/>
+                        <SetBlackboard value="0" output_key="palet_vert"/>
+                    </Sequence>
+                </BlackboardCheckString>
+                <BlackboardCheckString return_on_mismatch="FAILURE" value_A="{palets_rouge}" value_B="1">
+                    <Sequence>
+                        <Action ID="Aller" theta="90" x="0.1" y="1.05" y_mul="{sym_y}" theta_mul="{theta_mul}" comment="remonter sur la ligne des palets"/>
+                        <Action ID="Aller" theta="180" x="0.1" y="1.05" y_mul="{sym_y}" theta_mul="{theta_mul}" comment="se tourner vers les palets rouges"/>
+                        <Action ID="Aller" theta="180" x="-0.55" y="1.05" y_mul="{sym_y}" theta_mul="{theta_mul}" comment="capturer les deux palets"/>
+                        <Action ID="Aller" theta="270" x="-0.55" y="1.05" y_mul="{sym_y}" theta_mul="{theta_mul}" comment="se tourner en direction de la case rouge"/>
+                        <Action ID="Aller" theta="270" x="-0.55" y="1.25" y_mul="{sym_y}" theta_mul="{theta_mul}" comment="pousser les palets au fond de la case rouge"/>
+                        <Action ID="Aller" theta="270" x="-0.55" y="1.05" y_mul="{sym_y}" theta_mul="{theta_mul}" comment="libérer les palets"/>
+                        <Action ID="AjouterAuScore" score="12"/>
+                        <SetBlackboard value="0" output_key="palets_rouge"/>
+                    </Sequence>
+                </BlackboardCheckString>
+                <BlackboardCheckString return_on_mismatch="FAILURE" value_A="{palet_pente}" value_B="1">
+                    <Sequence>
+                        <Action ID="Aller" theta="90" x="0.8" y="1.2" y_mul="{sym_y}" theta_mul="{theta_mul}" comment="aller au pied de la balance"/>
+                        <Action ID="AjouterAuScore" score="12"/>
+                        <SetBlackboard value="0" output_key="palet_pente"/>
+                    </Sequence>
+                </BlackboardCheckString>
+            </Fallback>
+        </ForceSuccess>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="Yeux">
+        <Parallel threshold="2">
+            <Sequence>
+                <Action message="content.gif" repetition="1" defaut="1" ID="AfficheYeux" fps="2"/>
+                <Action ms="10000" ID="Attendre"/>
+                <Action message="carre.gif" repetition="1" defaut="1" ID="AfficheYeux" fps="10"/>
+                <Action ms="10000" ID="Attendre"/>
+                <Action message="folie.gif" repetition="1" defaut="1" ID="AfficheYeux" fps="2"/>
+                <Action ms="10000" ID="Attendre"/>
+                <Action message="perdu.gif" repetition="1" defaut="1" ID="AfficheYeux" fps="4"/>
+                <Action ms="10000" ID="Attendre"/>
+                <Action message="stardust.gif" repetition="1" defaut="1" ID="AfficheYeux" fps="1"/>
+                <Action ms="10000" ID="Attendre"/>
+            </Sequence>
+            <ForceSuccess>
+                <Fallback>
+                    <ReactiveSequence>
+                        <Condition ID="TiretteLaserPresente"/>
+                        <Action message="{camp}" repetition="1" defaut="0" ID="AfficheYeux" fps="4"/>
+                    </ReactiveSequence>
+                    <ReactiveSequence>
+                        <Condition ID="MinuterieDemarree"/>
+                        <Condition ID="MinuterieNonEcoulee"/>
+                        <Action ID="RecupererLeScore" score="{score}"/>
+                        <Action message="{score}" repetition="1" defaut="0" ID="AfficheYeux" fps="10"/>
+                    </ReactiveSequence>
+                    <ReactiveSequence>
+                        <Inverter>
+                            <Condition ID="MinuterieNonEcoulee"/>
+                        </Inverter>    
+                        <Action ID="RecupererLeScore" score="{score}"/>
+                        <Action message="{score}" repetition="1" defaut="1" ID="AfficheYeux" fps="10"/>
+                    </ReactiveSequence>
+                </Fallback>
+            </ForceSuccess>
+        </Parallel>
+    </BehaviorTree>
+    <!-- ////////// -->
     <TreeNodesModel>
         <Action ID="AfficheYeux">
-            <input_port name="is_default" default="0"/>
-            <input_port name="message"/>
+            <input_port default="0" name="defaut">1 = message par défaut</input_port>
+            <input_port default="4" name="fps">Frame per second (image animée)</input_port>
+            <input_port name="message">Message ou nom de l'image</input_port>
+            <input_port default="1" name="repetition">Nombre d'itération</input_port>
         </Action>
-        <SubTree ID="Afficher le score"/>
-        <Action ID="AfficherLeScore"/>
         <Action ID="AjouterAuScore">
-            <input_port name="score" default="1">Valeur à ajouter au score</input_port>
+            <input_port name="score"/>
         </Action>
         <Action ID="Aller">
-            <input_port name="theta" default="0">Angle du robot (en degree)</input_port>
-            <input_port name="x" default="0">Position absolue en X (en metre)</input_port>
-            <input_port name="y" default="0">Position absolue en Y (en metre)</input_port>
+            <input_port name="theta"/>
+            <input_port name="x"/>
+            <input_port name="y"/>
+            <input_port name="y"/>
+            <input_port name="mul_x"/>
+            <input_port name="mul_y"/>
+            <input_port name="mul_theta"/>
+            <input_port name="comment"/>
         </Action>
+        <Action ID="ArreterLaMinuterie"/>
         <Action ID="Attendre">
-            <input_port name="ms" default="1000">Temps en millisecondes</input_port>
+            <input_port name="ms"/>
         </Action>
         <Action ID="DefinirLeScore">
-            <input_port name="score" default="0">Valeur du score</input_port>
+            <input_port name="score"/>
         </Action>
         <Action ID="DefinirPosition">
-            <input_port name="theta" default="0">Angle initial (theta)</input_port>
-            <input_port name="x" default="0">Position initiale x</input_port>
-            <input_port name="y" default="0">Position initiale y</input_port>
+            <input_port name="theta"/>
+            <input_port name="x"/>
+            <input_port name="y"/>
         </Action>
-        <Action ID="DefinirTempsMinuterie">
-            <input_port name="seconds" default="1398">Temps de la minuterie en secondes</input_port>
+        <Action ID="RecupererLeScore">
+            <output_port name="score"/>
         </Action>
         <SubTree ID="Initialisation"/>
-        <Condition ID="IsCampViolet"/>
-        <Condition ID="IsTirettePresente"/>
+        <Action ID="Arreter le robot" />
+        <Condition ID="TiretteLaserPresente"/>
+        <Condition ID="LaVoieEstLibre-Devant"/>
+    <Condition ID="LaVoieEstLibre-Gauche"/>
+   <Condition ID="LaVoieEstLibre-Droite"/>
+    <Condition ID="LaVoieEstLibre-Derriere"/>
+
+        <Action ID="LancerLaMinuterie">
+            <input_port name="seconds"/>
+        </Action>
         <SubTree ID="Minuterie"/>
         <Condition ID="MinuterieDemarree"/>
         <Condition ID="MinuterieNonEcoulee"/>
         <Condition ID="RobotPret"/>
         <Condition ID="ScoreInferieurA">
-            <input_port name="score" default="1">Score</input_port>
-        </Condition>
-        <Condition ID="ScoreSuperieurA">
-            <input_port name="score" default="0">Score</input_port>
+            <input_port name="score"/>
         </Condition>
         <SubTree ID="Trier les palets"/>
-        <Action ID="VitesseConstante">
-            <input_port name="angular_z" default="0">Vitesse de rotation en rad/s</input_port>
-            <input_port name="linear_x" default="0">Vitesse dans le sens avant/arriere en m/s</input_port>
-            <input_port name="linear_y" default="0">Vitesse dans le sens droite/gauche en m/s</input_port>
-        </Action>
         <SubTree ID="Yeux"/>
     </TreeNodesModel>
     <!-- ////////// -->
