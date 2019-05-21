@@ -86,3 +86,14 @@ Pour voir l'affichage du score en temps réel :
 ```bash
 rostopic echo /r1/lcd/line1
 ```
+
+## Convention pour les positions du robots sur le terrain (MoveNodes)
+
+Orientation du terrain : 
+ - x dans le sens de la largeur, positif en direction des balances
+ - y dans le sens de la longueur, positif en direction du camp jaune
+
+Le centre du terrain est considéré comme l'origine du repère
+
+L'angle est égal à 0 face aux balances
+L'angle est positif en tournant dans le sens inverse des aiguilles d'une montre
