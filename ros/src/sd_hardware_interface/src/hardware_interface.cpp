@@ -274,7 +274,7 @@ void HWInterface::write(ros::Duration &elapsed_time)
    
     // Safety
     if(!joint_encoders_[joint_id]->isAlive()) {
-        ROS_ERROR_STREAM_THROTTLE(1, "Encoder do not emit data. By security, actuator mode is set a null effort");
+        ROS_WARN_STREAM_THROTTLE(5, "Encoder do not emit data. By security, actuator mode is set a null effort");
         cmd_effort = 0.0;
         cmd_speed = 0.0;
     }
