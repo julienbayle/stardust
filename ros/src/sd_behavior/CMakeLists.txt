@@ -36,46 +36,19 @@ add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EX
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
 add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-add_library(laser_nodes STATIC src/laser_nodes.cpp)
-add_dependencies(laser_nodes ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(laser_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
-target_link_libraries(${PROJECT_NAME} laser_nodes)
-
-add_library(gripper_nodes STATIC src/gripper_nodes.cpp)
-add_dependencies(gripper_nodes ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(gripper_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
-target_link_libraries(${PROJECT_NAME} gripper_nodes)
-
-add_library(move_nodes STATIC src/move_nodes.cpp)
-add_dependencies(move_nodes ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(move_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
-target_link_libraries(${PROJECT_NAME} move_nodes)
-
-add_library(score_nodes STATIC src/score_nodes.cpp)
-add_dependencies(score_nodes ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(score_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
-target_link_libraries(${PROJECT_NAME} score_nodes)
-
-add_library(sensors_nodes STATIC src/sensors_nodes.cpp)
-add_dependencies(sensors_nodes ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(sensors_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
-target_link_libraries(${PROJECT_NAME} sensors_nodes)
-
-add_library(status_nodes STATIC src/status_nodes.cpp)
-add_dependencies(status_nodes ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(status_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
-target_link_libraries(${PROJECT_NAME} status_nodes)
-
-add_library(timer_nodes STATIC src/timer_nodes.cpp)
-add_dependencies(timer_nodes ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(timer_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
-target_link_libraries(${PROJECT_NAME} timer_nodes)
-
-add_library(eye_nodes STATIC src/eye_nodes.cpp)
-add_dependencies(eye_nodes ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(eye_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
-target_link_libraries(${PROJECT_NAME} eye_nodes)
-
+add_library(${PROJECT_NAME}_nodes STATIC 
+  src/gripper_nodes.cpp
+  src/laser_nodes.cpp
+  src/move_nodes.cpp
+  src/score_nodes.cpp
+  src/sensors_nodes.cpp
+  src/status_nodes.cpp
+  src/timer_nodes.cpp
+  src/eye_nodes.cpp
+  src/control_nodes.cpp)
+add_dependencies(${PROJECT_NAME}_nodes ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(${PROJECT_NAME}_nodes ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
+target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_nodes)
 
 #############
 ## Install ##
@@ -91,12 +64,7 @@ install(
 
 install(
   TARGETS 
-    eye_nodes
-    gripper_nodes
-    move_nodes
-    score_nodes
-    sensors_nodes
-    timer_nodes
+    ${PROJECT_NAME}_nodes
 	ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 	LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )

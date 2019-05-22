@@ -97,3 +97,14 @@ Le centre du terrain est considéré comme l'origine du repère
 
 L'angle est égal à 0 face aux balances
 L'angle est positif en tournant dans le sens inverse des aiguilles d'une montre
+
+## Edition de l'arbre à chaud
+
+Il est possible de modifier l'arbre à chaud sur le robot. Le robot recharge alors l'arbre automatiquement.
+Par contre, le "monitoring temps réel via Groot" n'est alors plus mis à jour après le rechargement.
+
+Exemple :
+
+```bash
+vi stardust_20190522/install/share/sd_behavior/config/r2_bt.xml
+```

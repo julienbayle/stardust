@@ -13,7 +13,7 @@
 #include "sd_behavior/sensors_nodes.h"
 #include "sd_behavior/status_nodes.h"
 #include "sd_behavior/timer_nodes.h"
-
+#include "sd_behavior/control_nodes.h"
 
 using namespace BT;
 
@@ -26,13 +26,18 @@ long GetFileSize(std::string filename)
 
 bool run(std::string& path, BehaviorTreeFactory& factory) 
 {
-    
     try {
       auto tree = factory.createTreeFromFile(path);
 
-      // Real time monitoring with Groot
-      BT::PublisherZMQ publisher_zmq(tree);
-
+      // Real time monitoring with Groot (only first BT as it can be started twice)
+      static bool zmq = true;
+      BT::PublisherZMQ *publisher_zmq;
+      if(zmq)
+      {
+        publisher_zmq = new BT::PublisherZMQ(tree);
+        zmq = false;
+      }
+       
       // This logger saves state changes on file
       BT::FileLogger logger_file(tree, "bt_trace.fbl", 20);
 
@@ -50,6 +55,8 @@ bool run(std::string& path, BehaviorTreeFactory& factory)
         // watch tree file updates
         current_size = GetFileSize(path); 
       }
+
+      delete publisher_zmq;
 
       return loaded_size != current_size;
     }
@@ -94,6 +101,7 @@ int main(int argc, char* argv[])
   if(bt_modules.count("SensorsNodes"))    SensorsNodes::registerNodes(factory, nh);
   if(bt_modules.count("StatusNodes"))     StatusNodes::registerNodes(factory, nh);
   if(bt_modules.count("TimerNodes"))      TimerNodes::registerNodes(factory);
+  if(bt_modules.count("ControlNodes"))    ControlNodes::registerNodes(factory);
 
   // Run behavior tree and auto reload tree on file changed
 	std::string fn = argv[1];
