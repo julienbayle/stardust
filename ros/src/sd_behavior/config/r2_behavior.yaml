@@ -19,7 +19,7 @@ bt_modules:
   - TimerNodes
   - ControlNodes
 
-bt_max_load_average: 3.2
+bt_max_load_average: 4
 bt_laser_detector_topic: /r2/laser_pattern_detector
 bt_initialpose_topic: /r2/initialpose
 bt_move_base_topic: /r2/move_base
