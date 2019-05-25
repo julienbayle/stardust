@@ -4,8 +4,8 @@
         <Sequence>
             <Condition ID="RobotPret"/>
             <RealParallel>
-                <SubTree ID="Tirette" palet_vert="palet_vert" palets_rouge="palets_rouge" palet_pente="palet_pente" y_mul="y_mul" theta_mul="theta_mul" camp="camp"/>
-                <SubTree ID="Minuterie"/>
+                <SubTree ID="Tirette" y_mul="y_mul" theta_mul="theta_mul" camp="camp"/>
+                <SubTree ID="Minuterie" palet_vert="palet_vert" palets_rouge="palets_rouge" palet_pente="palet_pente" />
                 <SubTree ID="Yeux" camp="camp"/>
                 <SubTree ID="Trier les palets" palet_vert="palet_vert" palets_rouge="palets_rouge" palet_pente="palet_pente" y_mul="y_mul" theta_mul="theta_mul" />
             </RealParallel>
@@ -26,12 +26,14 @@
                         <SetBlackboard value="violet" output_key="camp"/>
                         <SetBlackboard value="-1.0" output_key="y_mul"/>
                         <SetBlackboard value="-1.0" output_key="sym_theta"/>
+                        <Action ms="1000" ID="Attendre"/>
                     </Sequence>
                     <Sequence>
                         <Action ID="DefinirPosition" theta="0" x="-0.18" y="1.18"/>
                         <SetBlackboard value="jaune" output_key="camp"/>
                         <SetBlackboard value="1.0" output_key="y_mul"/>
                         <SetBlackboard value="1.0" output_key="theta_mul"/>
+                        <Action ms="1000" ID="Attendre"/>
                     </Sequence>
                 </Fallback>
             </Sequence>
