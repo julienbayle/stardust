@@ -29,7 +29,9 @@ Puis reporter les données dans la configuration de l'IMU du paquet **sd_sensors
 
 Le second noeud fusionne les données IMU avec celle de l'odométrie afin de publier une odométrie filtrée (odom/filtered) et la transformation TF odom->base_link. Il s'agit en pratique d'un filtre *Unscented Kalman Filter* proposé dans le paquet [robot_localization]("http://docs.ros.org/melodic/api/robot_localization/html/index.html). La [documentation](http://docs.ros.org/melodic/api/robot_localization/html/state_estimation_nodes.html) précise comment régler les différents paramètres. 
 
-Pour valider le bon fonctionnement de ce filtre, on balade le robot à la télécommande et on valide que le topic odom/filtered contient des données de qualité. Une autre technique est de visualiser le robot dans RVIZ dans la base rX/odom et valider que les déplacements sont logiques, surtout les rotations.
+Pour valider le bon fonctionnement de ce filtre :
+ - on balade le robot à la télécommande et on valide que le topic odom/filtered contient des données de qualité. 
+ - on ajoute un "decay time" de 10 secondes dans RVIZ pour le LIDAR et on vérifie (en étant dans la frame r2/odom) que les points du LIDAR n'ont pas de décalage lors des mouvements du robots (rotation et déplacement). AMCL ne pourra bien fonctionner que si les décalages ne sont que de quelques millimètres et de maxi 1° pour le LIDAR. Si ce n'est pas le cas, il faut retravailler les paramètres.
 
 
 ## AMCL : Estimation de la position absolu
@@ -87,9 +89,9 @@ source source-pc-slave.sh stardust_rX
 rosrun tf view_frames
 ```
 
-Voir l'ensemble des éléments via RVIZ et une configuration adaptée (sd_description/rviz/rX.rviz) :
+Voir l'ensemble des éléments via RVIZ et une configuration adaptée :
 
 ```bash
 source source-pc-slave.sh stardust_rX
-rosrun rviz rviz &
+rosrun rviz rviz -d stardust/ros/src/sd_description/rviz/r2.rviz
 ```
