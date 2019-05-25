@@ -196,6 +196,20 @@ Pour voir la mémoire utilisée (normalement autour de 80 Mo après les optimisa
 free
 ```
 
+## Ajout du paquet sysstat
+
+Ce paquet permet de vérifer l'état du système rapidement
+
+```bash
+sudo apt-get install sysstat
+```
+
+Exemple de commande (Equivalent de TOP pour les IO)
+
+```bash
+iostat -x 1
+```
+
 ## Installation de ROS
 
 Source : http://wiki.ros.org/Installation/UbuntuARM
