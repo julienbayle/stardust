@@ -53,9 +53,9 @@ namespace MoveNodes
         initialpose.pose.pose.orientation.y = quaternion[1];
         initialpose.pose.pose.orientation.z = quaternion[2];
         initialpose.pose.pose.orientation.w = quaternion[3];
-        initialpose.pose.covariance[0] = 0.001;
-        initialpose.pose.covariance[7] = 0.001;
-        initialpose.pose.covariance[21] = 0.001;
+        initialpose.pose.covariance[0] = 0.1;
+        initialpose.pose.covariance[7] = 0.1;
+        initialpose.pose.covariance[35] = 0.05;
 
         initialpose_pub.publish(initialpose);
 
