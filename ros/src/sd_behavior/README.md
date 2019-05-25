@@ -108,3 +108,13 @@ Exemple :
 ```bash
 vi stardust_20190522/install/share/sd_behavior/config/r2_bt.xml
 ```
+
+## Analyse des logs sur le poste local
+
+Récupération des logs sur le robot :
+
+```bash
+rsync ubuntu@stardust_r2:/home/ubuntu/.ros/bt_trace.fbl .
+```
+
+Ouvrir Groot en mode "Log Replay" et ouvrir le fichier récupéré/
