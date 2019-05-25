@@ -46,12 +46,16 @@ add_executable(mpu6050_node src/mpu6050_node.cpp )
 add_dependencies(mpu6050_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(mpu6050_node ${catkin_LIBRARIES} i2c)
 
+add_executable(mpu6050_fifo_node src/mpu6050_fifo_node.cpp )
+add_dependencies(mpu6050_fifo_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(mpu6050_fifo_node ${catkin_LIBRARIES} i2c)
+
 ## Laser pattern detector 
 add_executable(laser_pattern_detector src/laser_pattern_detector.cpp )
 add_dependencies(laser_pattern_detector ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(laser_pattern_detector ${catkin_LIBRARIES})
 
-install(TARGETS sd_sensor_filters r2_sensor_node mpu6050_node laser_pattern_detector
+install(TARGETS sd_sensor_filters r2_sensor_node mpu6050_node mpu6050_fifo_node laser_pattern_detector 
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

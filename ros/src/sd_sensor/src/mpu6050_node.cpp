@@ -28,7 +28,8 @@ public:
     static const int YA_ST_BIT = (1 << 6);
     static const int ZA_ST_BIT = (1 << 5);
 
-    static const int BIAS_COUNT = 100;
+    
+    
 
 private:
     ros::NodeHandle nh_, nh_priv_;
@@ -46,6 +47,12 @@ private:
 
     double cp_bias_gx_, cp_bias_gy_, cp_bias_gz_, cp_bias_ax_, cp_bias_ay_, cp_bias_az_;
     int bias_count_;
+    int bias_init_count_;
+    bool update_bias_at_startup_;
+    bool updating_bias_at_startup_;
+
+    double linear_acceleration_stdev_, angular_velocity_stdev_;
+    double angular_velocity_covariance_, linear_acceleration_covariance_;
 
     double read_word_i2c(int addr)
     {
@@ -61,6 +68,8 @@ public:
         nh_priv_("~")
     {
         // Get parameters
+        double frequency;
+        nh_priv_.param("frequency", frequency, 10.0);
         nh_priv_.param("i2c_adapter", i2c_adapter_, 1);
         nh_priv_.param("i2c_address", i2c_address_, 0x68);
         nh_priv_.param("frame", frame_, (std::string)"imu_link");
@@ -70,6 +79,25 @@ public:
         nh_priv_.param("bias_ax", bias_ax_, 0.0);
         nh_priv_.param("bias_ay", bias_ay_, 0.0);
         nh_priv_.param("bias_az", bias_az_, 0.0);
+
+        // NOISE PERFORMANCE: Power Spectral Density @10Hz, AFS_SEL=0 & ODR=1kHz 400 ug/√Hz (probably wrong)
+        nh_priv_.param("linear_acceleration_stdev", linear_acceleration_stdev_, (400 / 1000000.0) * 9.807 );
+
+        // Total RMS Noise: DLPFCFG=2 (100Hz) 0.05 º/s-rms (probably lower (?) @ 42Hz)
+        nh_priv_.param("angular_velocity_stdev", angular_velocity_stdev_, 0.05 * (M_PI / 180.0));
+
+        angular_velocity_covariance_ = angular_velocity_stdev_ * angular_velocity_stdev_;
+        linear_acceleration_covariance_ = linear_acceleration_stdev_ * linear_acceleration_stdev_;
+
+        nh_priv_.param("update_bias_at_startup_count", bias_init_count_, 100);
+        nh_priv_.param("update_bias_at_startup", update_bias_at_startup_,false);
+        updating_bias_at_startup_ = update_bias_at_startup_;
+        if(updating_bias_at_startup_)
+        {
+            bias_count_ = bias_init_count_;
+            cp_bias_gx_ = cp_bias_gy_ = cp_bias_gz_ = 0.0;
+            cp_bias_ax_ = cp_bias_ay_ = cp_bias_az_ = 0.0;
+        }
 
         // Connect to device.
         char filename[20];
@@ -103,8 +131,10 @@ public:
         // Create services
         get_bias_service_ = nh_priv_.advertiseService("get_bias", &MPU6050::get_bias_callback, this);
 
+        ROS_INFO("Starting mpu6050_node (%1.2f Hz, frame = %s)", frequency, frame_.c_str());
+        
         // Create loop timer
-        timer_ = nh_priv_.createTimer(ros::Duration(0.1), &MPU6050::timer_callback, this);
+        timer_ = nh_priv_.createTimer(ros::Duration(1 / frequency), &MPU6050::timer_callback, this);
     }
 
     void timer_callback(const ros::TimerEvent&)
@@ -117,13 +147,13 @@ public:
         // At default sensitivity of 250deg/s we need to scale by 131.
         double gx = read_word_i2c(0x43) / 131 * M_PI / 180.0;
         double gy = read_word_i2c(0x45) / 131 * M_PI / 180.0;
-        double gz = -read_word_i2c(0x47) / 131 * M_PI / 180.0;
+        double gz = read_word_i2c(0x47) / 131 * M_PI / 180.0;
 
         // Read accelerometer values.
         // At default sensitivity of 2g we need to scale by 16384.
         // Note: at "level" x = y = 0 but z = 1 (i.e. gravity)
         // But! Imu msg docs say acceleration should be in m/2 so need to *9.807
-        double ax = -read_word_i2c(0x3b) / 16384.0 * 9.807;
+        double ax = read_word_i2c(0x3b) / 16384.0 * 9.807;
         double ay = read_word_i2c(0x3d) / 16384.0 * 9.807;
         double az = read_word_i2c(0x3f) / 16384.0 * 9.807;
 
@@ -132,11 +162,16 @@ public:
         msg.angular_velocity.x = gx - bias_gx_;
         msg.angular_velocity.y = gy - bias_gy_;
         msg.angular_velocity.z = gz - bias_gz_;
+        msg.angular_velocity_covariance[0] = angular_velocity_covariance_;
+        msg.angular_velocity_covariance[4] = angular_velocity_covariance_;
+        msg.angular_velocity_covariance[8] = angular_velocity_covariance_;
 
-        const float la_rescale = 16384.0 / 9.807;
         msg.linear_acceleration.x = ax - bias_ax_;
         msg.linear_acceleration.y = ay - bias_ay_;
         msg.linear_acceleration.z = az - bias_az_;
+        msg.linear_acceleration_covariance[0] = linear_acceleration_covariance_;
+        msg.linear_acceleration_covariance[4] = linear_acceleration_covariance_;
+        msg.linear_acceleration_covariance[8] = linear_acceleration_covariance_;
 
         // Pub & sleep.
         imu_publisher_.publish(msg);
@@ -151,6 +186,19 @@ public:
             cp_bias_az_ += az + 9.807;
             bias_count_--;
         }
+
+        if(updating_bias_at_startup_ && bias_count_ == 0)
+        {
+            updating_bias_at_startup_ = false;
+            bias_gx_ = cp_bias_gx_ / bias_init_count_;
+            bias_gy_ = cp_bias_gy_ / bias_init_count_;
+            bias_gz_ = cp_bias_gz_ / bias_init_count_;
+            bias_ax_ = cp_bias_ax_ / bias_init_count_;
+            bias_ay_ = cp_bias_ay_ / bias_init_count_;
+            bias_az_ = cp_bias_az_ / bias_init_count_;
+
+            ROS_INFO("IMU Bias updated");
+        }
     }
 
     bool get_bias_callback(sd_sensor::GetBias::Request& request, sd_sensor::GetBias::Response& response)
@@ -158,7 +206,7 @@ public:
         cp_bias_gx_ = cp_bias_gy_ = cp_bias_gz_ = 0.0;
         cp_bias_ax_ = cp_bias_ay_ = cp_bias_az_ = 0.0;
 
-        bias_count_ = BIAS_COUNT;
+        bias_count_ = bias_init_count_;
         int timeout = 15000; // 15s
         ros::Rate rate(10.0);
         
@@ -173,12 +221,12 @@ public:
             response.bias_ax = response.bias_ay = response.bias_az = 0.0;
         } else {
             response.result = true;
-            response.bias_gx = cp_bias_gx_ / BIAS_COUNT;
-            response.bias_gy = cp_bias_gy_ / BIAS_COUNT;
-            response.bias_gz = cp_bias_gz_ / BIAS_COUNT;
-            response.bias_ax = cp_bias_ax_ / BIAS_COUNT;
-            response.bias_ay = cp_bias_ay_ / BIAS_COUNT;
-            response.bias_az = cp_bias_az_ / BIAS_COUNT;
+            response.bias_gx = cp_bias_gx_ / bias_init_count_;
+            response.bias_gy = cp_bias_gy_ / bias_init_count_;
+            response.bias_gz = cp_bias_gz_ / bias_init_count_;
+            response.bias_ax = cp_bias_ax_ / bias_init_count_;
+            response.bias_ay = cp_bias_ay_ / bias_init_count_;
+            response.bias_az = cp_bias_az_ / bias_init_count_;
         }
 
         return true;
