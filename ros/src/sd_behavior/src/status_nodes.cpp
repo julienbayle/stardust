@@ -54,8 +54,11 @@ BT::NodeStatus StatusNodes::IsHealthy()
         return BT::NodeStatus::FAILURE;
 
     if (averages[0] > max_load_average_)
+    {
+        ROS_WARN_THROTTLE(1, "CPU usage limit is exceeded");
         return BT::NodeStatus::FAILURE;
-    
+    }
+        
 
     return BT::NodeStatus::SUCCESS;
 }
