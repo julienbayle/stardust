@@ -2,7 +2,7 @@
 <robot name="r2" xmlns:xacro="http://ros.org/wiki/xacro">
     <xacro:property name="body_length" value="0.150" />
     <xacro:property name="body_width" value="0.260" />
-    <xacro:property name="body_height" value="0.424" />
+    <xacro:property name="body_height" value="0.350" />
     <xacro:property name="body_ground_spacing" value="0.010" />
 
     <xacro:property name="wheel_length" value="0.014" />
@@ -10,32 +10,27 @@
     <xacro:property name="wheel_separation" value="0.190" />
     <xacro:property name="wheel_effort_max" value="10000" />
     <xacro:property name="wheel_velocity_max" value="10000" />
-    <xacro:property name="wheel_x" value="0.030" />
+    <xacro:property name="wheel_to_body_x" value="0.030" />
 
-    <xacro:property name="free_wheel_x" value="${wheel_x + body_length/2}" />
+    <xacro:property name="free_wheel_to_body_x" value="${body_length/2 - 0.012}" />
     
     <xacro:property name="imu_size" value="0.050"/>
-    <xacro:property name="imu_x" value="${wheel_x}" />
-    <xacro:property name="imu_y" value="${body_width / 2}" />
-    <xacro:property name="imu_z" value="0.170" />
+    <xacro:property name="imu_to_base_x" value="0" />
+    <xacro:property name="imu_to_base_y" value="0" />
+    <xacro:property name="imu_to_base_z" value="${0.145 - wheel_radius}" />
     
     <xacro:property name="lidar_height" value="0.037"/>
     <xacro:property name="lidar_width" value="0.100" />
-    <xacro:property name="lidar_x" value="0.01" />
-    <xacro:property name="lidar_y" value="0.0" />
-    <xacro:property name="lidar_z" value="0.040" />
+    <xacro:property name="lidar_to_base_x" value="-0.04" />
+    <xacro:property name="lidar_to_base_y" value="0.0" />
+    <xacro:property name="lidar_to_base_z" value="${0.040 - wheel_radius}" />
     
-    <xacro:property name="sonar_length" value="0.02"/>
-    <xacro:property name="sonar_width" value="0.044"/>
-    <xacro:property name="sonar_height" value="0.02"/>
-    <xacro:property name="sonar_y" value="0.073"/>
-    <xacro:property name="sonar_z" value="0.120"/>
-
-
     <xacro:include filename="$(find sd_description)/urdf/materials.xacro" />
 
+    <!-- Base link is at the center between the wheels axe -->
     <link name="base_link"/>
 
+    <!-- Body is the robot structure -->
     <link name="body_link">
         <visual>
             <geometry>
@@ -58,7 +53,7 @@
     <joint name="body_to_base" type="fixed">
         <parent link="base_link"/>
         <child link="body_link"/>
-        <origin xyz="${wheel_x} 0 ${- wheel_radius + body_ground_spacing}" rpy="0 0 0"/>
+        <origin xyz="${wheel_to_body_x} 0 ${- wheel_radius + body_ground_spacing}" rpy="0 0 0"/>
     </joint>
 
     <xacro:macro name="wheel_macro" params="prefix reflect">
@@ -124,7 +119,7 @@
     <joint name="free_wheel_to_body" type="fixed">
         <parent link="body_link"/>
         <child link="free_wheel_link"/>
-        <origin xyz="${free_wheel_x} 0 ${body_ground_spacing/2}" rpy="0 0 0"/>
+        <origin xyz="${free_wheel_to_body_x} 0 ${-body_ground_spacing/2}" rpy="0 0 0"/>
     </joint>
     
     <!-- Sensors -->
@@ -135,16 +130,12 @@
             </geometry>
             <material name="blue"/>
         </visual>
-        <!-- <inertial>
-			<mass value="0.1"/>
-			<inertia ixx="0.1e-3" ixy="0.0" ixz="0.0" iyy="0.1e-3" iyz="0.0" izz="0.1e-3"/>
-        </inertial> -->
     </link>
 
     <joint name="imu_to_body" type="fixed">
-        <parent link="body_link"/>
+        <parent link="base_link"/>
         <child link="imu_link"/>
-        <origin xyz="${imu_x} ${imu_y} ${imu_z}" rpy="0 ${pi} 0"/>
+        <origin xyz="${imu_to_base_x} ${imu_to_base_y} ${imu_to_base_z}" rpy="0 0 0"/>
     </joint>
     
     <link name="lidar_link">
@@ -154,16 +145,12 @@
             </geometry>
             <material name="blue"/>
         </visual>
-        <!-- <inertial>
-			<mass value="0.3"/>
-			<inertia ixx="0.5e-3" ixy="0.0" ixz="0.0" iyy="0.5e-3" iyz="0.0" izz="0.5e-3"/>
-        </inertial> -->
     </link>
 
     <joint name="lidar_to_body" type="fixed">
-        <parent link="body_link"/>
+        <parent link="base_link"/>
         <child link="lidar_link"/>
-        <origin xyz="${lidar_x} ${lidar_y} ${lidar_z}" rpy="${pi} 0 ${pi}"/>
+        <origin xyz="${lidar_to_base_x} ${lidar_to_base_y} ${lidar_to_base_y}" rpy="0 ${pi} 0"/>
     </joint>
 
     <xacro:macro name="sonar_macro" params="name y">
@@ -183,6 +170,6 @@
         </joint>
     </xacro:macro>
 
-    <sonar_macro name="left" y="${sonar_y}"/>
-    <sonar_macro name="right" y="${-sonar_y}"/>
+    <!--sonar_macro name="left" y="${sonar_y}"/-->
+    <!--sonar_macro name="right" y="${-sonar_y}"/-->
 </robot>
