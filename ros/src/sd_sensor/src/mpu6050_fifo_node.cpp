@@ -14,6 +14,7 @@ class MPU6050_FIFO {
         ros::ServiceServer get_bias_service_;
         ros::Timer timer_;
 
+        double frequency_;
         int i2c_adapter_;
         int i2c_address_;
         std::string frame_;
@@ -45,8 +46,7 @@ class MPU6050_FIFO {
             nh_priv_("~")
         {
             // Get parameters
-            double frequency;
-            nh_priv_.param("frequency", frequency, 100.0);
+            nh_priv_.param("frequency", frequency_, 100.0);
             nh_priv_.param("i2c_adapter", i2c_adapter_, 1);
             nh_priv_.param("i2c_address", i2c_address_, 0x68);
             nh_priv_.param("frame", frame_, (std::string)"imu_link");
@@ -93,7 +93,7 @@ class MPU6050_FIFO {
 
             wake_up_device(file_);
 
-            set_sample_rate(file_, frequency);  // 100 samples per second
+            set_sample_rate(file_, frequency_);  // 100 samples per second
             enable_fifo(file_);
             reset_fifo(file_);
 
@@ -106,10 +106,10 @@ class MPU6050_FIFO {
             // Create services
             get_bias_service_ = nh_priv_.advertiseService("get_bias", &MPU6050_FIFO::get_bias_callback, this);
 
-            ROS_INFO("Starting mpu6050_node (%1.2f Hz, frame = %s)", frequency, frame_.c_str());
+            ROS_INFO("Starting mpu6050_node (%1.2f Hz, frame = %s)", frequency_, frame_.c_str());
             
             // Create loop timer
-            timer_ = nh_priv_.createTimer(ros::Duration(1 / frequency), &MPU6050_FIFO::timer_callback, this);
+            timer_ = nh_priv_.createTimer(ros::Duration(1 / frequency_), &MPU6050_FIFO::timer_callback, this);
         }
 
         void timer_callback(const ros::TimerEvent&)
@@ -180,7 +180,7 @@ class MPU6050_FIFO {
             cp_bias_ax_ = cp_bias_ay_ = cp_bias_az_ = 0.0;
 
             bias_count_ = bias_init_count_;
-            int timeout = 15000; // 15s
+            int timeout = bias_init_count_ * frequency_ * 1.5;
             ros::Rate rate(10.0);
             
             while (bias_count_ != 0 && timeout > 0) {

@@ -8,6 +8,7 @@
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <endian.h>
 
 #include "sd_sensor/i2c.h"
 
@@ -212,7 +213,7 @@ void read_fifo_buffer(int fd, float temps, float accel_data[3], float accel_scal
 
     // swap byte from big endian to small endian
     for(j=0;j<7;j++)
-    FifoBuffer[j]=__bswap_16(FifoBuffer[j]);
+        FifoBuffer[j] = be16toh(FifoBuffer[j]);
 
     temps = (float)(FifoBuffer[3] / 340.0f + 36.53);
 
