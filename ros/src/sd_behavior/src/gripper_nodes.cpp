@@ -214,6 +214,16 @@ namespace GripperNodes
                 msg.data = 0;
                 activation_middle_valve_pub_.publish(msg);
         }
+	    if(!left_valve && !middle_valve && !right_valve)
+	    {
+		std_msgs::Int16 msg;
+		msg.data = 0;
+		activation_pump_pub_.publish(msg);
+
+		start_ = std::chrono::high_resolution_clock::now();	
+		t_chrono elapsed_time = std::chrono::milliseconds(0);
+		ROS_DEBUG_STREAM_NAMED("GripperNode","Extinction de la pompe...");
+	    }
 
 	    return BT::NodeStatus::SUCCESS;
 	}

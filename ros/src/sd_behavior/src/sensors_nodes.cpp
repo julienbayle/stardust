@@ -24,7 +24,7 @@ void SensorsNodes::registerNodes(BT::BehaviorTreeFactory& factory, ros::NodeHand
 	factory.registerSimpleCondition("IsVentouseGauche", std::bind(SensorsNodes::IsVentouseGauche));
 
 	sensors_sub_ = nh.subscribe("/r1/pilo/switches", 1, SensorsNodes::rosUpdate);
-	sensors_sub_ = nh.subscribe("/r1/amcl_pose", 1, SensorsNodes::rosUpdatePosition);
+	position_sub_ = nh.subscribe("/r1/amcl_pose", 1, SensorsNodes::rosUpdatePosition);
 	speed_sub_ = nh.subscribe("/r1/auto_cmd_vel", 1, SensorsNodes::rosUpdateMovement);
 
 	is_tirette_.store(false);
