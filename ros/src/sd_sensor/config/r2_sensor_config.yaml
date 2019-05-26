@@ -27,9 +27,5 @@ r2_laser_pattern_detector:
 
 mpu6050:
   frame: 'r2/imu_link'
-  bias_gx: 0.162825896087
-  bias_gy: -0.123678560658
-  bias_gz: 0.0581620980884
-  bias_ax: -0.81915744873
-  bias_ay: -0.39402782959
-  bias_az: 0.0371353930664
+  update_bias_at_startup: true
+  update_bias_at_startup_count: 100

@@ -8,7 +8,7 @@
 	node pkg="sd_sensor" type="$(arg robot_ns)_sensor_node" name="$(arg robot_ns)_sensor_node" if="$(eval arg('robot_ns') == 'r2')">
 	</node-->
 
-	<node name="mpu6050"  pkg="sd_sensor"  type="mpu6050_node" output="screen" respawn="false" if="$(eval not arg('sim'))">
+	<node name="mpu6050"  pkg="sd_sensor"  type="mpu6050_fifo_node" output="screen" respawn="false" if="$(eval not arg('sim'))">
 		<remap from="imu/data" to="imu/data_raw"/>
 	</node>
 
