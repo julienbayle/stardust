@@ -15,6 +15,7 @@
 	    <rosparam file="$(find sd_navigation)/config/$(arg robot_ns)_costmap_common_params.yaml" command="load" ns="local_costmap"/>
 	    
 	    <remap from="cmd_vel" to="auto_cmd_vel"/>
-		<remap from="odom" to="odometry/filtered"/>
+		<remap from="odom" to="mobile_base_controller/odom" if="$(eval arg('robot_ns') == 'r1')"/>
+		<remap from="odom" to="odometry/filtered" if="$(eval arg('robot_ns') == 'r2')"/>
 	</node>
 </launch>
