@@ -6,7 +6,8 @@ recovery_behaviors: [
   { name: conservative_reset, type: clear_costmap_recovery/ClearCostmapRecovery }, 
   # This package provides a recovery behavior for the navigation stack that attempts
   # to clear space by performing a 360 degree rotation of the robot.
-  { name: rotate_recovery, type: rotate_recovery/RotateRecovery }]
+  # { name: rotate_recovery, type: rotate_recovery/RotateRecovery }
+  ]
 
 # The rate in Hz at which to run the control loop and send velocity commands to the base
 controller_frequency: 2.0
@@ -17,7 +18,7 @@ planner_patience: 2.0
 controller_patience: 4.0
 
 # How long in seconds to allow for oscillation before executing recovery behaviors
-oscillation_timeout: 5
+oscillation_timeout: 10
 
 # How far in meters the robot must move to be considered not to be oscillating. 
 # Moving this far resets the timer counting up to the ~oscillation_timeout
@@ -64,10 +65,10 @@ TrajectoryPlannerROS:
   # Robot Configuration Parameters (same values as in sd_control)
   holonomic_robot: false
   
-  acc_lim_x: 0.5
-  acc_lim_y: 0.5
-  acc_lim_theta: 2
-  max_vel_x: 0.15
+  acc_lim_x: 0.3
+  acc_lim_y: 0.3
+  acc_lim_theta: 1
+  max_vel_x: 0.18
   min_vel_theta: -1.0
   max_vel_theta: 1.0
 
@@ -78,29 +79,29 @@ TrajectoryPlannerROS:
   min_in_place_vel_theta: 0.2
 
   # The amount of time to forward-simulate trajectories in seconds
-  sim_time: 2.0
+  sim_time: 1.0
 
   # The step size, in meters, to take between points on a given trajectory 
-  sim_granularity: 0.05
+  sim_granularity: 0.01
 
   # The step size, in radians, to take between angular samples 
   # on a given trajectory. - New in navigation 1.3.1 
-  angular_sim_granularity: 0.05
+  angular_sim_granularity: 0.01
 
   # The number of samples to use when exploring the x velocity space 
   # Default : 3
-  vx_samples: 5
+  vx_samples: 3
 
   # The number of samples to use when exploring the theta velocity space
   # Default : 20 
-  vtheta_samples: 10
+  vtheta_samples: 50
 
   # Velocity used when the robot attempt to escape (closed path)
   # Must be negative
   escape_vel: -0.1
 
   # Goal Tolerance Parameters
-  yaw_goal_tolerance: 0.9  # 5°
+  yaw_goal_tolerance: 0.05  # rad
   xy_goal_tolerance: 0.05   # m
 
   # When robot has reached xy goal, then ignore it for 
@@ -115,17 +116,17 @@ TrajectoryPlannerROS:
 
   # The weighting for how much the controller should stay 
   # close to the path it was given (0 - 5) 
-  pdist_scale: 4.5
+  pdist_scale: 5
   
   # The weighting for how much the controller should 
   # attempt to reach its local goal (0 - 5)
-  gdist_scale: 0.2
+  gdist_scale: 1
 
   # The weighting for how much the controller should attempt to avoid obstacles
-  occdist_scale: 2.0
+  #occdist_scale: 2.0
 
   # How far to look ahead in meters when scoring different in-place-rotation trajectories
-  heading_lookahead: 1.0
+  heading_lookahead: 0.10
 
   # Whether to score based on the robot's heading to the
   # path or its distance from the path
@@ -138,7 +139,7 @@ TrajectoryPlannerROS:
   # Whether or not to publish the cost grid that the planner will 
   # use when planning. When true, a sensor_msgs/PointCloud2 will 
   # be available on the ~<name>/cost_cloud topic
-  publish_cost_grid_pc: false
+  #publish_cost_grid_pc: false
   
   # The frame to set for the cost_cloud. 
   # Should be set to the same frame as the local costmap's global frame
