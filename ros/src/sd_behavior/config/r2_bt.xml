@@ -3,12 +3,13 @@
     <BehaviorTree ID="BehaviorTree">
         <Sequence>
             <Condition ID="RobotPret"/>
-            <RealParallel>
+            <JouerUnRosbag nom="rouge.bag" topics="r2/mobile_base_controller/cmd_vel" />
+            <!--RealParallel>
                 <SubTree ID="Tirette" y_mul="y_mul" theta_mul="theta_mul" camp="camp"/>
                 <SubTree ID="Minuterie" palet_vert="palet_vert" palets_rouge="palets_rouge" palet_pente="palet_pente" />
                 <SubTree ID="Yeux" camp="camp"/>
                 <SubTree ID="Trier les palets" palet_vert="palet_vert" palets_rouge="palets_rouge" palet_pente="palet_pente" y_mul="y_mul" theta_mul="theta_mul" />
-            </RealParallel>
+            </RealParallel-->
         </Sequence>
     </BehaviorTree>
     <!-- ////////// -->
@@ -210,6 +211,10 @@
         </Condition>
         <SubTree ID="Trier les palets"/>
         <SubTree ID="Yeux"/>
+        <Action ID="JouerUnRosbag">
+            <input_port name="nom"/>
+            <input_port name="topics"/>
+        </Action>
     </TreeNodesModel>
     <!-- ////////// -->
 </root>
