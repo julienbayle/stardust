@@ -4,11 +4,13 @@
 std::atomic<bool> 		is_tirette_;
 std::atomic<bool>		is_camp_violet_;
 std::atomic<bool>		is_robot_en_mouvement_;
+std::atomic<bool>		are_encoders_ok_;
 std::atomic<unsigned>  		ui32_switches_;
 geometry_msgs::PoseWithCovarianceStamped		position_robot_;
 ros::Subscriber 		sensors_sub_;
 ros::Subscriber 		position_sub_;
 ros::Subscriber 		speed_sub_;
+ros::Subscriber 		encodersOk_sub_;
 
 void SensorsNodes::registerNodes(BT::BehaviorTreeFactory& factory, ros::NodeHandle& nh)
 {
@@ -22,14 +24,17 @@ void SensorsNodes::registerNodes(BT::BehaviorTreeFactory& factory, ros::NodeHand
 	factory.registerSimpleCondition("IsVentouseDroite", std::bind(SensorsNodes::IsVentouseDroite));
 	factory.registerSimpleCondition("IsVentouseCentre", std::bind(SensorsNodes::IsVentouseCentre));
 	factory.registerSimpleCondition("IsVentouseGauche", std::bind(SensorsNodes::IsVentouseGauche));
+	factory.registerSimpleCondition("AreEncodersOk", std::bind(SensorsNodes::AreEncodersOk));
 
 	sensors_sub_ = nh.subscribe("/r1/pilo/switches", 1, SensorsNodes::rosUpdate);
 	position_sub_ = nh.subscribe("/r1/amcl_pose", 1, SensorsNodes::rosUpdatePosition);
 	speed_sub_ = nh.subscribe("/r1/auto_cmd_vel", 1, SensorsNodes::rosUpdateMovement);
+	encodersOk_sub_ = nh.subscribe("/r1/encoders_ok", 1, SensorsNodes::rosUpdateEncodersOk);
 
 	is_tirette_.store(false);
 	is_camp_violet_.store(true);
 	is_robot_en_mouvement_.store(false);
+	are_encoders_ok_.store(true);
 	ui32_switches_.store(0);
 }
 
@@ -97,6 +102,13 @@ BT::NodeStatus SensorsNodes::IsVentouseGauche()
 	return bit ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
 }
 
+BT::NodeStatus SensorsNodes::AreEncodersOk()
+{
+	
+	ROS_DEBUG_STREAM_NAMED("RobotSensorsCondition", "areEncodersOk : " << are_encoders_ok_);
+	return are_encoders_ok_ ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
+}
+
 void SensorsNodes::rosUpdateMovement(const geometry_msgs::Twist &speed)
 {
         ROS_DEBUG_STREAM_NAMED("RobotSensorsCondition",
@@ -112,6 +124,15 @@ void SensorsNodes::rosUpdatePosition(const geometry_msgs::PoseWithCovarianceStam
                  << position.pose.pose.position.x << "," << position.pose.pose.position.y);
 				 
 				 position_robot_ = position;
+}
+
+void SensorsNodes::rosUpdateEncodersOk(const std_msgs::Bool &encodersOk)
+{
+        ROS_DEBUG_STREAM_NAMED("RobotSensorsCondition",
+                "Update sensor values with "
+                 << encodersOk.data);
+				 
+				 are_encoders_ok_ = encodersOk.data;
 }
 
 void SensorsNodes::rosUpdate(const std_msgs::UInt32 &switches)

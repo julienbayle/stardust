@@ -6,18 +6,23 @@ purple_x: -0.550
 purple_y: 1.275
 purple_yaw: -1.5708 # -pi/2
 
-base_link_frame_id: r1/base_link
-odom_frame_id: r1/odom
-map_frame_id: map
+behavior_tree:
 
-bt_modules:
-  - GripperNodes
-  - MoveNodes
-  - ScoreNodes
-  - SensorsNodes
-  - StatusNodes
-  - TimerNodes
+  base_link_frame_id: r1/base_link
+  odom_frame_id: r1/odom
+  map_frame_id: map
 
-bt_initialpose_topic: /r1/initialpose
-bt_move_base_topic: /r1/move_base
-bt_cmd_vel_topic: /r1/auto_cmd_vel
+  modules:
+    - GripperNodes
+    - LaserNodes
+    - MoveNodes
+    - ScoreNodes
+    - SensorsNodes
+    - StatusNodes
+    - TimerNodes
+    - RosbagNodes
+
+  laser_detector_topic: /r1/laser_pattern_detector
+  initialpose_topic: /r1/initialpose
+  move_base_topic: /r1/move_base
+  cmd_vel_topic: /r1/auto_cmd_vel

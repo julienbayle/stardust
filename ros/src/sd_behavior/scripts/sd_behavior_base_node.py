@@ -5,14 +5,18 @@ import rospy
 from tf.transformations import quaternion_from_euler
 
 from std_msgs.msg import Bool
+from std_msgs.msg import Int16
+from std_msgs.msg import String
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import PoseWithCovarianceStamped
 from sd_behavior_msgs.msg import Start
 
-mode_auto = False
+mode_auto = True
+battery = 0
 
 cmd_vel_publisher = None
 initialpose_publisher = None
+lcd_publisher = None
 
 def mode_auto_callback(data):
     global mode_auto
@@ -27,6 +31,19 @@ def auto_cmd_vel_callback(data):
     global mode_auto, cmd_vel_publisher
     if (mode_auto):
         cmd_vel_publisher.publish(data)
+
+def battery_callback(data):
+    global battery
+    battery = data.data
+
+def encoders_ok_callback(data):
+    global lcd_publisher, battery
+    string_msg = String()
+    if (data.data):
+        string_msg.data = str(battery) + " OK        "
+    else:
+        string_msg.data = str(battery) + " XX        "
+    lcd_publisher.publish(string_msg)
 
 def start_callback(data):
     global initialpose_publisher
@@ -56,15 +73,18 @@ def main():
     rospy.init_node('sd_state_node')
     
     # Init publishers
-    global cmd_vel_publisher, initialpose_publisher
+    global cmd_vel_publisher, initialpose_publisher, lcd_publisher
     cmd_vel_publisher = rospy.Publisher('mobile_base_controller/cmd_vel', Twist, queue_size=10)
     initialpose_publisher = rospy.Publisher('initialpose', PoseWithCovarianceStamped, queue_size=1, latch=True)
-    
+    lcd_publisher = rospy.Publisher('lcd/line2', String, queue_size=1)
+
     # Create subscribers
     rospy.Subscriber("teleop/cmd_vel", Twist, teleop_cmd_vel_callback)
     rospy.Subscriber("auto_cmd_vel", Twist, auto_cmd_vel_callback)
     rospy.Subscriber("mode_auto", Bool, mode_auto_callback)
     rospy.Subscriber("start", Start, start_callback)
+    rospy.Subscriber("pilo/VbatmV", Int16, battery_callback)
+    rospy.Subscriber("encoders_ok", Bool, encoders_ok_callback)
 
     rospy.spin()
 
