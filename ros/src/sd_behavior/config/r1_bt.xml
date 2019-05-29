@@ -289,7 +289,7 @@
                             <ReactiveSequence>
                                 <Condition ID="AreEncodersOk"/>
                                 <Condition ID="LaVoieEstLibre-Devant"/>
-                                <Action nom="r1_simple_jaune.bag" ID="JouerUnRosbag" topics="/r1/mobile_base_controller/cmd_vel"/>
+                                <Action nom="r1_homol.bag" ID="JouerUnRosbag" topics="/r1/mobile_base_controller/cmd_vel"/>
                             </ReactiveSequence>
                             <Action ID="DefinirLeScore" score="51"/>
                             <Action ID="AfficherLeScore"/>
@@ -311,7 +311,7 @@
                             <ReactiveSequence>
                                 <Condition ID="AreEncodersOk"/>
                                 <Condition ID="LaVoieEstLibre-Devant"/>
-                                <Action nom="r1_simple_violet.bag" ID="JouerUnRosbag" topics="/r1/mobile_base_controller/cmd_vel"/>
+                                <Action nom="r1_homol.bag" ID="JouerUnRosbag" topics="/r1/mobile_base_controller/cmd_vel"/>
                             </ReactiveSequence>
                             <Action ID="DefinirLeScore" score="51"/>
                             <Action ID="AfficherLeScore"/>
