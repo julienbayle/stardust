@@ -81,10 +81,20 @@
                 <BlackboardCheckString return_on_mismatch="FAILURE" value_A="{palets_depart}" value_B="1">
                     <Fallback>
                         <Sequence>
-                            <ReactiveSequence>
-                                <Condition ID="LaVoieEstLibre-Devant"/>
-                                <JouerUnRosbag nom="r2_palets_depart_jaune.bag" topics="/r2/mobile_base_controller/cmd_vel" />
-                            </ReactiveSequence>
+                            <Fallback>
+                                <BlackboardCheckString return_on_mismatch="FAILURE" value_A="{camp}" value_B="jaune">
+                                    <ReactiveSequence>
+                                        <Condition ID="LaVoieEstLibre-Devant"/>
+                                        <JouerUnRosbag nom="r2_jaune.bag" topics="/r2/mobile_base_controller/cmd_vel" />
+                                    </ReactiveSequence>
+                                </BlackboardCheckString>
+                                <BlackboardCheckString return_on_mismatch="FAILURE" value_A="{camp}" value_B="violet">
+                                    <ReactiveSequence>
+                                        <Condition ID="LaVoieEstLibre-Devant"/>
+                                        <JouerUnRosbag nom="r2_violet.bag" topics="/r2/mobile_base_controller/cmd_vel" />
+                                    </ReactiveSequence>
+                                </BlackboardCheckString>
+                            </Fallback>
                             <Action ID="AjouterAuScore" score="18"/>
                             <SetBlackboard value="0" output_key="palets_depart"/>
                             <!--SetBlackboard value="1" output_key="palet_pente"/-->
