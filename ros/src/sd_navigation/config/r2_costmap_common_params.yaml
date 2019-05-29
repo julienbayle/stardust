@@ -31,16 +31,17 @@ inflation_layer:
   inflation_radius: 0.10
 
 # Robot foot print
-footprint: [[-0.075, 0.130], [0.075, 0.130], [0.075, -0.130], [-0.075, -0.130]]
+#footprint: [[-0.075, 0.130], [0.075, 0.130], [0.075, -0.130], [-0.075, -0.130]]
+robot_radius: 0.13
 
 # Robot base frame
 robot_base_frame: r2/base_link
 
 # The frequency in Hz for the map to be updated.
-update_frequency: 5.0
+update_frequency: 3.0
 
 # The frequency in Hz for the map to be publish display information
-publish_frequency: 1.0
+publish_frequency: 0.5
 
 # Specifies the delay in transform (tf) data that is tolerable in seconds
-transform_tolerance: 0.5
+transform_tolerance: 0.25

@@ -28,5 +28,6 @@ r2_laser_pattern_detector:
 mpu6050:
   frequency: 50
   frame: 'r2/imu_link'
+  frequency: 50
   update_bias_at_startup: true
   update_bias_at_startup_count: 100
