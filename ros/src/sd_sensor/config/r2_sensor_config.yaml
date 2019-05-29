@@ -20,12 +20,13 @@ r2_laser_pattern_detector:
   
   # Distance threshold in meters
   isTirette_threshold: 0.1
-  isLeftFree_threshold: 0.3
+  isLeftFree_threshold: 0.6
   isFrontFree_threshold: 0.3
-  isRightFree_threshold: 0.3
+  isRightFree_threshold: 0.6
   isBackFree_threshold: 0.3
 
 mpu6050:
+  frequency: 50
   frame: 'r2/imu_link'
   update_bias_at_startup: true
   update_bias_at_startup_count: 100
