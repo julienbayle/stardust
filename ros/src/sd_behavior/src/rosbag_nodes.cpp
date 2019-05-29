@@ -22,6 +22,9 @@ namespace RosbagNodes
               initialized_(false),
               playback_publishers_(),
               rosbag_bag_mtx_(),
+              pause_(0.0),
+              is_paused_(false),
+              pause_start_time_(0),
               bag_()
     { 
         halted_.store(false);
@@ -35,7 +38,7 @@ namespace RosbagNodes
 	BT::NodeStatus PlayRosbag::tick()
 	{	
         boost::mutex::scoped_lock(rosbag_bag_mtx_);
-       
+        
         if ( ! initialized_ )
         {
             std::string filename;
@@ -71,11 +74,29 @@ namespace RosbagNodes
             return BT::NodeStatus::FAILURE;
         }
 
-        first_message_time_ = ros::Time::now();
-        BOOST_FOREACH(rosbag::MessageInstance const m, view_) {
-            if( ! nh_->ok() || halted_ )
-                return  BT::NodeStatus::FAILURE;
+        if( ! is_paused_) {
+            ROS_WARN_STREAM("Start rosbag " 
+                    << "- Total duration: " << view_.getEndTime() - view_.getBeginTime());
 
+            first_message_time_ = last_message_time_ = ros::Time::now();
+        }
+
+        BOOST_FOREACH(rosbag::MessageInstance const m, view_) {
+            // Replay after pause
+            if(is_paused_) {
+                
+                pause_ += ros::Time::now() - pause_start_time_;
+                is_paused_ = false;
+
+                ROS_WARN_STREAM("Play rosbag after a pause" 
+                    << "- Time: " << (ros::Time::now() - first_message_time_) - pause_);
+            }
+
+            if( ! nh_->ok()) {
+                return  BT::NodeStatus::FAILURE;
+            }
+
+            // Declare publishers
             std::map<std::string, ros::Publisher>::iterator it = playback_publishers_.find(m.getTopic());
             if(it == playback_publishers_.end()) {
                 ros::AdvertiseOptions advertise_opts(
@@ -89,25 +110,47 @@ namespace RosbagNodes
                     std::pair<std::string, ros::Publisher>(m.getTopic(), publisher));
             }
 
-            while (m.getTime() - bag_start_time_ > ros::Time::now() - first_message_time_)
-                setStatusRunningAndYield();
-            
-            topic_tools::ShapeShifter::ConstPtr s = m.instantiate<topic_tools::ShapeShifter>();
-            playback_publishers_[m.getTopic()].publish(s);
-            ROS_DEBUG_STREAM("publish " 
-                << "- Topic: " << m.getTopic()
-                << "- Time: " << ros::Time::now() - first_message_time_);
+            // Ignore messages already played before the pause
+            if (m.getTime() - bag_start_time_ <= (ros::Time::now() - first_message_time_) - pause_)
+            {
+                ROS_DEBUG_STREAM("Ignore message after a pause" 
+                    << "- Time: " << m.getTime() - bag_start_time_);
+            }
+            else
+            {
+                // Wait to respect message original rate
+                while (m.getTime() - bag_start_time_ > (ros::Time::now() - first_message_time_) - pause_)
+                    setStatusRunningAndYield();
+
+                // Halted means a pause is requested
+                if( halted_ ) {
+                    halted_.store(false);
+                    return  BT::NodeStatus::FAILURE;
+                }
+                
+                topic_tools::ShapeShifter::ConstPtr s = m.instantiate<topic_tools::ShapeShifter>();
+                playback_publishers_[m.getTopic()].publish(s);
+                ROS_WARN_STREAM("publish " 
+                    << "- Topic: " << m.getTopic()
+                    << "- Time: " << m.getTime() - bag_start_time_);
+
+                last_message_time_ = ros::Time::now();
+            }
 
         }
 
-        ROS_DEBUG_STREAM("Rosbag - end of file");
+        pause_ = ros::Duration(0);
+        ROS_WARN_STREAM("Rosbag - end of file");
         return BT::NodeStatus::SUCCESS;
 	}
 	
 	void PlayRosbag::halt() 
 	{
-        ROS_WARN_STREAM("Arret");
-		halted_.store(true);
+		pause_start_time_ = last_message_time_;
+        is_paused_ = true;
+        halted_.store(true);
+        ROS_WARN_STREAM("Pause rosbag" 
+            << "- Time: " << (pause_start_time_ - first_message_time_) - pause_);
 	}
 
 }

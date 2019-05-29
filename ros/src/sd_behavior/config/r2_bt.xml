@@ -3,67 +3,73 @@
     <BehaviorTree ID="BehaviorTree">
         <Sequence>
             <Condition ID="RobotPret" />
-            <RealParallel>
-                <SubTree ID="Tirette" y_mul="y_mul" theta_mul="theta_mul" camp="camp"/>
-                <SubTree ID="Minuterie" palet_vert="palet_vert" palets_rouge="palets_rouge" palet_pente="palet_pente" />
+            <RealParallel> 
+                <SubTree ID="Tirette" y_mul="y_mul" theta_mul="theta_mul" camp="camp" tirette_presente_last_tick="tirette_presente_last_tick" />
+                <SubTree ID="Minuterie" palets_depart="palets_depart" palet_pente="palet_pente" tirette_presente_last_tick="tirette_presente_last_tick" />
                 <SubTree ID="Yeux" camp="camp"/>
-                <JouerUnRosbag nom="r1_simple.bag" topics="r2/mobile_base_controller/cmd_vel" />
-                <!--SubTree ID="Trier les palets" palet_vert="palet_vert" palets_rouge="palets_rouge" palet_pente="palet_pente" y_mul="y_mul" theta_mul="theta_mul" /-->
+                <SubTree ID="Trier les palets"  camp="camp" palets_depart="palets_depart" palet_pente="palet_pente" y_mul="y_mul" theta_mul="theta_mul" />
             </RealParallel>
         </Sequence>
     </BehaviorTree>
     <!-- ////////// -->
     <BehaviorTree ID="Tirette">
         <ForceSuccess>
-            <Sequence>
-                <Condition ID="TiretteLaserPresente"/>
-                <Action ID="Arreter le robot" />
-                <Action ID="DefinirLeScore" score="0"/>
-                <Action ID="ArreterLaMinuterie"/>
-                <Fallback>
-                    <Sequence>
-                        <Condition ID="LaVoieEstLibre-Gauche"/>
-                        <Action ID="DefinirPosition" theta="0" x="-0.18" y="-1.18"/>
-                        <SetBlackboard value="violet" output_key="camp"/>
-                        <SetBlackboard value="-1.0" output_key="y_mul"/>
-                        <SetBlackboard value="-1.0" output_key="sym_theta"/>
-                        <Action ms="1000" ID="Attendre"/>
-                    </Sequence>
-                    <Sequence>
-                        <Action ID="DefinirPosition" theta="0" x="-0.18" y="1.18"/>
-                        <SetBlackboard value="jaune" output_key="camp"/>
-                        <SetBlackboard value="1.0" output_key="y_mul"/>
-                        <SetBlackboard value="1.0" output_key="theta_mul"/>
-                        <Action ms="1000" ID="Attendre"/>
-                    </Sequence>
-                </Fallback>
-            </Sequence>
+            <Fallback>
+                <Sequence>
+                    <Condition ID="TiretteLaserPresente"/>
+                    <SetBlackboard value="true" output_key="tirette_presente_last_tick"/>
+                    <Action ID="Arreter le robot" />
+                    <Action ID="VitesseConstante" linear_x="0.0" linear_y="0.0" angular_z="0.0" />
+                    <Action ID="DefinirLeScore" score="0"/>
+                    <Action ID="ArreterLaMinuterie"/> 
+                    <Fallback>
+                        <Sequence>
+                            <Condition ID="LaVoieEstLibre-Gauche"/>
+                            <Action ID="DefinirPosition" theta="0" x="-0.18" y="-1.18"/>
+                            <SetBlackboard value="violet" output_key="camp"/>
+                            <SetBlackboard value="-1.0" output_key="y_mul"/>
+                            <SetBlackboard value="-1.0" output_key="sym_theta"/>
+                            <Action ms="500" ID="Attendre"/>
+                        </Sequence>
+                        <Sequence>
+                            <Action ID="DefinirPosition" theta="0" x="-0.18" y="1.18"/>
+                            <SetBlackboard value="jaune" output_key="camp"/>
+                            <SetBlackboard value="1.0" output_key="y_mul"/>
+                            <SetBlackboard value="1.0" output_key="theta_mul"/>
+                            <Action ms="500" ID="Attendre"/>
+                        </Sequence>
+                    </Fallback>
+                </Sequence>
+                <Sequence>
+                    <SetBlackboard value="false" output_key="tirette_presente_last_tick"/>
+                </Sequence>
+            </Fallback>
         </ForceSuccess>
     </BehaviorTree>
     <!-- ////////// -->
     <BehaviorTree ID="Minuterie">
         <ForceSuccess>
             <Fallback>
+                <BlackboardCheckString return_on_mismatch="FAILURE" value_A="{tirette_presente_last_tick}" value_B="true">
+                    <Sequence>
+                        <Inverter>
+                            <Condition ID="TiretteLaserPresente"/>
+                        </Inverter>
+                        <Inverter>
+                            <Condition ID="MinuterieDemarree"/>
+                        </Inverter>
+                        <Action seconds="88" ID="LancerLaMinuterie"/>
+                        <SetBlackboard value="1" output_key="palets_depart"/>
+                    </Sequence>
+                </BlackboardCheckString>
                 <Sequence>
-                    <Inverter>
-                        <Condition ID="TiretteLaserPresente"/>
-                    </Inverter>
-                    <Inverter>
-                        <Condition ID="MinuterieDemarree"/>
-                    </Inverter>
-                    <Action seconds="88" ID="LancerLaMinuterie"/>
-                    <SetBlackboard value="1" output_key="palet_vert"/>
-                    <SetBlackboard value="1" output_key="palets_rouge"/>
-                    <SetBlackboard value="1" output_key="palet_pente"/>
-                </Sequence>
-                 <Sequence>
                     <Inverter>
                         <Condition ID="MinuterieNonEcoulee"/>
                     </Inverter>
-                    <SetBlackboard value="0" output_key="palet_vert"/>
-                    <SetBlackboard value="0" output_key="palets_rouge"/>
+                    <SetBlackboard value="0" output_key="palets_depart"/>
                     <SetBlackboard value="0" output_key="palet_pente"/>
                     <Action ID="Arreter le robot"/>
+                    <Action ID="VitesseConstante" linear_x="0.0" linear_y="0.0" angular_z="0.0" />
                 </Sequence>
             </Fallback>
         </ForceSuccess>
@@ -72,31 +78,19 @@
     <BehaviorTree ID="Trier les palets">
         <ForceSuccess>
             <Fallback>
-                <BlackboardCheckString return_on_mismatch="FAILURE" value_A="{palet_vert}" value_B="1">
-                    <Sequence>
-                        <Action ID="Aller" theta="90"  x="0.30" y="1.15" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="contourner les palets par l'extérieur"/>
-                        <Action ID="Aller" theta="180" x="0.30" y="1.05" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="se placer face aux palets"/>
-                        <Action ID="Aller" theta="180" x="0.05" y="1.05" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="capturer le palet vert"/>
-                        <Action ID="Aller" theta="270" x="0.05" y="1.05" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="tourner en directin de la zone de tri"/>
-                        <Action ID="Aller" theta="270" x="0.05" y="1.25" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="avancer dans la zone de tri"/>
-                        <Action ID="Aller" theta="180" x="0.05" y="1.25" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="se tourner en direction de la case verte"/>
-                        <Action ID="Aller" theta="180" x="-0.25" y="1.25" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="déposer le palet dans la case verte"/>
-                        <Action ID="Aller" theta="180" x="0.1" y="1.25" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="reculer pour libérer le palet"/>
-                        <Action ID="AjouterAuScore" score="6"/>
-                        <SetBlackboard value="0" output_key="palet_vert"/>
-                    </Sequence>
-                </BlackboardCheckString>
-                <BlackboardCheckString return_on_mismatch="FAILURE" value_A="{palets_rouge}" value_B="1">
-                    <Sequence>
-                        <Action ID="Aller" theta="90" x="0.1" y="1.05" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="remonter sur la ligne des palets"/>
-                        <Action ID="Aller" theta="180" x="0.1" y="1.05" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="se tourner vers les palets rouges"/>
-                        <Action ID="Aller" theta="180" x="-0.55" y="1.05" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="capturer les deux palets"/>
-                        <Action ID="Aller" theta="270" x="-0.55" y="1.05" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="se tourner en direction de la case rouge"/>
-                        <Action ID="Aller" theta="270" x="-0.55" y="1.25" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="pousser les palets au fond de la case rouge"/>
-                        <Action ID="Aller" theta="270" x="-0.55" y="1.05" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="libérer les palets"/>
-                        <Action ID="AjouterAuScore" score="12"/>
-                        <SetBlackboard value="0" output_key="palets_rouge"/>
-                    </Sequence>
+                <BlackboardCheckString return_on_mismatch="FAILURE" value_A="{palets_depart}" value_B="1">
+                    <Fallback>
+                        <Sequence>
+                            <ReactiveSequence>
+                                <Condition ID="LaVoieEstLibre-Devant"/>
+                                <JouerUnRosbag nom="r2_palets_depart_jaune.bag" topics="/r2/mobile_base_controller/cmd_vel" />
+                            </ReactiveSequence>
+                            <Action ID="AjouterAuScore" score="18"/>
+                            <SetBlackboard value="0" output_key="palets_depart"/>
+                            <!--SetBlackboard value="1" output_key="palet_pente"/-->
+                        </Sequence>
+                        <Action ID="VitesseConstante" linear_x="0.0" linear_y="0.0" angular_z="0.0" />
+                     </Fallback>
                 </BlackboardCheckString>
                 <BlackboardCheckString return_on_mismatch="FAILURE" value_A="{palet_pente}" value_B="1">
                     <Sequence>
@@ -128,12 +122,15 @@
                     <Sequence>
                         <Inverter>
                             <Condition ID="RobotEnBonneSante"/>
-                        </Inverter>    
-                        <Action message="CPU !!!" repetition="1" defaut="0" ID="AfficheYeux" fps="20"/>
+                        </Inverter>  
+                        <Inverter>
+                            <Condition ID="MinuterieNonEcoulee"/>
+                        </Inverter>  
+                        <Action message="CPU !!!" repetition="1" defaut="0" ID="AfficheYeux" fps="40"/>
                     </Sequence>
                     <Sequence>
                         <Condition ID="TiretteLaserPresente"/>
-                        <Action message="{camp}" repetition="1" defaut="0" ID="AfficheYeux" fps="40"/>
+                        <Action message="{camp}" repetition="1" defaut="0" ID="AfficheYeux" fps="30"/>
                     </Sequence>
                     <Sequence>
                         <Condition ID="MinuterieDemarree"/>
@@ -148,7 +145,7 @@
                         </Inverter>    
                         <Action ms="5000" ID="Attendre"/>
                         <Action ID="RecupererLeScore" score="{score}"/>
-                        <Action message="{score}" repetition="1" defaut="0" ID="AfficheYeux" fps="35"/>
+                        <Action message="{score}" repetition="1" defaut="0" ID="AfficheYeux" fps="15"/>
                     </Sequence>
                 </ReactiveFallback>
             </ForceSuccess>
@@ -165,6 +162,11 @@
         </Action>
         <Action ID="AjouterAuScore">
             <input_port name="score"/>
+        </Action>
+        <Action ID="VitesseConstante">
+            <input_port name="linear_x"/>
+            <input_port name="linear_y"/>
+            <input_port name="angular_z"/>
         </Action>
         <Action ID="Aller">
             <input_port name="theta"/>
@@ -219,3 +221,18 @@
     <!-- ////////// -->
 </root>
 
+<!--Action ID="Aller" theta="90"  x="0.30" y="1.15" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="contourner les palets par l'extérieur"/>
+<Action ID="Aller" theta="180" x="0.30" y="1.05" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="se placer face aux palets"/>
+<Action ID="Aller" theta="180" x="0.05" y="1.05" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="capturer le palet vert"/>
+<Action ID="Aller" theta="270" x="0.05" y="1.05" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="tourner en directin de la zone de tri"/>
+<Action ID="Aller" theta="270" x="0.05" y="1.25" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="avancer dans la zone de tri"/>
+<Action ID="Aller" theta="180" x="0.05" y="1.25" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="se tourner en direction de la case verte"/>
+<Action ID="Aller" theta="180" x="-0.25" y="1.25" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="déposer le palet dans la case verte"/>
+<Action ID="Aller" theta="180" x="0.1" y="1.25" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="reculer pour libérer le palet"/-->
+
+    <!--Action ID="Aller" theta="90" x="0.1" y="1.05" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="remonter sur la ligne des palets"/>
+<Action ID="Aller" theta="180" x="0.1" y="1.05" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="se tourner vers les palets rouges"/>
+<Action ID="Aller" theta="180" x="-0.55" y="1.05" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="capturer les deux palets"/>
+<Action ID="Aller" theta="270" x="-0.55" y="1.05" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="se tourner en direction de la case rouge"/>
+<Action ID="Aller" theta="270" x="-0.55" y="1.25" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="pousser les palets au fond de la case rouge"/>
+<Action ID="Aller" theta="270" x="-0.55" y="1.05" y_mul="{y_mul}" theta_mul="{theta_mul}" comment="libérer les palets"/-->

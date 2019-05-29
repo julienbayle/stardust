@@ -45,6 +45,11 @@ namespace RosbagNodes
 			rosbag::Bag bag_;
 			ros::Time bag_start_time_;
 			ros::Time first_message_time_;
+			ros::Time last_message_time_;
+
+			bool is_paused_;
+			ros::Time pause_start_time_;
+			ros::Duration pause_;
 
   			boost::mutex rosbag_bag_mtx_;
 			std::atomic_bool halted_;
