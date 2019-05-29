@@ -120,6 +120,11 @@ namespace sd_hardware_interface
     std::vector<ros::Publisher> effort_publishers_;
     std::vector<ros::Publisher> speed_publishers_;
 
+    // Encoders ok
+    ros::Publisher encoders_ok_publisher_;
+    ros::Timer encoders_ok_timer_;
+    void encodersOkCallback(const ros::TimerEvent&);
+
     // Encoder type
     bool is_quadrature_encoder_;
 
