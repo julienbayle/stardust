@@ -13,6 +13,7 @@ from sd_behavior_msgs.msg import Start
 
 mode_auto = True
 battery = 0
+team = Start.YELLOW
 
 cmd_vel_publisher = None
 initialpose_publisher = None
@@ -37,16 +38,22 @@ def battery_callback(data):
     battery = data.data
 
 def encoders_ok_callback(data):
-    global lcd_publisher, battery
+    global lcd_publisher, battery, team
     string_msg = String()
+    string_msg.data = str(battery)
     if (data.data):
-        string_msg.data = str(battery) + " OK        "
+        string_msg.data = string_msg.data + " OK"
     else:
-        string_msg.data = str(battery) + " XX        "
+        string_msg.data = string_msg.data + " XX"
+    if (team == Start.PURPLE):
+        string_msg.data = string_msg.data + " PURPLE " 
+    else:
+        string_msg.data = string_msg.data + " YELLOW " 
+
     lcd_publisher.publish(string_msg)
 
 def start_callback(data):
-    global initialpose_publisher
+    global initialpose_publisher, team
 
     team = 'yellow'
     if (data.team == Start.PURPLE):
