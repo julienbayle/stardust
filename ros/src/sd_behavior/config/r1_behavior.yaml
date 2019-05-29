@@ -14,11 +14,13 @@ behavior_tree:
 
   modules:
     - GripperNodes
+    - LaserNodes
     - MoveNodes
     - ScoreNodes
     - SensorsNodes
     - StatusNodes
     - TimerNodes
+    - RosbagNodes
 
   initialpose_topic: /r1/initialpose
   move_base_topic: /r1/move_base

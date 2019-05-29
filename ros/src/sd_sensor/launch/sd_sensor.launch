@@ -27,7 +27,7 @@
 		<remap from="scan_filtered" to="laser/scan_filtered" />
 	</node>
 
-	<node pkg="sd_sensor" type="laser_pattern_detector" name="$(arg robot_ns)_laser_pattern_detector" output="screen" if="$(eval arg('robot_ns') == 'r2')">
+	<node pkg="sd_sensor" type="laser_pattern_detector" name="$(arg robot_ns)_laser_pattern_detector" output="screen">
 		<remap from="scan" to="laser/scan" />
 	</node>
 
