@@ -25,7 +25,7 @@ long GetFileSize(std::string filename)
     return rc == 0 ? stat_buf.st_size : -1;
 }
 
-bool run(std::string& path, BehaviorTreeFactory& factory) 
+bool run(std::string& path, BehaviorTreeFactory& factory, int frequency) 
 {
     try {
       auto tree = factory.createTreeFromFile(path);
@@ -48,7 +48,7 @@ bool run(std::string& path, BehaviorTreeFactory& factory)
       long loaded_size, current_size;
       loaded_size = current_size = GetFileSize(path); 
       while(loaded_size == current_size && ros::ok()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000/frequency));
         
         // execute tree
         tree.root_node->executeTick();
@@ -106,10 +106,14 @@ int main(int argc, char* argv[])
   if(bt_modules.count("TimerNodes"))      TimerNodes::registerNodes(factory);
   if(bt_modules.count("ControlNodes"))    ControlNodes::registerNodes(factory);
 
+  // Read parameters
+  std::string bt_path;
+  nh_priv.param("bt_path", bt_path, std::string("bt.xml"));
+  int frequency;
+  nh_priv.param("frequency", frequency, 20);
 
   // Run behavior tree and auto reload tree on file changed
-	std::string fn = argv[1];
-  while(run(fn, factory))
+  while(run(bt_path, factory, frequency))
   {
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }

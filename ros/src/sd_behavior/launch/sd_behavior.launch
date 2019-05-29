@@ -7,8 +7,8 @@
 		<remap from="teleop/cmd_vel" to="$(arg robot_ns)_teleop/cmd_vel"/>
 	</node>
 
-	<node pkg="sd_behavior" type="sd_behavior" name="$(arg robot_ns)_behavior_tree" output="screen"
-		args="$(find sd_behavior)/config/$(arg robot_ns)_bt.xml">
+	<node pkg="sd_behavior" type="sd_behavior" name="behavior_tree" output="screen">
+		<param name="bt_path" value="$(find sd_behavior)/config/$(arg robot_ns)_bt.xml" />
 		<param name="bags_path" value="$(find sd_behavior)/bags/" />
 	</node>
 

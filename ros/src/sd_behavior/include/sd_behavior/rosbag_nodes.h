@@ -23,6 +23,7 @@ namespace RosbagNodes
 	{
 		public:
 			PlayRosbag(const std::string& name, const BT::NodeConfiguration& config);
+			~PlayRosbag();
 
 			BT::NodeStatus tick() override;
 
@@ -42,7 +43,8 @@ namespace RosbagNodes
 			bool initialized_;
 			rosbag::View view_;
 			rosbag::Bag bag_;
-			ros::Time last_message_time_;
+			ros::Time bag_start_time_;
+			ros::Time first_message_time_;
 
   			boost::mutex rosbag_bag_mtx_;
 			std::atomic_bool halted_;

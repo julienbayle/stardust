@@ -9,8 +9,8 @@ namespace RosbagNodes
         factory.registerNodeType<RosbagNodes::PlayRosbag>("JouerUnRosbag");
         ros::NodeHandle nh_priv("~");
         nh_priv.param("bags_path", bags_path_, std::string(""));
-        //if(bags_path_.empty())
-        ROS_ERROR("Bag path not defined ! -%s-", bags_path_.c_str());
+        if(bags_path_.empty())
+            ROS_ERROR("Bag path parameter is missing.");
 
         nh_ = &nh;
     }
@@ -22,16 +22,20 @@ namespace RosbagNodes
               initialized_(false),
               playback_publishers_(),
               rosbag_bag_mtx_(),
-              bag_(),
-              last_message_time_(ros::Time::now())
+              bag_()
     { 
         halted_.store(false);
+    }
+
+    PlayRosbag::~PlayRosbag() {
+        bag_.close();
+
     }
 
 	BT::NodeStatus PlayRosbag::tick()
 	{	
         boost::mutex::scoped_lock(rosbag_bag_mtx_);
-        
+       
         if ( ! initialized_ )
         {
             std::string filename;
@@ -39,9 +43,10 @@ namespace RosbagNodes
                 throw BT::RuntimeError("nom is missing");
             
             std::string topics;
-            std::vector<std::string> rosbag_topics;
             if( !getInput("topics", topics) )
                 throw BT::RuntimeError("topics is missing");
+            
+            std::vector<std::string> rosbag_topics;
             boost::split(rosbag_topics, topics, [](char c){return c == ',';});
 
             ROS_DEBUG_STREAM_NAMED("PlayRosBag", 
@@ -49,21 +54,24 @@ namespace RosbagNodes
                 << "- Fichier : " << bags_path_ + filename
                 << " - Nb topics " << rosbag_topics.size());
 
+            rosbag::View full_view;
             bag_.open(bags_path_ + filename, rosbag::bagmode::Read);
+            full_view.addQuery(bag_);
 
-            ros::Time start_time = view_.getBeginTime();
-            ros::Time end_time = ros::TIME_MAX;
+            bag_start_time_ = full_view.getBeginTime();
+            
             rosbag::TopicQuery topic_query(rosbag_topics);
-            view_.addQuery(bag_, topic_query, start_time, end_time);
+            view_.addQuery(bag_, topic_query, bag_start_time_, ros::TIME_MAX);
 
             initialized_ = true;
         }
         
-        if (view_.size() == 0) {    
+        if (view_.size() == 0) {   
             ROS_ERROR("No messages to play on specified topics.");
             return BT::NodeStatus::FAILURE;
         }
 
+        first_message_time_ = ros::Time::now();
         BOOST_FOREACH(rosbag::MessageInstance const m, view_) {
             if( ! nh_->ok() || halted_ )
                 return  BT::NodeStatus::FAILURE;
@@ -81,14 +89,18 @@ namespace RosbagNodes
                     std::pair<std::string, ros::Publisher>(m.getTopic(), publisher));
             }
 
+            while (m.getTime() - bag_start_time_ > ros::Time::now() - first_message_time_)
+                setStatusRunningAndYield();
+            
             topic_tools::ShapeShifter::ConstPtr s = m.instantiate<topic_tools::ShapeShifter>();
             playback_publishers_[m.getTopic()].publish(s);
-            last_message_time_ = m.getTime();
-            ROS_WARN_STREAM("publish " 
+            ROS_DEBUG_STREAM("publish " 
                 << "- Topic: " << m.getTopic()
-                << "- Time: " << last_message_time_);
-            setStatusRunningAndYield();
+                << "- Time: " << ros::Time::now() - first_message_time_);
+
         }
+
+        ROS_DEBUG_STREAM("Rosbag - end of file");
         return BT::NodeStatus::SUCCESS;
 	}
 	

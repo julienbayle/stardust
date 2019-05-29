@@ -7,6 +7,7 @@ purple_y: 1.275
 purple_yaw: -1.5708 # -pi/2
 
 behavior_tree:
+  frequency: 30
 
   base_link_frame_id: r2/base_link
   odom_frame_id: r2/odom

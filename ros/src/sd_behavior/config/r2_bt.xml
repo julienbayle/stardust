@@ -2,14 +2,14 @@
     <!-- ////////// -->
     <BehaviorTree ID="BehaviorTree">
         <Sequence>
-            <Condition ID="RobotPret"/>
-            <JouerUnRosbag nom="rouge.bag" topics="r2/mobile_base_controller/cmd_vel" />
-            <!--RealParallel>
+            <Condition ID="RobotPret" />
+            <RealParallel>
                 <SubTree ID="Tirette" y_mul="y_mul" theta_mul="theta_mul" camp="camp"/>
                 <SubTree ID="Minuterie" palet_vert="palet_vert" palets_rouge="palets_rouge" palet_pente="palet_pente" />
                 <SubTree ID="Yeux" camp="camp"/>
-                <SubTree ID="Trier les palets" palet_vert="palet_vert" palets_rouge="palets_rouge" palet_pente="palet_pente" y_mul="y_mul" theta_mul="theta_mul" />
-            </RealParallel-->
+                <JouerUnRosbag nom="r1_simple.bag" topics="r2/mobile_base_controller/cmd_vel" />
+                <!--SubTree ID="Trier les palets" palet_vert="palet_vert" palets_rouge="palets_rouge" palet_pente="palet_pente" y_mul="y_mul" theta_mul="theta_mul" /-->
+            </RealParallel>
         </Sequence>
     </BehaviorTree>
     <!-- ////////// -->
