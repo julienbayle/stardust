@@ -9,7 +9,7 @@ from geometry_msgs.msg import Twist
 from geometry_msgs.msg import PoseWithCovarianceStamped
 from sd_behavior_msgs.msg import Start
 
-mode_auto = False
+mode_auto = True
 
 cmd_vel_publisher = None
 initialpose_publisher = None
