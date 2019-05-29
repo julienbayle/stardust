@@ -1,5 +1,6 @@
 #include "behaviortree_cpp/bt_factory.h"
 #include <std_msgs/UInt32.h>
+#include <std_msgs/Bool.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/Twist.h>
 #include <ros/ros.h>
@@ -49,8 +50,11 @@ namespace SensorsNodes
 	BT::NodeStatus IsVentouseCentre();
 	BT::NodeStatus IsVentouseGauche();
 
+	BT::NodeStatus AreEncodersOk();
+
 	void rosUpdate(const std_msgs::UInt32 &switches);
 	void rosUpdateMovement(const geometry_msgs::Twist &speed);
 	void rosUpdatePosition(const geometry_msgs::PoseWithCovarianceStamped &position);
+	void rosUpdateEncodersOk(const std_msgs::Bool &encodersOk);
 
 }
