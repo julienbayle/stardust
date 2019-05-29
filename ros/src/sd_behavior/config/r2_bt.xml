@@ -6,8 +6,8 @@
             <RealParallel> 
                 <SubTree ID="Tirette" y_mul="y_mul" theta_mul="theta_mul" camp="camp" tirette_presente_last_tick="tirette_presente_last_tick" />
                 <SubTree ID="Minuterie" palets_depart="palets_depart" palet_pente="palet_pente" tirette_presente_last_tick="tirette_presente_last_tick" />
+                <SubTree ID="Trier les palets" camp="camp" palets_depart="palets_depart" palet_pente="palet_pente" y_mul="y_mul" theta_mul="theta_mul" />
                 <SubTree ID="Yeux" camp="camp"/>
-                <SubTree ID="Trier les palets"  camp="camp" palets_depart="palets_depart" palet_pente="palet_pente" y_mul="y_mul" theta_mul="theta_mul" />
             </RealParallel>
         </Sequence>
     </BehaviorTree>
@@ -26,14 +26,14 @@
                         <Sequence>
                             <Condition ID="LaVoieEstLibre-Gauche"/>
                             <Action ID="DefinirPosition" theta="0" x="-0.18" y="-1.18"/>
-                            <SetBlackboard value="violet" output_key="camp"/>
+                            <SetBlackboard value="jaune" output_key="camp"/>
                             <SetBlackboard value="-1.0" output_key="y_mul"/>
                             <SetBlackboard value="-1.0" output_key="sym_theta"/>
                             <Action ms="500" ID="Attendre"/>
                         </Sequence>
                         <Sequence>
                             <Action ID="DefinirPosition" theta="0" x="-0.18" y="1.18"/>
-                            <SetBlackboard value="jaune" output_key="camp"/>
+                            <SetBlackboard value="violet" output_key="camp"/>
                             <SetBlackboard value="1.0" output_key="y_mul"/>
                             <SetBlackboard value="1.0" output_key="theta_mul"/>
                             <Action ms="500" ID="Attendre"/>
@@ -54,9 +54,6 @@
                     <Sequence>
                         <Inverter>
                             <Condition ID="TiretteLaserPresente"/>
-                        </Inverter>
-                        <Inverter>
-                            <Condition ID="MinuterieDemarree"/>
                         </Inverter>
                         <Action seconds="88" ID="LancerLaMinuterie"/>
                         <SetBlackboard value="1" output_key="palets_depart"/>
@@ -79,28 +76,32 @@
         <ForceSuccess>
             <Fallback>
                 <BlackboardCheckString return_on_mismatch="FAILURE" value_A="{palets_depart}" value_B="1">
-                    <Fallback>
-                        <Sequence>
-                            <Fallback>
-                                <BlackboardCheckString return_on_mismatch="FAILURE" value_A="{camp}" value_B="jaune">
+                    <Sequence>
+                        <Fallback>
+                            <BlackboardCheckString return_on_mismatch="FAILURE" value_A="{camp}" value_B="jaune">
+                                <Sequence>
                                     <ReactiveSequence>
                                         <Condition ID="LaVoieEstLibre-Devant"/>
                                         <JouerUnRosbag nom="r2_jaune.bag" topics="/r2/mobile_base_controller/cmd_vel" />
                                     </ReactiveSequence>
-                                </BlackboardCheckString>
-                                <BlackboardCheckString return_on_mismatch="FAILURE" value_A="{camp}" value_B="violet">
-                                    <ReactiveSequence>
-                                        <Condition ID="LaVoieEstLibre-Devant"/>
-                                        <JouerUnRosbag nom="r2_violet.bag" topics="/r2/mobile_base_controller/cmd_vel" />
-                                    </ReactiveSequence>
-                                </BlackboardCheckString>
-                            </Fallback>
-                            <Action ID="AjouterAuScore" score="18"/>
-                            <SetBlackboard value="0" output_key="palets_depart"/>
-                            <!--SetBlackboard value="1" output_key="palet_pente"/-->
-                        </Sequence>
-                        <Action ID="VitesseConstante" linear_x="0.0" linear_y="0.0" angular_z="0.0" />
-                     </Fallback>
+                                    <Action ID="AjouterAuScore" score="18"/>
+                                    <SetBlackboard value="0" output_key="palets_depart"/>
+                                </Sequence>
+                            </BlackboardCheckString>
+                            <BlackboardCheckString return_on_mismatch="FAILURE" value_A="{camp}" value_B="violet">
+                                <Sequence>
+                                <ReactiveSequence>
+                                    <Condition ID="LaVoieEstLibre-Devant"/>
+                                    <JouerUnRosbag nom="r2_violet.bag" topics="/r2/mobile_base_controller/cmd_vel" />
+                                </ReactiveSequence>
+                                <Action ID="AjouterAuScore" score="18"/>
+                                <SetBlackboard value="0" output_key="palets_depart"/>
+                                </Sequence>
+                            </BlackboardCheckString>
+                            <Action ID="VitesseConstante" linear_x="0.0" linear_y="0.0" angular_z="0.0" />
+                        </Fallback>
+                        <!--SetBlackboard value="1" output_key="palet_pente"/-->
+                    </Sequence>
                 </BlackboardCheckString>
                 <BlackboardCheckString return_on_mismatch="FAILURE" value_A="{palet_pente}" value_B="1">
                     <Sequence>

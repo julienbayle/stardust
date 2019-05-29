@@ -75,7 +75,7 @@ namespace RosbagNodes
         }
 
         if( ! is_paused_) {
-            ROS_WARN_STREAM("Start rosbag " 
+            ROS_DEBUG_STREAM("Start rosbag " 
                     << "- Total duration: " << view_.getEndTime() - view_.getBeginTime());
 
             first_message_time_ = last_message_time_ = ros::Time::now();
@@ -88,7 +88,7 @@ namespace RosbagNodes
                 pause_ += ros::Time::now() - pause_start_time_;
                 is_paused_ = false;
 
-                ROS_WARN_STREAM("Play rosbag after a pause" 
+                ROS_DEBUG_STREAM("Play rosbag after a pause" 
                     << "- Time: " << (ros::Time::now() - first_message_time_) - pause_);
             }
 
@@ -130,7 +130,7 @@ namespace RosbagNodes
                 
                 topic_tools::ShapeShifter::ConstPtr s = m.instantiate<topic_tools::ShapeShifter>();
                 playback_publishers_[m.getTopic()].publish(s);
-                ROS_WARN_STREAM("publish " 
+                ROS_DEBUG_STREAM("publish " 
                     << "- Topic: " << m.getTopic()
                     << "- Time: " << m.getTime() - bag_start_time_);
 
@@ -140,7 +140,7 @@ namespace RosbagNodes
         }
 
         pause_ = ros::Duration(0);
-        ROS_WARN_STREAM("Rosbag - end of file");
+        ROS_DEBUG_STREAM("Rosbag - end of file");
         return BT::NodeStatus::SUCCESS;
 	}
 	
@@ -149,7 +149,7 @@ namespace RosbagNodes
 		pause_start_time_ = last_message_time_;
         is_paused_ = true;
         halted_.store(true);
-        ROS_WARN_STREAM("Pause rosbag" 
+        ROS_DEBUG_STREAM("Pause rosbag" 
             << "- Time: " << (pause_start_time_ - first_message_time_) - pause_);
 	}
 
