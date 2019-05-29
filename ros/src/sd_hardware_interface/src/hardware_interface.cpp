@@ -12,6 +12,7 @@
 #include <rosparam_shortcuts/rosparam_shortcuts.h>
 #include <std_msgs/Int16.h>
 #include <std_msgs/Int32.h>
+#include <std_msgs/Bool.h>
 #include <ros/ros.h>
 
 namespace sd_hardware_interface
@@ -188,9 +189,26 @@ void HWInterface::init()
   registerInterface(&effort_joint_interface_);
   registerInterface(&velocity_joint_interface_);
 
+  // Encoders ok
+  encoders_ok_publisher_ = nh_.advertise<std_msgs::Bool>("encoders_ok", 1, true);
+  encoders_ok_timer_ = nh_.createTimer(ros::Duration(0.1), &HWInterface::encodersOkCallback, this);
+
   ROS_INFO_STREAM_NAMED(name_, "HWInterface Ready.");
 }
 
+void HWInterface::encodersOkCallback(const ros::TimerEvent&)
+{
+  bool is_ok = true;
+
+  for (std::size_t i = 0; i < num_joints_; ++i)
+  {
+    is_ok &= joint_encoders_[i]->isAlive();
+  }
+
+  std_msgs::Bool bool_msg;
+  bool_msg.data = is_ok;
+  encoders_ok_publisher_.publish(bool_msg);
+}
 
 void HWInterface::printStatus()
 {
