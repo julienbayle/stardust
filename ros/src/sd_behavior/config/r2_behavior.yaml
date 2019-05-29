@@ -6,21 +6,25 @@ purple_x: -0.250
 purple_y: 1.275
 purple_yaw: -1.5708 # -pi/2
 
-base_link_frame_id: r2/base_link
-odom_frame_id: r2/odom
-map_frame_id: map
+behavior_tree:
+  frequency: 30
 
-bt_modules:
-  - EyeNodes
-  - LaserNodes
-  - MoveNodes
-  - ScoreNodes
-  - StatusNodes
-  - TimerNodes
-  - ControlNodes
+  base_link_frame_id: r2/base_link
+  odom_frame_id: r2/odom
+  map_frame_id: map
 
-bt_max_load_average: 4
-bt_laser_detector_topic: /r2/laser_pattern_detector
-bt_initialpose_topic: /r2/initialpose
-bt_move_base_topic: /r2/move_base
-bt_cmd_vel_topic: /r2/auto_cmd_vel
+  modules:
+    - EyeNodes
+    - LaserNodes
+    - MoveNodes
+    - ScoreNodes
+    - StatusNodes
+    - RosbagNodes
+    - TimerNodes
+    - ControlNodes
+
+  max_load_average: 4
+  laser_detector_topic: /r2/laser_pattern_detector
+  initialpose_topic: /r2/initialpose
+  move_base_topic: /r2/move_base
+  cmd_vel_topic: /r2/auto_cmd_vel

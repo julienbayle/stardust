@@ -7,13 +7,15 @@
 	
 	<node name="$(arg robot_ns)_map_server" pkg="map_server" type="map_server" args="$(find sd_localization)/config/amcl_$(arg location)_map.yaml"/>
 
-	<node pkg="imu_filter_madgwick" type="imu_filter_node" name="$(arg robot_ns)_imu_filter_madgwick" />
+	<node pkg="imu_filter_madgwick" type="imu_filter_node" name="$(arg robot_ns)_imu_filter_madgwick" if="$(eval arg('robot_ns') == 'r2')" />
 
-	<node pkg="robot_localization" type="ukf_localization_node" name="$(arg robot_ns)_localization_odom" clear_params="true" output="screen">
+	<node pkg="robot_localization" type="ukf_localization_node" name="$(arg robot_ns)_localization_odom" clear_params="true" output="screen" if="$(eval arg('robot_ns') == 'r2')" />
+
+	<node pkg="sd_localization" type="odom_to_map" name="$(arg robot_ns)_amcl" output="screen" if="$(eval arg('robot_ns') == 'r2')">
+		<remap from="odom" to="odometry/filtered"/>"
 	</node>
 
-	<node pkg="sd_localization" type="odom_to_map" name="$(arg robot_ns)_amcl" output="screen">
-	<!--node pkg="amcl" type="amcl" name="$(arg robot_ns)_amcl" output="screen"-->
+  <node pkg="amcl" type="amcl" name="$(arg robot_ns)_amcl" output="screen" if="$(eval arg('robot_ns') == 'r1')">
 		<remap from="scan" to="laser/scan_filtered"/>
 		<remap from="odom" to="odometry/filtered"/>"
 		

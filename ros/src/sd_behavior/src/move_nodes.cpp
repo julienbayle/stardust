@@ -20,9 +20,10 @@ namespace MoveNodes
         const BT::NodeConfiguration& config) :
         SyncActionNode(name, config) 
     {
-        std::string bt_initialpose_topic;
-        nh_->param("bt_initialpose_topic", bt_initialpose_topic, std::string("initialpose"));
-        initialpose_pub = nh_->advertise<geometry_msgs::PoseWithCovarianceStamped>(bt_initialpose_topic, 1);
+        ros::NodeHandle nh_priv("~");
+        std::string initialpose_topic;
+        nh_priv.param("initialpose_topic", initialpose_topic, std::string("initialpose"));
+        initialpose_pub = nh_->advertise<geometry_msgs::PoseWithCovarianceStamped>(initialpose_topic, 1);
     }
 
     BT::NodeStatus SetPositionNode::tick()
@@ -67,9 +68,10 @@ namespace MoveNodes
         const BT::NodeConfiguration& config) :
         SyncActionNode(name, config) 
     {
-        std::string bt_cmd_vel_topic;
-        nh_->param("bt_cmd_vel_topic", bt_cmd_vel_topic, std::string("/cmd_vel"));
-        cmd_pub = nh_->advertise<geometry_msgs::Twist>(bt_cmd_vel_topic, 10);
+        ros::NodeHandle nh_priv("~");
+        std::string cmd_vel_topic;
+        nh_priv.param("cmd_vel_topic", cmd_vel_topic, std::string("/cmd_vel"));
+        cmd_pub = nh_->advertise<geometry_msgs::Twist>(cmd_vel_topic, 10);
     }
 
     BT::NodeStatus ConstantVelocityNode::tick()
@@ -98,13 +100,14 @@ namespace MoveNodes
         const BT::NodeConfiguration& config)
         : CoroActionNode(name,config)
     {
-        std::string bt_move_base_topic;
-        nh_->param("bt_move_base_topic", bt_move_base_topic, std::string("move_base"));
+        ros::NodeHandle nh_priv("~");
+        std::string move_base_topic;
+        nh_priv.param("move_base_topic", move_base_topic, std::string("move_base"));
 
         ROS_DEBUG_STREAM_NAMED("GotoNode",  
-            "Init a goto node with : " << bt_move_base_topic);
+            "Init a goto node with : " << move_base_topic);
 
-        ac = new MoveBaseClient(*nh_, bt_move_base_topic, true);
+        ac = new MoveBaseClient(*nh_, move_base_topic, true);
     }
 
     BT::NodeStatus GotoNode::tick()

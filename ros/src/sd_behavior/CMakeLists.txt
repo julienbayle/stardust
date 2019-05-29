@@ -12,6 +12,9 @@ find_package(catkin REQUIRED COMPONENTS
   actionlib
   tf
   sd_sensor_msgs
+  rosbag
+  rosbag_storage
+  topic_tools
 )
 
 catkin_package(
@@ -36,7 +39,7 @@ add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EX
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${BEHAVIOR_TREE_LIBRARY})
 add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-add_library(${PROJECT_NAME}_nodes STATIC 
+add_library(${PROJECT_NAME}_nodes 
   src/gripper_nodes.cpp
   src/laser_nodes.cpp
   src/move_nodes.cpp
@@ -44,6 +47,7 @@ add_library(${PROJECT_NAME}_nodes STATIC
   src/sensors_nodes.cpp
   src/status_nodes.cpp
   src/timer_nodes.cpp
+  src/rosbag_nodes.cpp
   src/eye_nodes.cpp
   src/control_nodes.cpp)
 add_dependencies(${PROJECT_NAME}_nodes ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -79,5 +83,6 @@ install(
   DIRECTORY
     config
     launch
+    bags
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )

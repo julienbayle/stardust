@@ -13,9 +13,10 @@ void LaserNodes::registerNodes(BT::BehaviorTreeFactory& factory, ros::NodeHandle
 
     factory.registerSimpleCondition("TiretteLaserPresente", std::bind(LaserNodes::IsLaserTirettePresent));
 
-    std::string bt_laser_detector_topic;
-    nh.param("bt_laser_detector_topic", bt_laser_detector_topic, std::string("laser_pattern_detector"));
-	laser_detector_sub_ = nh.subscribe(bt_laser_detector_topic, 1, LaserNodes::rosUpdate);
+    ros::NodeHandle nh_priv("~");
+    std::string laser_detector_topic;
+    nh_priv.param("laser_detector_topic", laser_detector_topic, std::string("laser_pattern_detector"));
+	laser_detector_sub_ = nh.subscribe(laser_detector_topic, 1, LaserNodes::rosUpdate);
     sd_sensor_msgs::LaserPatternDetector initial_detector;
     initial_detector.isTirette = false;
     last_detector_ = initial_detector;

@@ -173,7 +173,7 @@
     <joint name="imu_to_body" type="fixed">
         <parent link="body_link"/>
         <child link="imu_link"/>
-        <origin xyz="${imu_x} ${imu_y} ${imu_z}" rpy="0 0 0"/>
+        <origin xyz="${imu_x} ${imu_y} ${imu_z}" rpy="0 ${pi} 0"/>
     </joint>
 
     <xacro:include filename="$(find ydlidar)/urdf/ydlidar.urdf"/>

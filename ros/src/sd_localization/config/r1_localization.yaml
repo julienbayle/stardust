@@ -117,7 +117,7 @@ r1_localization_odom:
                   0.0 ,0.0, 0.0]
 
   # Use this filter to publish odom TF     
-  publish_tf: true
+  publish_tf: false
   publish_acceleration: false
   print_diagnostics: false
   

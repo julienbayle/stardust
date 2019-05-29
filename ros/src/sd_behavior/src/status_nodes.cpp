@@ -14,19 +14,20 @@ double max_load_average_;
 
 void StatusNodes::registerNodes(BT::BehaviorTreeFactory& factory, ros::NodeHandle& nh)
 {
-	nh.param("base_link_frame_id", base_link_frame_id_, std::string("base_link"));
-    nh.param("odom_frame_id", odom_frame_id_, std::string("odom"));
-    nh.param("map_frame_id", map_frame_id_, std::string("map"));
+	ros::NodeHandle nh_priv("~");
+    nh_priv.param("base_link_frame_id", base_link_frame_id_, std::string("base_link"));
+    nh_priv.param("odom_frame_id", odom_frame_id_, std::string("odom"));
+    nh_priv.param("map_frame_id", map_frame_id_, std::string("map"));
 
     listener_ = new tf::TransformListener(nh);
 
     std::string bt_move_base_topic;
-    nh.param("bt_move_base_topic", bt_move_base_topic, std::string("move_base"));
+    nh_priv.param("move_base_topic", bt_move_base_topic, std::string("move_base"));
     ac_ = new MoveBaseClient(nh, bt_move_base_topic, true);
 
     factory.registerSimpleCondition("RobotPret", std::bind(StatusNodes::IsReady));
 
-    nh.param("bt_max_load_average", max_load_average_, 3.0);
+    nh_priv.param("max_load_average", max_load_average_, 3.0);
     factory.registerSimpleCondition("RobotEnBonneSante", std::bind(StatusNodes::IsHealthy));
 }
 

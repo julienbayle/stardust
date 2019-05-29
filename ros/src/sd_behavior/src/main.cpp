@@ -12,6 +12,7 @@
 #include "sd_behavior/score_nodes.h"
 #include "sd_behavior/sensors_nodes.h"
 #include "sd_behavior/status_nodes.h"
+#include "sd_behavior/rosbag_nodes.h"
 #include "sd_behavior/timer_nodes.h"
 #include "sd_behavior/control_nodes.h"
 
@@ -24,7 +25,7 @@ long GetFileSize(std::string filename)
     return rc == 0 ? stat_buf.st_size : -1;
 }
 
-bool run(std::string& path, BehaviorTreeFactory& factory) 
+bool run(std::string& path, BehaviorTreeFactory& factory, int frequency) 
 {
     try {
       auto tree = factory.createTreeFromFile(path);
@@ -47,7 +48,7 @@ bool run(std::string& path, BehaviorTreeFactory& factory)
       long loaded_size, current_size;
       loaded_size = current_size = GetFileSize(path); 
       while(loaded_size == current_size && ros::ok()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000/frequency));
         
         // execute tree
         tree.root_node->executeTick();
@@ -75,8 +76,9 @@ bool run(std::string& path, BehaviorTreeFactory& factory)
 
 int main(int argc, char* argv[])
 {
-  ros::init(argc, argv, "robot_behavior");
+  ros::init(argc, argv, "behavior_tree");
   ros::NodeHandle nh;
+  ros::NodeHandle nh_priv("~");
   ros::CallbackQueue queue;
 	nh.setCallbackQueue(&queue);
 
@@ -90,7 +92,7 @@ int main(int argc, char* argv[])
 
   // Load modules
   std::vector< std::string > bt_modules_array;
-  nh.param("bt_modules", bt_modules_array, std::vector< std::string >());
+  nh_priv.param("modules", bt_modules_array, std::vector< std::string >());
   std::set<std::string> bt_modules(begin(bt_modules_array), end(bt_modules_array));
 
   if(bt_modules.count("EyeNodes"))        EyeNodes::registerNodes(factory, nh);
@@ -100,12 +102,18 @@ int main(int argc, char* argv[])
   if(bt_modules.count("ScoreNodes"))      ScoreNodes::registerNodes(factory, nh);
   if(bt_modules.count("SensorsNodes"))    SensorsNodes::registerNodes(factory, nh);
   if(bt_modules.count("StatusNodes"))     StatusNodes::registerNodes(factory, nh);
+  if(bt_modules.count("RosbagNodes"))     RosbagNodes::registerNodes(factory, nh);
   if(bt_modules.count("TimerNodes"))      TimerNodes::registerNodes(factory);
   if(bt_modules.count("ControlNodes"))    ControlNodes::registerNodes(factory);
 
+  // Read parameters
+  std::string bt_path;
+  nh_priv.param("bt_path", bt_path, std::string("bt.xml"));
+  int frequency;
+  nh_priv.param("frequency", frequency, 20);
+
   // Run behavior tree and auto reload tree on file changed
-	std::string fn = argv[1];
-  while(run(fn, factory))
+  while(run(bt_path, factory, frequency))
   {
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }

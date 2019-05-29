@@ -113,7 +113,7 @@ namespace sd_sensor {
         
         if((i+1) % increments == 0)
         {
-          mesure += good_increments != increments ? std::to_string(good_increments) : (sum > threshold * increments ? "H" : "L");
+          mesure += good_increments == 0 ? "-" /*std::to_string(good_increments)*/ : (sum > threshold * increments ? "H" : "L");
           sum = good_increments = 0;
         }        
       }
