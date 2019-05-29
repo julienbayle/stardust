@@ -22,6 +22,7 @@ behavior_tree:
     - TimerNodes
     - RosbagNodes
 
+  laser_detector_topic: /r1/laser_pattern_detector
   initialpose_topic: /r1/initialpose
   move_base_topic: /r1/move_base
   cmd_vel_topic: /r1/auto_cmd_vel
