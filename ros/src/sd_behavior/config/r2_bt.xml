@@ -86,7 +86,7 @@
                                         <Condition ID="LaVoieEstLibre-Devant"/>
                                         <JouerUnRosbag nom="r2_jaune.bag" topics="/r2/mobile_base_controller/cmd_vel" />
                                     </ReactiveSequence>
-                                    <Action ID="AjouterAuScore" score="18"/>
+                                    <Action ID="AjouterAuScore" score="41"/>
                                     <SetBlackboard value="0" output_key="palets_depart"/>
                                 </Sequence>
                             </BlackboardCheckString>
@@ -96,7 +96,7 @@
                                     <Condition ID="LaVoieEstLibre-Devant"/>
                                     <JouerUnRosbag nom="r2_violet.bag" topics="/r2/mobile_base_controller/cmd_vel" />
                                 </ReactiveSequence>
-                                <Action ID="AjouterAuScore" score="18"/>
+                                <Action ID="AjouterAuScore" score="41"/>
                                 <SetBlackboard value="0" output_key="palets_depart"/>
                                 </Sequence>
                             </BlackboardCheckString>
