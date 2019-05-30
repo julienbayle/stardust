@@ -7,6 +7,7 @@ namespace RosbagNodes
     void registerNodes(BT::BehaviorTreeFactory& factory, ros::NodeHandle& nh) 
     {
         factory.registerNodeType<RosbagNodes::PlayRosbag>("JouerUnRosbag");
+        factory.registerNodeType<RosbagNodes::ResetRosbags>("RestartRosbags");
         ros::NodeHandle nh_priv("~");
         nh_priv.param("bags_path", bags_path_, std::string(""));
         if(bags_path_.empty())
@@ -74,7 +75,8 @@ namespace RosbagNodes
             return BT::NodeStatus::FAILURE;
         }
 
-        if( ! is_paused_) {
+        // First execution or tick after a reset, set initial start replay time
+        if( ! is_paused_ || mustReset()) {
             ROS_DEBUG_STREAM("Start rosbag " 
                     << "- Total duration: " << view_.getEndTime() - view_.getBeginTime());
 
@@ -92,7 +94,7 @@ namespace RosbagNodes
                     << "- Time: " << (ros::Time::now() - first_message_time_) - pause_);
             }
 
-            if( ! nh_->ok()) {
+            if( ! nh_->ok() || mustReset()) {
                 return  BT::NodeStatus::FAILURE;
             }
 
@@ -143,6 +145,10 @@ namespace RosbagNodes
         ROS_DEBUG_STREAM("Rosbag - end of file");
         return BT::NodeStatus::SUCCESS;
 	}
+
+    bool PlayRosbag::mustReset() {
+        return first_message_time_ < last_rosbag_reset_;
+    }
 	
 	void PlayRosbag::halt() 
 	{
@@ -152,5 +158,19 @@ namespace RosbagNodes
         ROS_DEBUG_STREAM("Pause rosbag" 
             << "- Time: " << (pause_start_time_ - first_message_time_) - pause_);
 	}
+
+
+    ResetRosbags::ResetRosbags(
+        const std::string& name, 
+        const BT::NodeConfiguration& config) 
+            : SyncActionNode(name, config)
+    { 
+        last_rosbag_reset_ = ros::Time::now();
+    }
+
+    BT::NodeStatus ResetRosbags::tick()
+    {
+        last_rosbag_reset_ = ros::Time::now();
+    }
 
 }

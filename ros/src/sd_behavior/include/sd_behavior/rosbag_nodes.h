@@ -18,6 +18,8 @@ namespace RosbagNodes
 
 	// Root directory for bag files
 	static std::string bags_path_;
+
+	static ros::Time last_rosbag_reset_;
 	
     class PlayRosbag : public BT::CoroActionNode
 	{
@@ -26,6 +28,8 @@ namespace RosbagNodes
 			~PlayRosbag();
 
 			BT::NodeStatus tick() override;
+
+			bool mustReset();
 
 			virtual void halt() override;
 			
@@ -53,6 +57,19 @@ namespace RosbagNodes
 
   			boost::mutex rosbag_bag_mtx_;
 			std::atomic_bool halted_;
+	};	
+
+	class ResetRosbags : public BT::SyncActionNode
+	{
+		public:
+			ResetRosbags(const std::string& name, const BT::NodeConfiguration& config);
+
+			BT::NodeStatus tick() override;
+
+		    static BT::PortsList providedPorts()
+		    {
+			   	return { };
+			}
 	};	
 }
 #endif //SD_ROSBAG_NODES_H
