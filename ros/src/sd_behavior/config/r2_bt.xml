@@ -23,6 +23,7 @@
                     <Action ID="VitesseConstante" linear_x="0.0" linear_y="0.0" angular_z="0.0" />
                     <Action ID="DefinirLeScore" score="40"/>
                     <Action ID="ArreterLaMinuterie"/> 
+                    <Action ID="RestartRosbags" />
                     <SetBlackboard value="0" output_key="palets_depart"/>
                     <SetBlackboard value="0" output_key="palet_pente"/>
                     <Fallback>
@@ -70,7 +71,7 @@
                     <SetBlackboard value="0" output_key="palet_pente"/>
                     <SetBlackboard value="0" output_key="palet_chaos"/>
                     <Action ID="Arreter le robot"/>
-                    <Action ID="VitesseConstante" linear_x="0.0" linear_y="0.0" angular_z="0.0" />
+                    <!--Action ID="VitesseConstante" linear_x="0.0" linear_y="0.0" angular_z="0.0" /-->
                 </Sequence>
             </Fallback>
         </ForceSuccess>
@@ -210,6 +211,7 @@
             <input_port name="linear_y"/>
             <input_port name="angular_z"/>
         </Action>
+        <Action ID="RestartRosbags" />
         <Action ID="Aller">
             <input_port name="theta"/>
             <input_port name="x"/>
