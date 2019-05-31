@@ -147,7 +147,13 @@ namespace RosbagNodes
 	}
 
     bool PlayRosbag::mustReset() {
-        return first_message_time_ < last_rosbag_reset_;
+        bool must_reset = first_message_time_ < last_rosbag_reset_;
+
+        if (must_reset) 
+        {
+            ROS_WARN("Rosbag reset");
+        } 
+        return must_reset;
     }
 	
 	void PlayRosbag::halt() 
